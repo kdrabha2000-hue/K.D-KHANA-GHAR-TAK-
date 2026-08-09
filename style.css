@@ -26,7 +26,8 @@ input, textarea, select { width: 100%; padding: 10px; margin: 5px 0; background:
 .page { display: none; }
 .page.active { display: block; }
 
-.banner { background: linear-gradient(45deg, #d32f2f, #880e4f); padding: 12px; border-radius: 8px; font-weight: bold; font-size: 0.85rem; margin-bottom: 12px; }
+.banner-slider { overflow: hidden; border-radius: 8px; margin-bottom: 12px; }
+.banner { background: linear-gradient(45deg, #d32f2f, #880e4f); padding: 12px; font-weight: bold; font-size: 0.85rem; text-align: center; transition: all 0.5s ease-in-out; }
 
 .category-scroll { display: flex; overflow-x: auto; gap: 8px; padding-bottom: 10px; }
 .cat-chip { background: #252525; padding: 6px 14px; border-radius: 20px; font-size: 0.75rem; white-space: nowrap; cursor: pointer; border: 1px solid var(--border); }
@@ -51,3 +52,4 @@ input, textarea, select { width: 100%; padding: 10px; margin: 5px 0; background:
 #admin-panel { display: none; background: #251212; padding: 15px; margin-top: 20px; border: 2px dashed var(--primary-red); border-radius: 8px; }
 .admin-stats { display: flex; justify-content: space-between; background: #181818; padding: 10px; border-radius: 6px; font-size: 0.8rem; margin-bottom: 15px; }
 .order-card { background: var(--card-dark); padding: 12px; border-radius: 6px; margin-bottom: 10px; border-left: 4px solid var(--primary-red); font-size: 0.85rem; }
+.admin-item-row { display: flex; justify-content: space-between; align-items: center; background: #181818; padding: 8px; margin-bottom: 5px; border-radius: 4px; font-size: 0.8rem; }
