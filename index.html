@@ -4,23 +4,14 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>K.D KA KHANA GHAR TAK</title>
-
-  <!-- SwiperJS CSS for Banners -->
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css" />
-
   <style>
     * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
     body { background-color: #121212; color: #ffffff; padding-bottom: 80px; }
-    
-    /* Top Header */
     .header { background: #e50914; padding: 15px; text-align: center; font-size: 18px; font-weight: bold; position: sticky; top: 0; z-index: 100; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 2px 10px rgba(0,0,0,0.5); }
     .cart-top { font-size: 22px; cursor: pointer; }
-    
-    /* Auto Slider Banner */
     .swiper { width: 95%; height: 180px; margin: 12px auto; border-radius: 12px; overflow: hidden; }
     .swiper-slide img { width: 100%; height: 100%; object-fit: cover; }
-    
-    /* Food Cards Layout */
     .container { padding: 12px; }
     .food-card { background: #1e1e1e; border-radius: 10px; padding: 12px; margin-bottom: 12px; display: flex; justify-content: space-between; align-items: center; border: 1px solid #2a2a2a; }
     .food-details { display: flex; align-items: center; }
@@ -29,18 +20,12 @@
     .food-info p { color: #2ed573; font-weight: bold; }
     .add-btn { background: #e50914; color: #fff; border: none; padding: 8px 16px; border-radius: 6px; font-weight: bold; cursor: pointer; }
     .heart-btn { background: none; border: none; color: #ff4757; font-size: 20px; cursor: pointer; margin-right: 10px; }
-    
-    /* Panels */
     .panel { display: none; background: #1e1e1e; padding: 20px; margin: 15px; border-radius: 10px; border: 1px solid #333; }
     .panel.active { display: block; }
     input, textarea, select { width: 100%; padding: 10px; margin: 8px 0; background: #2b2b2b; color: white; border: 1px solid #444; border-radius: 5px; }
     .submit-btn { width: 100%; background: #e50914; color: white; padding: 10px; border: none; border-radius: 5px; font-weight: bold; margin-top: 10px; cursor: pointer; }
-    
-    /* Order Cards */
     .order-card { background: #2a2a2a; padding: 12px; border-radius: 8px; margin-bottom: 12px; border-left: 4px solid #2ed573; }
     .status-badge { display: inline-block; padding: 3px 8px; border-radius: 4px; font-size: 11px; font-weight: bold; background: #e50914; color: white; margin-top: 4px; }
-    
-    /* Bottom Navigation Bar */
     .nav-bar { position: fixed; bottom: 0; left: 0; right: 0; background: #1a1a1a; display: flex; justify-content: space-around; padding: 10px 0; border-top: 1px solid #333; z-index: 100; }
     .nav-item { color: #aaa; text-decoration: none; font-size: 12px; text-align: center; cursor: pointer; }
     .nav-item.active { color: #e50914; font-weight: bold; }
@@ -48,13 +33,11 @@
 </head>
 <body>
 
-  <!-- Top Header -->
   <div class="header">
     <span>K.D KA KHANA GHAR TAK</span>
     <span class="cart-top" onclick="window.showTab('cartPanel')">🛒</span>
   </div>
 
-  <!-- Customer Home View -->
   <div id="customerView" style="display:block;">
     <div class="swiper mySwiper">
       <div class="swiper-wrapper">
@@ -69,13 +52,11 @@
     </div>
   </div>
 
-  <!-- Watchlist Panel -->
   <div id="wishlistPanel" class="panel">
     <h3 style="color:#ff4757;">❤️ My Watchlist</h3>
     <div id="wishlistItems" style="margin-top:10px;"></div>
   </div>
 
-  <!-- Cart Panel -->
   <div id="cartPanel" class="panel">
     <h3 style="color:#ff4757;">🛒 Your Shopping Cart</h3>
     <div id="cartItemsList" style="margin-top:10px;"></div>
@@ -88,7 +69,6 @@
     <button class="submit-btn" onclick="window.placeOrder()">PLACE ORDER NOW</button>
   </div>
 
-  <!-- Account / Login / My Orders Panel -->
   <div id="authPanel" class="panel">
     <div id="loginForm">
       <h3>Customer / Admin Login</h3>
@@ -103,7 +83,6 @@
     </div>
   </div>
 
-  <!-- Admin Panel -->
   <div id="adminPanel" class="panel">
     <h3 style="color:#2ed573;">🛠️ Secret Admin Control Panel</h3>
     <p style="margin-top:5px; font-size:12px; color:#aaa;">Boss: kdrabha2000@gmail.com</p>
@@ -120,7 +99,6 @@
     <button class="submit-btn" onclick="window.addFoodToMenu()">Add To Menu</button>
   </div>
 
-  <!-- Bottom Navigation Bar -->
   <div class="nav-bar">
     <div class="nav-item active" onclick="window.showTab('customerView')">🏠<br>Home</div>
     <div class="nav-item" onclick="window.showTab('wishlistPanel')">❤️<br>Watchlist</div>
@@ -129,16 +107,13 @@
     <div class="nav-item" id="adminNavTab" style="display:none;" onclick="window.showTab('adminPanel')">⚙️<br>Admin</div>
   </div>
 
-  <!-- SwiperJS Script -->
   <script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
 
-  <!-- Firebase & App Script -->
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
     import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
     import { getFirestore, collection, addDoc, getDocs, doc, updateDoc, query, where } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
-    // Firebase Configuration
     const firebaseConfig = {
       apiKey: "AIzaSyDDTFzD8eaxS6hsQ_N5akOWRNixyZdjkSo",
       authDomain: "kd-ka-khana-ghar-tak.firebaseapp.com",
@@ -148,7 +123,6 @@
       appId: "1:69933070653:web:f9b93ba827d794bb376d54"
     };
 
-    // Initialize Firebase
     const app = initializeApp(firebaseConfig);
     const auth = getAuth(app);
     const db = getFirestore(app);
@@ -157,7 +131,6 @@
     let cart = [];
     let wishlist = JSON.parse(localStorage.getItem('kd_wishlist')) || [];
 
-    // Global UI Tab Switching Function
     window.showTab = function(tabId) {
       document.getElementById('customerView').style.display = 'none';
       document.getElementById('wishlistPanel').classList.remove('active');
@@ -172,7 +145,6 @@
       }
     };
 
-    // Auth Change Tracking
     onAuthStateChanged(auth, (user) => {
       if (user) {
         document.getElementById('loginForm').style.display = 'none';
@@ -212,7 +184,6 @@
       }
     };
 
-    // Load Food Menu from Firestore
     const loadMenu = async () => {
       try {
         const querySnapshot = await getDocs(collection(db, "menu"));
@@ -405,7 +376,6 @@
       }
     }
 
-    // Initialize Menu & Swiper
     loadMenu();
     renderWishlist();
 
