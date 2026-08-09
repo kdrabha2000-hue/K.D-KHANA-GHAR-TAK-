@@ -5,141 +5,116 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>KD KA KHANA GHAR TAK</title>
   <style>
-    * { box-sizing: border-box; margin: 0; padding: 0; }
-    body { font-family: Arial, sans-serif; background-color: #121212; color: #ffffff; padding-bottom: 70px; }
-    header { background-color: #8b0000; padding: 15px; display: flex; justify-content: space-between; align-items: center; position: sticky; top: 0; z-index: 100; }
-    .header-title { font-weight: bold; font-size: 1.1rem; }
-    .cart-badge { background: #fff; color: #8b0000; padding: 2px 8px; border-radius: 12px; font-weight: bold; }
+    * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
+    body { background-color: #0d0d0d; color: #ffffff; padding-bottom: 70px; }
     
-    .delivery-notice { background: #ff8c00; color: #000; text-align: center; padding: 5px; font-weight: bold; font-size: 12px; }
+    /* Premium Header */
+    header { background: #8b0000; padding: 12px 15px; display: flex; justify-content: space-between; align-items: center; position: sticky; top: 0; z-index: 100; box-shadow: 0 2px 10px rgba(0,0,0,0.8); }
+    .header-title { font-weight: bold; font-size: 1.1rem; color: #fff; letter-spacing: 0.5px; }
+    .cart-badge { background: #fff; color: #8b0000; padding: 2px 8px; border-radius: 12px; font-weight: bold; font-size: 12px; }
 
-    /* Live Offer Banner Slider */
-    .banner-container { width: 100%; height: 160px; position: relative; overflow: hidden; }
-    .banner-slide { width: 100%; height: 100%; position: absolute; opacity: 0; transition: opacity 0.8s ease-in-out; display: flex; flex-direction: column; justify-content: center; align-items: center; text-align: center; background-size: cover; background-position: center; color: #fff; text-shadow: 2px 2px 5px #000; }
-    .banner-slide.active { opacity: 1; }
-    .slide-1 { background-image: linear-gradient(rgba(0,0,0,0.5), rgba(0,0,0,0.5)), url('https://images.unsplash.com/photo-1555396273-367ea4eb4db5?w=500'); }
-    .slide-2 { background-image: linear-gradient(rgba(0,0,0,0.5), rgba(0,0,0,0.5)), url('https://images.unsplash.com/photo-1565299624946-b28f40a0ae38?w=500'); }
-    
-    .section-title { margin: 15px 10px 5px 10px; font-size: 1.1rem; color: #ff8c00; border-bottom: 1px solid #333; padding-bottom: 5px; }
-    .page { display: none; padding: 10px; }
+    /* Notice Bar */
+    .delivery-notice { background: linear-gradient(90deg, #d32f2f, #ff8c00); color: #fff; text-align: center; padding: 6px; font-weight: 600; font-size: 12px; }
+
+    /* Category Filter Pills (Like Screenshot) */
+    .category-tabs { display: flex; overflow-x: auto; padding: 10px 15px; gap: 8px; background: #141414; border-bottom: 1px solid #222; }
+    .category-tabs::-webkit-scrollbar { display: none; }
+    .tab-btn { background: #222; color: #ccc; border: 1px solid #333; padding: 6px 14px; border-radius: 20px; font-size: 12px; font-weight: bold; white-space: nowrap; cursor: pointer; }
+    .tab-btn.active { background: #8b0000; color: #fff; border-color: #e50914; }
+
+    .page { display: none; padding: 12px; }
     .page.active { display: block; }
 
-    /* Food Cards */
-    .food-card { background: #1e1e1e; border-radius: 8px; padding: 10px; margin: 8px 0; display: flex; align-items: center; justify-content: space-between; }
-    .food-img { width: 70px; height: 70px; border-radius: 8px; object-fit: cover; margin-right: 12px; }
+    /* Food Cards (S&A Style) */
+    .food-card { background: #181818; border-radius: 12px; padding: 10px; margin-bottom: 12px; display: flex; align-items: center; justify-content: space-between; border: 1px solid #262626; box-shadow: 0 4px 8px rgba(0,0,0,0.4); }
+    .food-img { width: 75px; height: 75px; border-radius: 10px; object-fit: cover; margin-right: 12px; }
     .food-info { flex: 1; }
-    .food-info h3 { font-size: 0.95rem; }
-    .food-info p { color: #ff8c00; font-weight: bold; font-size: 0.9rem; margin-top: 3px; }
-    .btn { background: #8b0000; color: white; border: none; padding: 8px 12px; border-radius: 5px; cursor: pointer; font-weight: bold; text-decoration: none; display: inline-block; }
+    .food-info h3 { font-size: 0.95rem; font-weight: 600; color: #eee; }
+    .food-info p { color: #ff4d4d; font-weight: bold; font-size: 0.9rem; margin-top: 4px; }
+    
+    .btn-add { background: #8b0000; color: white; border: none; padding: 6px 14px; border-radius: 6px; font-weight: bold; font-size: 12px; cursor: pointer; }
+    .btn-add:hover { background: #b20710; }
 
-    /* Order Status Tracker */
-    .status-box { background: #222; padding: 15px; border-radius: 8px; border: 1px solid #ff8c00; margin: 15px 0; }
-    .status-step { padding: 5px 0; color: #888; }
-    .status-step.active { color: #00ff00; font-weight: bold; }
+    /* Cart & Checkout Box */
+    .checkout-box { background: #181818; border-radius: 10px; padding: 15px; border: 1px solid #333; margin-top: 15px; }
+    .upi-tag { background: #222; padding: 10px; border-radius: 6px; color: #ff8c00; font-family: monospace; font-size: 13px; text-align: center; margin: 10px 0; border: 1px dashed #ff8c00; }
 
-    /* Admin Order Card */
-    .order-admin-card { background: #2b2b2b; padding: 12px; border-radius: 8px; margin-bottom: 10px; border-left: 4px solid #ff8c00; }
-    .btn-accept { background: #008000; margin-right: 5px; }
-    .btn-reject { background: #b22222; }
+    /* Contact Box (Login Required) */
+    .contact-card { background: #181818; padding: 15px; border-radius: 10px; border: 1px solid #333; margin-top: 15px; text-align: center; }
+    .btn-whatsapp { background: #25D366; color: white; border: none; padding: 10px; border-radius: 6px; font-weight: bold; width: 100%; display: block; text-decoration: none; margin-top: 10px; }
 
-    /* Contact & Payment Box */
-    .contact-card, .upi-card { background: #1e1e1e; padding: 15px; border-radius: 8px; border: 1px solid #333; margin-top: 15px; }
-    .upi-id { background: #2b2b2b; color: #ff8c00; padding: 8px; border-radius: 5px; font-family: monospace; font-size: 14px; text-align: center; margin: 8px 0; font-weight: bold; border: 1px dashed #ff8c00; }
+    /* Login Box */
+    .form-box { max-width: 400px; margin: 10px auto; background: #181818; padding: 20px; border-radius: 10px; border: 1px solid #262626; }
+    input { width: 100%; padding: 11px; margin: 8px 0; background: #262626; border: 1px solid #333; color: #fff; border-radius: 6px; }
 
-    .form-box { max-width: 400px; margin: 10px auto; background: #1e1e1e; padding: 20px; border-radius: 8px; }
-    input { width: 100%; padding: 10px; margin: 8px 0; background: #2b2b2b; border: 1px solid #333; color: #fff; border-radius: 5px; }
-
-    nav { position: fixed; bottom: 0; width: 100%; background: #000; display: flex; justify-content: space-around; padding: 10px 0; border-top: 1px solid #222; }
+    /* Bottom Nav Bar */
+    nav { position: fixed; bottom: 0; width: 100%; background: #000; display: flex; justify-content: space-around; padding: 8px 0; border-top: 1px solid #222; z-index: 100; }
     nav button { background: none; border: none; color: #888; font-size: 11px; cursor: pointer; }
-    nav button.active { color: #8b0000; font-weight: bold; }
+    nav button.active { color: #e50914; font-weight: bold; }
   </style>
 </head>
 <body>
 
   <header>
-    <div class="header-title">K.D KA KHANA GHAR TAK</div>
+    <div class="header-title">KD KA KHANA GHAR TAK</div>
     <div>🛒 <span class="cart-badge" id="cart-count">0</span></div>
   </header>
-  <div class="delivery-notice">📍 Delivery available within 10 - 12 KM only!</div>
+  <div class="delivery-notice">🛵 Freshly Made, Especially for You • Delivery 5-10 km</div>
 
-  <!-- HOME PAGE -->
+  <!-- HOME / MENU SCREEN -->
   <div id="home-page" class="page active">
-    <!-- Live Banner Slider -->
-    <div class="banner-container">
-      <div class="banner-slide slide-1 active">
-        <h2>🔥 HOT & FRESH FOOD</h2>
-        <p>Ghar Jaisa Swad Direct Aapke Ghar Tak</p>
-      </div>
-      <div class="banner-slide slide-2">
-        <h2>🚀 LIGHTNING DELIVERY</h2>
-        <p>Call or WhatsApp: 8453270362</p>
-      </div>
+    <!-- Category Tabs Filter -->
+    <div class="category-tabs">
+      <button class="tab-btn active" onclick="filterCategory('All', this)">All</button>
+      <button class="tab-btn" onclick="filterCategory('Main Course', this)">Main Course</button>
+      <button class="tab-btn" onclick="filterCategory('Fast Food', this)">Fast Food</button>
+      <button class="tab-btn" onclick="filterCategory('Drinks & Coffee', this)">Drinks & Coffee</button>
+      <button class="tab-btn" onclick="filterCategory('Breads', this)">Breads</button>
     </div>
 
-    <div id="menu-list"></div>
+    <div id="menu-list" style="margin-top: 10px;"></div>
   </div>
 
-  <!-- TRACKING PAGE -->
-  <div id="track-page" class="page">
-    <h2>📍 Live Order Tracker</h2>
-    <div id="tracking-content">
-      <p style="color:#aaa; margin-top:10px;">Aapne filhal koi order place nahi kiya hai.</p>
-    </div>
-  </div>
-
-  <!-- CART PAGE -->
+  <!-- CART & CHECKOUT SCREEN -->
   <div id="cart-page" class="page">
-    <h2>🛒 Your Cart</h2>
-    <div id="cart-items" style="margin:15px 0;"></div>
+    <h2 style="font-size: 1.2rem; color: #ff4d4d; margin-bottom: 10px;">YOUR CART</h2>
+    <div id="cart-items"></div>
     <div id="cart-summary"></div>
 
-    <!-- UPI Payment Box -->
-    <div class="upi-card">
-      <h3>💳 Online Payment (UPI)</h3>
-      <p style="font-size:12px; color:#aaa; margin-top:4px;">Direct GPay / PhonePe / Paytm se pay karein:</p>
-      <div class="upi-id">6000026478@okbizaxis</div>
-      <p style="font-size:11px; color:#00ff00;">Payment karne ke baad Order Place karein.</p>
+    <div class="checkout-box">
+      <h3 style="font-size: 0.95rem;">PAYMENT METHOD</h3>
+      <div class="upi-tag">UPI ID: 6000026478@okbizaxis</div>
+      <p style="font-size: 11px; color: #aaa;">GPay / PhonePe / Paytm se pay karke order confirm karein.</p>
+      <button class="btn-add" style="width: 100%; padding: 12px; margin-top: 12px; background: #28a745;" onclick="placeOrder()">PROCEED TO CHECKOUT</button>
     </div>
-
-    <button class="btn" style="width:100%; margin-top:15px; background:#008000; padding:12px;" onclick="placeOrder()">Place Order Now</button>
   </div>
 
-  <!-- ACCOUNT & CONTACT PAGE -->
+  <!-- ACCOUNT & CONTACT SCREEN -->
   <div id="account-page" class="page">
     <div class="form-box">
-      <h2>Login / Account</h2>
+      <h2 style="font-size: 1.1rem; text-align: center; margin-bottom: 10px;">Customer Login</h2>
       <input type="email" id="email" placeholder="Email Address" value="kdrabha2000@gmail.com">
       <input type="password" id="password" placeholder="Password">
-      <button class="btn" style="width:100%" onclick="handleLogin()">Login / Register</button>
-      <p id="status" style="margin-top:10px; text-align:center; font-size:13px;"></p>
+      <button class="btn-add" style="width:100%; padding: 10px; margin-top: 5px;" onclick="handleLogin()">Login / Register</button>
+      <p id="status" style="margin-top:10px; text-align:center; font-size:12px; color: #ff8c00;"></p>
 
-      <!-- Contact Us Section -->
-      <div class="contact-card">
-        <h3 style="color:#ff8c00; margin-bottom:8px;">📞 Contact Us</h3>
-        <p style="font-size:13px; margin-bottom:6px;">Call: <b>+91 8453270362</b></p>
-        <p style="font-size:13px; margin-bottom:12px;">WhatsApp: <b>+91 8453270362</b></p>
-        <a href="https://wa.me/918453270362" target="_blank" class="btn" style="background:#25D366; width:100%; text-align:center;">💬 Chat on WhatsApp</a>
-      </div>
-
-      <!-- ADMIN DASHBOARD -->
-      <div id="admin-panel" style="display:none; margin-top:20px;">
-        <h3 style="color:#ff8c00;">👑 Admin Live Orders Panel</h3>
-        <div id="admin-orders-list" style="margin-top:10px;">
-          <p style="color:#aaa; font-size:12px;">Koi naya live order nahi hai.</p>
-        </div>
+      <!-- Contact Us (SHOWS ONLY AFTER LOGIN) -->
+      <div id="contact-section" class="contact-card" style="display: none;">
+        <h3 style="color:#ff4d4d; font-size: 1rem;">📞 WhatsApp & Call Support</h3>
+        <p style="font-size:12px; margin-top: 6px; color: #ccc;">Call / WhatsApp: <b>+91 8453270362</b></p>
+        <a href="https://wa.me/918453270362" target="_blank" class="btn-whatsapp">💬 WhatsApp Support On</a>
       </div>
     </div>
   </div>
 
-  <!-- BOTTOM NAVIGATION -->
+  <!-- BOTTOM NAVIGATION BAR -->
   <nav>
     <button id="nav-home" class="active" onclick="showPage('home-page', 'nav-home')">🏠<br>Home</button>
-    <button id="nav-track" onclick="showPage('track-page', 'nav-track')">📍<br>Track</button>
     <button id="nav-cart" onclick="showPage('cart-page', 'nav-cart')">🛒<br>Cart</button>
-    <button id="nav-account" onclick="showPage('account-page', 'nav-account')">👤<br>Account</button>
+    <button id="nav-account" onclick="showPage('account-page', 'nav-account')">👤<br>Profile</button>
   </nav>
 
-  <!-- Firebase Compat Scripts -->
+  <!-- Firebase Scripts -->
   <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-auth-compat.js"></script>
 
@@ -156,92 +131,54 @@
     firebase.initializeApp(firebaseConfig);
     const auth = firebase.auth();
 
-    // Menu Data
-    const menuData = [
-      { category: "🫓 Breads & Rotis", items: [
-        { name: "Plain Tawa Roti", price: 10, img: "https://images.unsplash.com/photo-1626074353765-517a681e40be?w=200" },
-        { name: "Tawa Roti Butter", price: 15, img: "https://images.unsplash.com/photo-1626074353765-517a681e40be?w=200" },
-        { name: "Tandoori Roti", price: 25, img: "https://images.unsplash.com/photo-1626074353765-517a681e40be?w=200" },
-        { name: "Tandoori Butter Roti", price: 35, img: "https://images.unsplash.com/photo-1626074353765-517a681e40be?w=200" },
-        { name: "Plain Naan", price: 60, img: "https://images.unsplash.com/photo-1601050690597-df0568f70950?w=200" },
-        { name: "Butter Naan", price: 80, img: "https://images.unsplash.com/photo-1601050690597-df0568f70950?w=200" },
-        { name: "Lacha Paratha", price: 30, img: "https://images.unsplash.com/photo-1626074353765-517a681e40be?w=200" }
-      ]},
-      { category: "🍚 Rice", items: [
-        { name: "Plain Rice", price: 140, img: "https://images.unsplash.com/photo-1516684732162-798a0062be99?w=200" },
-        { name: "Jeera Rice", price: 160, img: "https://images.unsplash.com/photo-1516684732162-798a0062be99?w=200" }
-      ]},
-      { category: "🍲 Dal & Curry Specialties", items: [
-        { name: "Plain Dal", price: 70, img: "https://images.unsplash.com/photo-1546833999-b9f581a1996d?w=200" },
-        { name: "Dal Fry", price: 110, img: "https://images.unsplash.com/photo-1546833999-b9f581a1996d?w=200" },
-        { name: "Dal Tarka", price: 140, img: "https://images.unsplash.com/photo-1546833999-b9f581a1996d?w=200" },
-        { name: "Dal Makhani", price: 200, img: "https://images.unsplash.com/photo-1546833999-b9f581a1996d?w=200" },
-        { name: "Chole Masala", price: 220, img: "https://images.unsplash.com/photo-1588166524941-3bf61a9c41db?w=200" },
-        { name: "Paneer Masala", price: 200, img: "https://images.unsplash.com/photo-1631452180519-c014fe946bc7?w=200" },
-        { name: "Shahi Paneer", price: 260, img: "https://images.unsplash.com/photo-1631452180519-c014fe946bc7?w=200" },
-        { name: "Palak Paneer", price: 200, img: "https://images.unsplash.com/photo-1631452180519-c014fe946bc7?w=200" },
-        { name: "Mix Veg", price: 180, img: "https://images.unsplash.com/photo-1540420773420-3366772f4999?w=200" },
-        { name: "Aloo Gobi", price: 160, img: "https://images.unsplash.com/photo-1540420773420-3366772f4999?w=200" }
-      ]},
-      { category: "🍗 Non-Veg Main Course", items: [
-        { name: "Chicken Butter Masala (Full)", price: 380, img: "https://images.unsplash.com/photo-1603894584373-5ac82b2ae398?w=200" },
-        { name: "Chicken Butter Masala (Half)", price: 200, img: "https://images.unsplash.com/photo-1603894584373-5ac82b2ae398?w=200" },
-        { name: "Chicken Curry (Full)", price: 240, img: "https://images.unsplash.com/photo-1603894584373-5ac82b2ae398?w=200" },
-        { name: "Chicken Curry (Half)", price: 140, img: "https://images.unsplash.com/photo-1603894584373-5ac82b2ae398?w=200" },
-        { name: "Mutton Curry (Full)", price: 400, img: "https://images.unsplash.com/photo-1544025162-d76694265947?w=200" },
-        { name: "Mutton Curry (Half)", price: 220, img: "https://images.unsplash.com/photo-1544025162-d76694265947?w=200" },
-        { name: "Mutton Rogan Josh", price: 300, img: "https://images.unsplash.com/photo-1544025162-d76694265947?w=200" },
-        { name: "Pork Curry (Full)", price: 280, img: "https://images.unsplash.com/photo-1544025162-d76694265947?w=200" },
-        { name: "Pork Curry (Half)", price: 150, img: "https://images.unsplash.com/photo-1544025162-d76694265947?w=200" },
-        { name: "Pork Masala", price: 300, img: "https://images.unsplash.com/photo-1544025162-d76694265947?w=200" }
-      ]},
-      { category: "🥟 Momos", items: [
-        { name: "Veg Momo (Full)", price: 50, img: "https://images.unsplash.com/photo-1625220194771-7ebdea0b70b9?w=200" },
-        { name: "Veg Momo (Half)", price: 30, img: "https://images.unsplash.com/photo-1625220194771-7ebdea0b70b9?w=200" },
-        { name: "Chicken Momo (Full)", price: 70, img: "https://images.unsplash.com/photo-1625220194771-7ebdea0b70b9?w=200" },
-        { name: "Chicken Momo (Half)", price: 40, img: "https://images.unsplash.com/photo-1625220194771-7ebdea0b70b9?w=200" },
-        { name: "Pork Momo (Full)", price: 80, img: "https://images.unsplash.com/photo-1625220194771-7ebdea0b70b9?w=200" },
-        { name: "Pork Momo (Half)", price: 50, img: "https://images.unsplash.com/photo-1625220194771-7ebdea0b70b9?w=200" },
-        { name: "Paneer Momo (Full)", price: 100, img: "https://images.unsplash.com/photo-1625220194771-7ebdea0b70b9?w=200" },
-        { name: "Paneer Momo (Half)", price: 60, img: "https://images.unsplash.com/photo-1625220194771-7ebdea0b70b9?w=200" },
-        { name: "Cheese Momo (Full)", price: 120, img: "https://images.unsplash.com/photo-1625220194771-7ebdea0b70b9?w=200" },
-        { name: "Cheese Momo (Half)", price: 70, img: "https://images.unsplash.com/photo-1625220194771-7ebdea0b70b9?w=200" }
-      ]}
+    // Menu Item Database with Categories
+    const foodItems = [
+      // Breads
+      { name: "Plain Tawa Roti", price: 10, category: "Breads", img: "https://images.unsplash.com/photo-1626074353765-517a681e40be?w=200" },
+      { name: "Butter Naan", price: 80, category: "Breads", img: "https://images.unsplash.com/photo-1601050690597-df0568f70950?w=200" },
+      // Main Course
+      { name: "Chicken Biryani", price: 180, category: "Main Course", img: "https://images.unsplash.com/photo-1563379091339-03b21ab4a4f8?w=200" },
+      { name: "Butter Chicken", price: 200, category: "Main Course", img: "https://images.unsplash.com/photo-1603894584373-5ac82b2ae398?w=200" },
+      { name: "Paneer Butter Masala", price: 200, category: "Main Course", img: "https://images.unsplash.com/photo-1631452180519-c014fe946bc7?w=200" },
+      { name: "Dal Makhani", price: 200, category: "Main Course", img: "https://images.unsplash.com/photo-1546833999-b9f581a1996d?w=200" },
+      // Fast Food
+      { name: "Chicken Momo (Full)", price: 70, category: "Fast Food", img: "https://images.unsplash.com/photo-1625220194771-7ebdea0b70b9?w=200" },
+      { name: "Chicken Roll", price: 80, category: "Fast Food", img: "https://images.unsplash.com/photo-1626777552726-4a6b54c97e46?w=200" },
+      { name: "Red Sauce Pasta", price: 100, category: "Fast Food", img: "https://images.unsplash.com/photo-1551183053-bf91a1d81141?w=200" },
+      // Drinks & Coffee
+      { name: "Cold Coffee", price: 70, category: "Drinks & Coffee", img: "https://images.unsplash.com/photo-1517701604599-bb29b565090c?w=200" },
+      { name: "Fresh Lime Water", price: 50, category: "Drinks & Coffee", img: "https://images.unsplash.com/photo-1513558161293-cdaf765ed2fd?w=200" }
     ];
 
     let cart = [];
-    let liveOrder = null;
 
-    function renderMenu() {
+    function renderMenu(items) {
       const container = document.getElementById('menu-list');
       container.innerHTML = "";
-      menuData.forEach(cat => {
-        let html = `<h2 class="section-title">${cat.category}</h2>`;
-        cat.items.forEach(item => {
-          html += `
-            <div class="food-card">
-              <img src="${item.img}" class="food-img" alt="food">
-              <div class="food-info">
-                <h3>${item.name}</h3>
-                <p>₹${item.price}</p>
-              </div>
-              <button class="btn" onclick="addToCart('${item.name}', ${item.price})">Add</button>
+      items.forEach(item => {
+        container.innerHTML += `
+          <div class="food-card">
+            <img src="${item.img}" class="food-img" alt="food">
+            <div class="food-info">
+              <h3>${item.name}</h3>
+              <p>₹${item.price}</p>
             </div>
-          `;
-        });
-        container.innerHTML += html;
+            <button class="btn-add" onclick="addToCart('${item.name}', ${item.price})">ADD +</button>
+          </div>
+        `;
       });
     }
-    renderMenu();
 
-    // Banner Slider
-    let currentSlide = 0;
-    const slides = document.querySelectorAll('.banner-slide');
-    setInterval(() => {
-      slides[currentSlide].classList.remove('active');
-      currentSlide = (currentSlide + 1) % slides.length;
-      slides[currentSlide].classList.add('active');
-    }, 3500);
+    function filterCategory(cat, btn) {
+      document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      if (cat === 'All') {
+        renderMenu(foodItems);
+      } else {
+        const filtered = foodItems.filter(item => item.category === cat);
+        renderMenu(filtered);
+      }
+    }
 
     function showPage(pageId, navId) {
       document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
@@ -254,91 +191,39 @@
       cart.push({ name, price });
       document.getElementById('cart-count').innerText = cart.length;
       renderCart();
-      alert(name + " Cart mein add ho gaya!");
+      alert(name + " added to cart!");
     }
 
     function renderCart() {
-      const cartContainer = document.getElementById('cart-items');
-      const cartSummary = document.getElementById('cart-summary');
+      const container = document.getElementById('cart-items');
+      const summary = document.getElementById('cart-summary');
       if (cart.length === 0) {
-        cartContainer.innerHTML = "<p style='color:#aaa;'>Cart khali hai.</p>";
-        cartSummary.innerHTML = "";
+        container.innerHTML = "<p style='color:#888;'>Cart is empty.</p>";
+        summary.innerHTML = "";
         return;
       }
       let total = 0;
       let html = "";
       cart.forEach((item) => {
         total += item.price;
-        html += `<div style="display:flex; justify-content:space-between; margin-bottom:8px;">
+        html += `<div style="display:flex; justify-content:space-between; margin-bottom:8px; border-bottom:1px solid #222; padding-bottom:5px;">
           <span>${item.name}</span>
-          <span>₹${item.price}</span>
+          <span style="color:#ff4d4d; font-weight:bold;">₹${item.price}</span>
         </div>`;
       });
-      cartContainer.innerHTML = html;
-      cartSummary.innerHTML = `<h3>Total: ₹${total}</h3>`;
+      container.innerHTML = html;
+      summary.innerHTML = `<h3 style="margin-top:10px; text-align:right;">Total Amount: ₹${total}</h3>`;
     }
 
     function placeOrder() {
       if (cart.length === 0) {
-        alert("Pehle cart mein items add karein!");
+        alert("Cart is empty!");
         return;
       }
-      liveOrder = {
-        id: "ORD" + Math.floor(Math.random() * 10000),
-        items: [...cart],
-        status: "Pending Accept"
-      };
+      alert("Order Placed Successfully!");
       cart = [];
       document.getElementById('cart-count').innerText = 0;
       renderCart();
-      updateTracker();
-      updateAdminOrders();
-      alert("Order Place ho gaya! Admin Accept karega.");
-      showPage('track-page', 'nav-track');
-    }
-
-    function updateTracker() {
-      const container = document.getElementById('tracking-content');
-      if (!liveOrder) {
-        container.innerHTML = "<p style='color:#aaa;'>Koi live order nahi hai.</p>";
-        return;
-      }
-      container.innerHTML = `
-        <div class="status-box">
-          <h3>Order ID: #${liveOrder.id}</h3>
-          <p style="margin-bottom:10px; font-size:12px; color:#ff8c00;">Status: <b>${liveOrder.status}</b></p>
-          <div class="status-step ${liveOrder.status !== 'Rejected' ? 'active' : ''}">1. Order Placed</div>
-          <div class="status-step ${liveOrder.status === 'Accepted' || liveOrder.status === 'Cooking' || liveOrder.status === 'Out for Delivery' ? 'active' : ''}">2. Order Accepted by Kitchen</div>
-          <div class="status-step ${liveOrder.status === 'Cooking' || liveOrder.status === 'Out for Delivery' ? 'active' : ''}">3. Food Preparing</div>
-          <div class="status-step ${liveOrder.status === 'Out for Delivery' ? 'active' : ''}">4. Out for Delivery (10-12 KM)</div>
-        </div>
-      `;
-    }
-
-    function updateAdminOrders() {
-      const container = document.getElementById('admin-orders-list');
-      if (!liveOrder || liveOrder.status !== "Pending Accept") {
-        container.innerHTML = "<p style='color:#aaa; font-size:12px;'>Koi naya live order nahi hai.</p>";
-        return;
-      }
-      container.innerHTML = `
-        <div class="order-admin-card">
-          <p><b>Order ID:</b> #${liveOrder.id}</p>
-          <p><b>Items:</b> ${liveOrder.items.map(i => i.name).join(', ')}</p>
-          <br>
-          <button class="btn btn-accept" onclick="adminAction('Accepted')">Accept Order</button>
-          <button class="btn btn-reject" onclick="adminAction('Rejected')">Reject Order</button>
-        </div>
-      `;
-    }
-
-    function adminAction(action) {
-      if (liveOrder) {
-        liveOrder.status = action;
-        updateTracker();
-        updateAdminOrders();
-        alert("Order status update ho gaya: " + action);
-      }
     }
 
     function handleLogin() {
@@ -347,29 +232,24 @@
       const status = document.getElementById('status');
 
       if (!email || !password) {
-        status.innerText = "Kripya email aur password bharein.";
+        status.innerText = "Please enter email and password.";
         return;
       }
 
-      status.innerText = "Processing...";
+      status.innerText = "Logging in...";
 
       auth.signInWithEmailAndPassword(email, password)
         .then(() => {
           status.innerText = "Login Successful!";
-          if (email === "kdrabha2000@gmail.com") {
-            document.getElementById('admin-panel').style.display = 'block';
-            updateAdminOrders();
-          }
+          // Show WhatsApp Contact Box ONLY AFTER LOGIN
+          document.getElementById('contact-section').style.display = 'block';
         })
         .catch((error) => {
           if (error.code === 'auth/user-not-found' || error.code === 'auth/invalid-credential') {
             auth.createUserWithEmailAndPassword(email, password)
               .then(() => {
                 status.innerText = "Account Registered!";
-                if (email === "kdrabha2000@gmail.com") {
-                  document.getElementById('admin-panel').style.display = 'block';
-                  updateAdminOrders();
-                }
+                document.getElementById('contact-section').style.display = 'block';
               })
               .catch(err => status.innerText = "Error: " + err.message);
           } else {
@@ -377,6 +257,9 @@
           }
         });
     }
+
+    // Initial Load
+    renderMenu(foodItems);
   </script>
 </body>
 </html>
