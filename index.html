@@ -25,17 +25,48 @@
     .header-title { font-weight: bold; font-size: 1.1rem; }
     .cart-badge { background: #fff; color: #8b0000; padding: 2px 8px; border-radius: 12px; font-weight: bold; }
     
-    .page { display: none; padding: 15px; }
+    /* Live Offer Banner Styles */
+    .banner-slider {
+      background: linear-gradient(45deg, #ff4500, #8b0000);
+      padding: 15px;
+      text-align: center;
+      font-weight: bold;
+      border-radius: 8px;
+      margin: 15px;
+      box-shadow: 0 4px 10px rgba(255, 69, 0, 0.3);
+      animation: pulse 2s infinite;
+    }
+    @keyframes pulse {
+      0% { opacity: 0.9; }
+      50% { opacity: 1; }
+      100% { opacity: 0.9; }
+    }
+
+    .section-title { margin: 15px 15px 5px 15px; font-size: 1.2rem; color: #ff8c00; }
+    
+    .page { display: none; padding: 10px; }
     .page.active { display: block; }
 
     .food-card {
       background: #1e1e1e;
       border-radius: 8px;
       padding: 15px;
-      margin-bottom: 15px;
+      margin: 10px;
       display: flex;
       justify-content: space-between;
       align-items: center;
+      position: relative;
+    }
+    .badge-bestseller {
+      position: absolute;
+      top: -8px;
+      left: 10px;
+      background: #ff8c00;
+      color: #000;
+      font-size: 10px;
+      font-weight: bold;
+      padding: 2px 6px;
+      border-radius: 4px;
     }
     .btn {
       background: #8b0000;
@@ -45,6 +76,23 @@
       border-radius: 5px;
       cursor: pointer;
       font-weight: bold;
+    }
+
+    /* Coupon Section */
+    .coupon-box {
+      background: #252525;
+      padding: 15px;
+      border-radius: 8px;
+      margin: 15px 0;
+      border: 1px dashed #ff8c00;
+    }
+    .coupon-code {
+      background: #333;
+      padding: 5px 10px;
+      color: #ff8c00;
+      font-family: monospace;
+      font-weight: bold;
+      border-radius: 4px;
     }
 
     .form-box {
@@ -93,36 +141,62 @@
 
   <!-- HOME PAGE -->
   <div id="home-page" class="page active">
-    <h2>Menu</h2>
-    <br>
-    <div class="food-card">
-      <div>
-        <h3>Special Thali</h3>
-        <p>₹150</p>
-      </div>
-      <button class="btn" onclick="addToCart('Special Thali', 150)">Add to Cart</button>
+    
+    <!-- Live Offer Banner -->
+    <div class="banner-slider">
+      🔥 LIVE OFFER: Use Code <span class="coupon-code">KDFOOD20</span> & Get 20% OFF!
     </div>
+
+    <h2 class="section-title">🔥 Best Sellers (Sabse Jyada Bikne Wala)</h2>
+    
+    <div class="food-card">
+      <span class="badge-bestseller">TOP SELLER #1</span>
+      <div>
+        <h3>Special Chicken Thali</h3>
+        <p>₹180</p>
+      </div>
+      <button class="btn" onclick="addToCart('Special Chicken Thali', 180)">Add to Cart</button>
+    </div>
+
+    <div class="food-card">
+      <span class="badge-bestseller">TOP SELLER #2</span>
+      <div>
+        <h3>KD Veg Supreme Thali</h3>
+        <p>₹130</p>
+      </div>
+      <button class="btn" onclick="addToCart('KD Veg Supreme Thali', 130)">Add to Cart</button>
+    </div>
+
+    <h2 class="section-title">🍱 Regular Menu</h2>
+
     <div class="food-card">
       <div>
-        <h3>Chicken Biryani</h3>
-        <p>₹200</p>
+        <h3>Paneer Butter Masala Combo</h3>
+        <p>₹160</p>
       </div>
-      <button class="btn" onclick="addToCart('Chicken Biryani', 200)">Add to Cart</button>
+      <button class="btn" onclick="addToCart('Paneer Butter Masala Combo', 160)">Add to Cart</button>
     </div>
   </div>
 
   <!-- WATCHLIST PAGE -->
   <div id="watchlist-page" class="page">
-    <h2>Watchlist / Favorites</h2>
-    <br>
-    <p style="color:#aaa;">Koi favorite item saved nahi hai.</p>
+    <h2 style="padding:10px;">❤️ Watchlist / Favorites</h2>
+    <p style="color:#aaa; padding:10px;">Koi favorite item saved nahi hai.</p>
   </div>
 
-  <!-- CART PAGE -->
+  <!-- CART & COUPON PAGE -->
   <div id="cart-page" class="page">
-    <h2>Your Cart</h2>
-    <br>
-    <div id="cart-items">
+    <h2 style="padding:10px;">🛒 Your Cart</h2>
+    
+    <!-- Coupon Apply Box -->
+    <div class="coupon-box">
+      <p style="margin-bottom:8px; font-weight:bold;">Have a Coupon Code?</p>
+      <input type="text" id="coupon-input" placeholder="Enter Coupon Code (e.g. KDFOOD20)">
+      <button class="btn" style="width:100%; background:#ff8c00; color:#000;" onclick="applyCoupon()">Apply Coupon</button>
+      <p id="coupon-msg" style="margin-top:8px; font-size:13px;"></p>
+    </div>
+
+    <div id="cart-items" style="padding:10px;">
       <p style="color:#aaa;">Cart khali hai.</p>
     </div>
   </div>
@@ -177,6 +251,19 @@
       cartCount++;
       document.getElementById('cart-count').innerText = cartCount;
       alert(itemName + " Cart mein add ho gaya!");
+    }
+
+    function applyCoupon() {
+      const code = document.getElementById('coupon-input').value.trim();
+      const msg = document.getElementById('coupon-msg');
+      
+      if (code === "KDFOOD20") {
+        msg.style.color = "#00ff00";
+        msg.innerText = "🎉 Coupon Applied! You got 20% Discount!";
+      } else {
+        msg.style.color = "#ff4444";
+        msg.innerText = "❌ Invalid Coupon Code. Try KDFOOD20";
+      }
     }
 
     function handleLogin() {
