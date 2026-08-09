@@ -1,0 +1,53 @@
+:root {
+  --bg-dark: #121212;
+  --card-dark: #1e1e1e;
+  --primary-red: #d32f2f;
+  --accent-red: #ff1744;
+  --text-white: #ffffff;
+  --text-gray: #aaaaaa;
+  --border: #2c2c2c;
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; font-family: sans-serif; }
+body { background: var(--bg-dark); color: var(--text-white); padding-bottom: 75px; }
+
+.header { background: #181818; padding: 10px 15px; display: flex; justify-content: space-between; align-items: center; position: sticky; top:0; z-index:100; border-bottom:1px solid var(--border); }
+.brand-title { color: var(--primary-red); font-weight: bold; font-size: 1.1rem; }
+.brand-sub { font-size: 0.75rem; color: #fff; }
+.header-info { font-size: 0.65rem; color: var(--text-gray); }
+.header-actions .icon-btn { margin-left: 10px; cursor: pointer; position: relative; font-size: 1.2rem; }
+
+.notif-popup { display: none; background: var(--primary-red); color: white; padding: 8px 15px; font-size: 0.8rem; text-align: center; }
+
+.search-container { padding: 10px 15px; }
+input, textarea, select { width: 100%; padding: 10px; margin: 5px 0; background: #252525; border: 1px solid #333; color: white; border-radius: 6px; }
+
+.container { padding: 15px; }
+.page { display: none; }
+.page.active { display: block; }
+
+.banner { background: linear-gradient(45deg, #d32f2f, #880e4f); padding: 12px; border-radius: 8px; font-weight: bold; font-size: 0.85rem; margin-bottom: 12px; }
+
+.category-scroll { display: flex; overflow-x: auto; gap: 8px; padding-bottom: 10px; }
+.cat-chip { background: #252525; padding: 6px 14px; border-radius: 20px; font-size: 0.75rem; white-space: nowrap; cursor: pointer; border: 1px solid var(--border); }
+.cat-chip.active { background: var(--primary-red); font-weight: bold; }
+
+.food-card { background: var(--card-dark); padding: 10px; border-radius: 8px; margin-bottom: 10px; display: flex; gap: 10px; border: 1px solid var(--border); }
+.food-img { width: 70px; height: 70px; border-radius: 6px; object-fit: cover; }
+.food-info { flex: 1; }
+.food-title { font-size: 0.9rem; font-weight: bold; }
+.food-price { color: var(--accent-red); font-weight: bold; font-size: 0.85rem; margin-top: 2px; }
+
+.btn-primary { background: var(--primary-red); color: white; border: none; padding: 8px 12px; border-radius: 4px; cursor: pointer; width: 100%; font-weight: bold; }
+.btn-sec { background: #333; color: white; border: none; padding: 8px 12px; border-radius: 4px; cursor: pointer; width: 100%; margin-top: 5px; }
+.btn-whatsapp { background: #25D366; color: white; text-decoration: none; display: block; text-align: center; padding: 8px; border-radius: 4px; font-weight: bold; }
+
+.bill-summary { background: #1e1e1e; padding: 10px; border-radius: 6px; margin: 10px 0; font-size: 0.9rem; }
+
+.nav { position: fixed; bottom: 0; width: 100%; background: #181818; display: flex; justify-content: space-around; padding: 8px 0; border-top: 1px solid var(--border); }
+.nav-item { text-align: center; font-size: 0.65rem; color: var(--text-gray); cursor: pointer; }
+.nav-item.active { color: var(--primary-red); font-weight: bold; }
+
+#admin-panel { display: none; background: #251212; padding: 15px; margin-top: 20px; border: 2px dashed var(--primary-red); border-radius: 8px; }
+.admin-stats { display: flex; justify-content: space-between; background: #181818; padding: 10px; border-radius: 6px; font-size: 0.8rem; margin-bottom: 15px; }
+.order-card { background: var(--card-dark); padding: 12px; border-radius: 6px; margin-bottom: 10px; border-left: 4px solid var(--primary-red); font-size: 0.85rem; }
