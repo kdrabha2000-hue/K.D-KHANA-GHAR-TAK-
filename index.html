@@ -16,12 +16,11 @@
 
     .delivery-notice { background: linear-gradient(90deg, #d32f2f, #ff8c00); color: #fff; text-align: center; padding: 6px; font-weight: 600; font-size: 12px; }
 
-    .banner-container { width: 100%; height: 150px; position: relative; overflow: hidden; }
-    .banner-slide { width: 100%; height: 100%; position: absolute; opacity: 0; transition: opacity 0.8s ease-in-out; display: flex; flex-direction: column; justify-content: center; align-items: center; text-align: center; background-size: cover; background-position: center; color: #fff; text-shadow: 2px 2px 5px #000; }
-    .banner-slide.active { opacity: 1; }
-    .slide-1 { background-image: linear-gradient(rgba(0,0,0,0.5), rgba(0,0,0,0.5)), url('https://images.unsplash.com/photo-1555396273-367ea4eb4db5?w=500'); }
-    .slide-2 { background-image: linear-gradient(rgba(0,0,0,0.5), rgba(0,0,0,0.5)), url('https://images.unsplash.com/photo-1565299624946-b28f40a0ae38?w=500'); }
-    
+    .banner-container { width: 100%; height: 160px; position: relative; overflow: hidden; border-bottom: 1px solid #333; }
+    .banner-slide { width: 100%; height: 100%; position: absolute; opacity: 1; display: flex; flex-direction: column; justify-content: center; align-items: center; text-align: center; background-size: cover; background-position: center; color: #fff; text-shadow: 2px 2px 5px #000; padding: 10px; }
+    .banner-slide h2 { font-size: 1.3rem; color: #ff8c00; }
+    .banner-slide p { font-size: 0.85rem; margin-top: 4px; }
+
     .category-tabs { display: flex; overflow-x: auto; padding: 10px 15px; gap: 8px; background: #141414; border-bottom: 1px solid #222; }
     .category-tabs::-webkit-scrollbar { display: none; }
     .tab-btn { background: #222; color: #ccc; border: 1px solid #333; padding: 6px 14px; border-radius: 20px; font-size: 12px; font-weight: bold; white-space: nowrap; cursor: pointer; }
@@ -40,15 +39,17 @@
     .btn-add { background: #8b0000; color: white; border: none; padding: 5px 10px; border-radius: 5px; font-weight: bold; font-size: 11px; cursor: pointer; }
     .btn-heart { background: none; border: none; font-size: 16px; cursor: pointer; }
 
-    .checkout-box { background: #181818; border-radius: 10px; padding: 15px; border: 1px solid #333; margin-top: 15px; }
-    .coupon-box { background: #222; padding: 12px; border-radius: 8px; border: 1px dashed #ff8c00; margin-bottom: 15px; }
+    /* Admin Box */
+    .admin-card { background: #181818; padding: 15px; border-radius: 10px; border: 1px solid #ff8c00; margin-top: 15px; }
+    .order-item-box { background: #222; padding: 10px; border-radius: 8px; margin-bottom: 8px; border-left: 3px solid #ff8c00; text-align: left; }
+    .btn-accept { background: #28a745; color: #fff; border: none; padding: 5px 10px; border-radius: 4px; font-weight: bold; cursor: pointer; margin-right: 5px; }
+    .btn-reject { background: #dc3545; color: #fff; border: none; padding: 5px 10px; border-radius: 4px; font-weight: bold; cursor: pointer; }
+
+    .checkout-box, .coupon-box, .contact-card { background: #181818; padding: 15px; border-radius: 10px; border: 1px solid #333; margin-top: 15px; }
     .upi-tag { background: #222; padding: 10px; border-radius: 6px; color: #ff8c00; font-family: monospace; font-size: 13px; text-align: center; margin: 10px 0; border: 1px dashed #ff8c00; }
 
-    .contact-card { background: #181818; padding: 15px; border-radius: 10px; border: 1px solid #333; margin-top: 15px; text-align: center; }
-    .btn-whatsapp { background: #25D366; color: white; border: none; padding: 10px; border-radius: 6px; font-weight: bold; width: 100%; display: block; text-decoration: none; margin-top: 10px; }
-
     .form-box { max-width: 400px; margin: 10px auto; background: #181818; padding: 20px; border-radius: 10px; border: 1px solid #262626; }
-    input { width: 100%; padding: 10px; margin: 8px 0; background: #262626; border: 1px solid #333; color: #fff; border-radius: 6px; }
+    input { width: 100%; padding: 10px; margin: 6px 0; background: #262626; border: 1px solid #333; color: #fff; border-radius: 6px; }
 
     nav { position: fixed; bottom: 0; width: 100%; background: #000; display: flex; justify-content: space-around; padding: 8px 0; border-top: 1px solid #222; z-index: 100; }
     nav button { background: none; border: none; color: #888; font-size: 11px; cursor: pointer; }
@@ -66,21 +67,15 @@
   </header>
   <div class="delivery-notice">🛵 Delivery available within 10-12 KM only!</div>
 
+  <!-- HOME PAGE -->
   <div id="home-page" class="page active">
     <div class="banner-container">
-      <div class="banner-slide slide-1 active">
-        <h2>🔥 MEGA FOOD SALE</h2>
-        <p>Get Flat 30% OFF on First Order</p>
-        <span style="background:#ff8c00; color:#000; padding:2px 6px; border-radius:4px; font-size:10px; font-weight:bold;">Code: FIRST30</span>
-      </div>
-      <div class="banner-slide slide-2">
-        <h2>🍗 SPECIAL DISCOUNTS</h2>
-        <p>Flat 20% OFF on Orders Above ₹200</p>
-        <span style="background:#ff8c00; color:#000; padding:2px 6px; border-radius:4px; font-size:10px; font-weight:bold;">Code: KDFOOD20</span>
+      <div class="banner-slide" id="live-banner" style="background-image: linear-gradient(rgba(0,0,0,0.6), rgba(0,0,0,0.6)), url('https://images.unsplash.com/photo-1555396273-367ea4eb4db5?w=500');">
+        <h2 id="banner-title">🔥 SPECIAL DINNER OFFER</h2>
+        <p id="banner-desc">Get Fresh & Delicious Meal Delivered Fast!</p>
       </div>
     </div>
 
-    <!-- Category Tabs Filter -->
     <div class="category-tabs">
       <button class="tab-btn active" onclick="filterCategory('All', this)">All Items</button>
       <button class="tab-btn" onclick="filterCategory('Breads & Rotis', this)">Breads & Rotis</button>
@@ -94,20 +89,15 @@
     <div id="menu-list" style="margin-top: 10px;"></div>
   </div>
 
+  <!-- WATCHLIST PAGE -->
   <div id="watchlist-page" class="page">
     <h2 style="font-size: 1.1rem; color: #ff4d4d; margin-bottom: 10px;">❤️ YOUR WATCHLIST</h2>
     <div id="watchlist-items"></div>
   </div>
 
+  <!-- CART PAGE -->
   <div id="cart-page" class="page">
     <h2 style="font-size: 1.1rem; color: #ff4d4d; margin-bottom: 10px;">🛒 YOUR CART</h2>
-    <div class="coupon-box">
-      <p style="font-size: 11px; font-weight: bold;">Have a Coupon Code?</p>
-      <input type="text" id="coupon-input" placeholder="Enter Code (e.g. KDFOOD20)">
-      <button class="btn-add" style="width:100%; margin-top:4px; background:#ff8c00; color:#000;" onclick="applyCoupon()">Apply</button>
-      <p id="coupon-msg" style="margin-top:4px; font-size:11px;"></p>
-    </div>
-
     <div id="cart-items"></div>
     <div id="cart-summary"></div>
 
@@ -118,6 +108,7 @@
     </div>
   </div>
 
+  <!-- ACCOUNT PAGE & ADMIN PANEL -->
   <div id="account-page" class="page">
     <div class="form-box">
       <h2 style="font-size: 1rem; text-align: center; margin-bottom: 10px;">Customer / Admin Login</h2>
@@ -126,10 +117,22 @@
       <button class="btn-add" style="width:100%; padding: 10px;" onclick="handleLogin()">Login / Register</button>
       <p id="status" style="margin-top:8px; text-align:center; font-size:11px; color: #ff8c00;"></p>
 
-      <div id="contact-section" class="contact-card" style="display: none;">
-        <h3 style="color:#ff4d4d; font-size: 0.95rem;">📞 WhatsApp & Call Support</h3>
-        <p style="font-size:12px; margin-top: 4px; color: #ccc;">Call / WhatsApp: <b>+91 8453270362</b></p>
-        <a href="https://wa.me/918453270362" target="_blank" class="btn-whatsapp">💬 Chat on WhatsApp</a>
+      <!-- ADMIN CONTROL PANEL -->
+      <div id="admin-panel" class="admin-card" style="display: none;">
+        <h3 style="color:#ff8c00; font-size: 1rem; margin-bottom: 8px;">👑 Admin Control Panel</h3>
+        
+        <p style="font-size: 12px; font-weight: bold; color: #00ff00; margin-top: 10px;">1. Customer Live Orders Control:</p>
+        <div id="admin-orders-list" style="margin-top: 5px;">
+          <p style="font-size: 11px; color: #777;">Koi naya live order nahi hai.</p>
+        </div>
+
+        <hr style="border: 0.5px solid #333; margin: 15px 0;">
+
+        <p style="font-size: 12px; font-weight: bold; color: #ff8c00;">2. Change Live Dinner/Special Banner:</p>
+        <input type="text" id="admin-banner-title" placeholder="Banner Title (e.g. SPECIAL NIGHT DINNER)">
+        <input type="text" id="admin-banner-desc" placeholder="Offer Details (e.g. Flat 30% OFF Tonight)">
+        <input type="text" id="admin-banner-img" placeholder="Photo URL Link">
+        <button class="btn-add" style="width: 100%; background: #ff8c00; color: #000; margin-top: 5px;" onclick="updateBannerLive()">Update Live Banner</button>
       </div>
     </div>
   </div>
@@ -155,83 +158,21 @@
     firebase.initializeApp(firebaseConfig);
     const auth = firebase.auth();
 
-    // COMPLETE FULL MENU LIST
     const foodItems = [
-      // Breads & Rotis
       { name: "Plain Tawa Roti", price: 10, category: "Breads & Rotis", img: "https://images.unsplash.com/photo-1626074353765-517a681e40be?w=200" },
-      { name: "Tawa Roti Butter", price: 15, category: "Breads & Rotis", img: "https://images.unsplash.com/photo-1626074353765-517a681e40be?w=200" },
-      { name: "Tandoori Roti", price: 25, category: "Breads & Rotis", img: "https://images.unsplash.com/photo-1626074353765-517a681e40be?w=200" },
-      { name: "Tandoori Butter Roti", price: 35, category: "Breads & Rotis", img: "https://images.unsplash.com/photo-1626074353765-517a681e40be?w=200" },
-      { name: "Plain Naan", price: 60, category: "Breads & Rotis", img: "https://images.unsplash.com/photo-1601050690597-df0568f70950?w=200" },
       { name: "Butter Naan", price: 80, category: "Breads & Rotis", img: "https://images.unsplash.com/photo-1601050690597-df0568f70950?w=200" },
-      { name: "Lacha Paratha", price: 30, category: "Breads & Rotis", img: "https://images.unsplash.com/photo-1626074353765-517a681e40be?w=200" },
-      
-      // Rice & Dal
       { name: "Plain Rice", price: 140, category: "Rice & Dal", img: "https://images.unsplash.com/photo-1516684732162-798a0062be99?w=200" },
-      { name: "Jeera Rice", price: 160, category: "Rice & Dal", img: "https://images.unsplash.com/photo-1516684732162-798a0062be99?w=200" },
-      { name: "Plain Dal", price: 70, category: "Rice & Dal", img: "https://images.unsplash.com/photo-1546833999-b9f581a1996d?w=200" },
-      { name: "Dal Fry", price: 110, category: "Rice & Dal", img: "https://images.unsplash.com/photo-1546833999-b9f581a1996d?w=200" },
-      { name: "Dal Tarka", price: 140, category: "Rice & Dal", img: "https://images.unsplash.com/photo-1546833999-b9f581a1996d?w=200" },
       { name: "Dal Makhani", price: 200, category: "Rice & Dal", img: "https://images.unsplash.com/photo-1546833999-b9f581a1996d?w=200" },
-
-      // Main Course
-      { name: "Chole Masala", price: 220, category: "Main Course", img: "https://images.unsplash.com/photo-1588166524941-3bf61a9c41db?w=200" },
-      { name: "Paneer Masala", price: 200, category: "Main Course", img: "https://images.unsplash.com/photo-1631452180519-c014fe946bc7?w=200" },
-      { name: "Shahi Paneer", price: 260, category: "Main Course", img: "https://images.unsplash.com/photo-1631452180519-c014fe946bc7?w=200" },
-      { name: "Palak Paneer", price: 200, category: "Main Course", img: "https://images.unsplash.com/photo-1631452180519-c014fe946bc7?w=200" },
-      { name: "Mix Veg", price: 180, category: "Main Course", img: "https://images.unsplash.com/photo-1540420773420-3366772f4999?w=200" },
-      { name: "Aloo Gobi", price: 160, category: "Main Course", img: "https://images.unsplash.com/photo-1540420773420-3366772f4999?w=200" },
       { name: "Chicken Butter Masala (Full)", price: 380, category: "Main Course", img: "https://images.unsplash.com/photo-1603894584373-5ac82b2ae398?w=200" },
-      { name: "Chicken Butter Masala (Half)", price: 200, category: "Main Course", img: "https://images.unsplash.com/photo-1603894584373-5ac82b2ae398?w=200" },
-      { name: "Chicken Curry (Full)", price: 240, category: "Main Course", img: "https://images.unsplash.com/photo-1603894584373-5ac82b2ae398?w=200" },
-      { name: "Chicken Curry (Half)", price: 140, category: "Main Course", img: "https://images.unsplash.com/photo-1603894584373-5ac82b2ae398?w=200" },
       { name: "Mutton Curry (Full)", price: 400, category: "Main Course", img: "https://images.unsplash.com/photo-1544025162-d76694265947?w=200" },
-      { name: "Mutton Curry (Half)", price: 220, category: "Main Course", img: "https://images.unsplash.com/photo-1544025162-d76694265947?w=200" },
-      { name: "Mutton Rogan Josh", price: 300, category: "Main Course", img: "https://images.unsplash.com/photo-1544025162-d76694265947?w=200" },
-      { name: "Pork Curry (Full)", price: 280, category: "Main Course", img: "https://images.unsplash.com/photo-1544025162-d76694265947?w=200" },
-      { name: "Pork Curry (Half)", price: 150, category: "Main Course", img: "https://images.unsplash.com/photo-1544025162-d76694265947?w=200" },
-
-      // Snacks & Pasta
       { name: "Red Sauce Pasta (Full)", price: 100, category: "Snacks & Pasta", img: "https://images.unsplash.com/photo-1551183053-bf91a1d81141?w=200" },
-      { name: "Red Sauce Pasta (Half)", price: 60, category: "Snacks & Pasta", img: "https://images.unsplash.com/photo-1551183053-bf91a1d81141?w=200" },
-      { name: "White Sauce Pasta (Full)", price: 120, category: "Snacks & Pasta", img: "https://images.unsplash.com/photo-1551183053-bf91a1d81141?w=200" },
-      { name: "Chicken Pasta (Full)", price: 180, category: "Snacks & Pasta", img: "https://images.unsplash.com/photo-1551183053-bf91a1d81141?w=200" },
-      { name: "Veg Sandwich", price: 50, category: "Snacks & Pasta", img: "https://images.unsplash.com/photo-1528735602780-2552fd46c7af?w=200" },
-      { name: "Non-Veg Sandwich", price: 80, category: "Snacks & Pasta", img: "https://images.unsplash.com/photo-1528735602780-2552fd46c7af?w=200" },
-      { name: "Aloo Paratha", price: 50, category: "Snacks & Pasta", img: "https://images.unsplash.com/photo-1626074353765-517a681e40be?w=200" },
-
-      // Momos & Rolls
-      { name: "Veg Momo (Full)", price: 50, category: "Momos & Rolls", img: "https://images.unsplash.com/photo-1625220194771-7ebdea0b70b9?w=200" },
-      { name: "Veg Momo (Half)", price: 30, category: "Momos & Rolls", img: "https://images.unsplash.com/photo-1625220194771-7ebdea0b70b9?w=200" },
       { name: "Chicken Momo (Full)", price: 70, category: "Momos & Rolls", img: "https://images.unsplash.com/photo-1625220194771-7ebdea0b70b9?w=200" },
-      { name: "Chicken Momo (Half)", price: 40, category: "Momos & Rolls", img: "https://images.unsplash.com/photo-1625220194771-7ebdea0b70b9?w=200" },
-      { name: "Pork Momo (Full)", price: 80, category: "Momos & Rolls", img: "https://images.unsplash.com/photo-1625220194771-7ebdea0b70b9?w=200" },
-      { name: "Paneer Momo (Full)", price: 100, category: "Momos & Rolls", img: "https://images.unsplash.com/photo-1625220194771-7ebdea0b70b9?w=200" },
-      { name: "Veg Roll", price: 40, category: "Momos & Rolls", img: "https://images.unsplash.com/photo-1626777552726-4a6b54c97e46?w=200" },
-      { name: "Egg Roll", price: 60, category: "Momos & Rolls", img: "https://images.unsplash.com/photo-1626777552726-4a6b54c97e46?w=200" },
-      { name: "Chicken Roll", price: 80, category: "Momos & Rolls", img: "https://images.unsplash.com/photo-1626777552726-4a6b54c97e46?w=200" },
-      { name: "Pork Roll", price: 100, category: "Momos & Rolls", img: "https://images.unsplash.com/photo-1626777552726-4a6b54c97e46?w=200" },
-
-      // Beverages
-      { name: "Black Tea", price: 10, category: "Beverages", img: "https://images.unsplash.com/photo-1517701604599-bb29b565090c?w=200" },
-      { name: "Milk Tea", price: 20, category: "Beverages", img: "https://images.unsplash.com/photo-1517701604599-bb29b565090c?w=200" },
-      { name: "Black Coffee", price: 20, category: "Beverages", img: "https://images.unsplash.com/photo-1517701604599-bb29b565090c?w=200" },
-      { name: "Cold Coffee", price: 70, category: "Beverages", img: "https://images.unsplash.com/photo-1517701604599-bb29b565090c?w=200" },
-      { name: "Fresh Lime Water", price: 50, category: "Beverages", img: "https://images.unsplash.com/photo-1513558161293-cdaf765ed2fd?w=200" }
+      { name: "Cold Coffee", price: 70, category: "Beverages", img: "https://images.unsplash.com/photo-1517701604599-bb29b565090c?w=200" }
     ];
 
     let cart = [];
     let wishlist = [];
-
-    let currentSlide = 0;
-    const slides = document.querySelectorAll('.banner-slide');
-    setInterval(() => {
-      if (slides.length > 0) {
-        slides[currentSlide].classList.remove('active');
-        currentSlide = (currentSlide + 1) % slides.length;
-        slides[currentSlide].classList.add('active');
-      }
-    }, 3500);
+    let liveOrders = [];
 
     function renderMenu(items) {
       const container = document.getElementById('menu-list');
@@ -256,12 +197,8 @@
     function filterCategory(cat, btn) {
       document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
       btn.classList.add('active');
-      if (cat === 'All') {
-        renderMenu(foodItems);
-      } else {
-        const filtered = foodItems.filter(item => item.category === cat);
-        renderMenu(filtered);
-      }
+      if (cat === 'All') renderMenu(foodItems);
+      else renderMenu(foodItems.filter(item => item.category === cat));
     }
 
     function showPage(pageId, navId) {
@@ -277,86 +214,68 @@
       cart.push({ name, price });
       document.getElementById('cart-count').innerText = cart.length;
       renderCart();
-      alert(name + " added to cart!");
+      alert(name + " cart mein add ho gaya!");
     }
 
-    function toggleWishlist(name, price, img) {
-      const index = wishlist.findIndex(item => item.name === name);
-      if(index === -1) {
-        wishlist.push({ name, price, img });
-        alert(name + " Watchlist mein add ho gaya!");
-      } else {
-        wishlist.splice(index, 1);
-        alert(name + " Watchlist se hata diya gaya!");
-      }
-      document.getElementById('wishlist-count').innerText = wishlist.length;
-      renderWishlist();
+    function placeOrder() {
+      if (cart.length === 0) return alert("Cart khali hai!");
+      
+      const orderId = "ORD#" + Math.floor(1000 + Math.random() * 9000);
+      const totalAmount = cart.reduce((sum, item) => sum + item.price, 0);
+      
+      liveOrders.push({
+        id: orderId,
+        items: [...cart],
+        amount: totalAmount,
+        status: "Pending"
+      });
+
+      alert("Order Placed Successfully! ID: " + orderId);
+      cart = [];
+      document.getElementById('cart-count').innerText = 0;
+      renderCart();
+      renderAdminOrders();
     }
 
-    function renderWishlist() {
-      const container = document.getElementById('watchlist-items');
-      if (wishlist.length === 0) {
-        container.innerHTML = "<p style='color:#888;'>Watchlist khali hai.</p>";
+    function renderAdminOrders() {
+      const container = document.getElementById('admin-orders-list');
+      if (liveOrders.length === 0) {
+        container.innerHTML = "<p style='font-size: 11px; color: #777;'>Koi naya live order nahi hai.</p>";
         return;
       }
       let html = "";
-      wishlist.forEach(item => {
+      liveOrders.forEach((ord, idx) => {
         html += `
-          <div class="food-card">
-            <img src="${item.img}" class="food-img" alt="food">
-            <div class="food-info">
-              <h3>${item.name}</h3>
-              <p>₹${item.price}</p>
+          <div class="order-item-box">
+            <p><b>Order ID:</b> ${ord.id} (${ord.status})</p>
+            <p style="font-size:11px; color:#ccc;">Items: ${ord.items.map(i => i.name).join(', ')}</p>
+            <p style="font-size:12px; color:#00ff00; font-weight:bold;">Total: ₹${ord.amount}</p>
+            <div style="margin-top:5px;">
+              <button class="btn-accept" onclick="updateOrderStatus(${idx}, 'Accepted')">Accept</button>
+              <button class="btn-reject" onclick="updateOrderStatus(${idx}, 'Rejected')">Reject</button>
             </div>
-            <button class="btn-add" onclick="addToCart('${item.name}', ${item.price})">ADD TO CART</button>
           </div>
         `;
       });
       container.innerHTML = html;
     }
 
-    function renderCart() {
-      const container = document.getElementById('cart-items');
-      const summary = document.getElementById('cart-summary');
-      if (cart.length === 0) {
-        container.innerHTML = "<p style='color:#888;'>Cart khali hai.</p>";
-        summary.innerHTML = "";
-        return;
-      }
-      let total = 0;
-      let html = "";
-      cart.forEach((item) => {
-        total += item.price;
-        html += `<div style="display:flex; justify-content:space-between; margin-bottom:8px; border-bottom:1px solid #222; padding-bottom:5px;">
-          <span>${item.name}</span>
-          <span style="color:#ff4d4d; font-weight:bold;">₹${item.price}</span>
-        </div>`;
-      });
-      container.innerHTML = html;
-      summary.innerHTML = `<h3 style="margin-top:10px; text-align:right;">Total Amount: ₹${total}</h3>`;
+    function updateOrderStatus(idx, status) {
+      liveOrders[idx].status = status;
+      alert("Order " + status + "!");
+      renderAdminOrders();
     }
 
-    function applyCoupon() {
-      const code = document.getElementById('coupon-input').value.trim();
-      const msg = document.getElementById('coupon-msg');
-      if (code === "KDFOOD20" || code === "FIRST30") {
-        msg.style.color = "#00ff00";
-        msg.innerText = "🎉 Coupon Applied Successfully!";
-      } else {
-        msg.style.color = "#ff4444";
-        msg.innerText = "❌ Invalid Coupon Code.";
-      }
-    }
+    function updateBannerLive() {
+      const title = document.getElementById('admin-banner-title').value;
+      const desc = document.getElementById('admin-banner-desc').value;
+      const img = document.getElementById('admin-banner-img').value;
 
-    function placeOrder() {
-      if (cart.length === 0) {
-        alert("Cart is empty!");
-        return;
-      }
-      alert("Order Placed Successfully!");
-      cart = [];
-      document.getElementById('cart-count').innerText = 0;
-      renderCart();
+      if (title) document.getElementById('banner-title').innerText = title;
+      if (desc) document.getElementById('banner-desc').innerText = desc;
+      if (img) document.getElementById('live-banner').style.backgroundImage = `linear-gradient(rgba(0,0,0,0.6), rgba(0,0,0,0.6)), url('${img}')`;
+
+      alert("Live Banner Updated Successfully!");
     }
 
     function handleLogin() {
@@ -364,30 +283,18 @@
       const password = document.getElementById('password').value;
       const status = document.getElementById('status');
 
-      if (!email || !password) {
-        status.innerText = "Please enter email and password.";
-        return;
-      }
+      if (!email || !password) return status.innerText = "Please enter email & password.";
 
       status.innerText = "Logging in...";
-
       auth.signInWithEmailAndPassword(email, password)
         .then(() => {
           status.innerText = "Login Successful!";
-          document.getElementById('contact-section').style.display = 'block';
-        })
-        .catch((error) => {
-          if (error.code === 'auth/user-not-found' || error.code === 'auth/invalid-credential') {
-            auth.createUserWithEmailAndPassword(email, password)
-              .then(() => {
-                status.innerText = "Account Registered!";
-                document.getElementById('contact-section').style.display = 'block';
-              })
-              .catch(err => status.innerText = "Error: " + err.message);
-          } else {
-            status.innerText = "Error: " + error.message;
+          if (email === "kdrabha2000@gmail.com") {
+            document.getElementById('admin-panel').style.display = 'block';
+            renderAdminOrders();
           }
-        });
+        })
+        .catch(err => status.innerText = "Error: " + err.message);
     }
 
     renderMenu(foodItems);
