@@ -5,71 +5,152 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>KD KA KHANA GHAR TAK</title>
   <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
     body {
       font-family: Arial, sans-serif;
-      margin: 0;
       background-color: #121212;
       color: #ffffff;
-      display: flex;
-      flex-direction: column;
-      min-height: 100vh;
+      padding-bottom: 70px;
     }
     header {
       background-color: #8b0000;
       padding: 15px;
-      text-align: center;
-      font-weight: bold;
-      font-size: 1.2em;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      position: sticky;
+      top: 0;
+      z-index: 100;
     }
-    .container {
-      max-width: 400px;
-      margin: 40px auto;
-      padding: 20px;
+    .header-title { font-weight: bold; font-size: 1.1rem; }
+    .cart-badge { background: #fff; color: #8b0000; padding: 2px 8px; border-radius: 12px; font-weight: bold; }
+    
+    .page { display: none; padding: 15px; }
+    .page.active { display: block; }
+
+    .food-card {
       background: #1e1e1e;
       border-radius: 8px;
-      box-shadow: 0 4px 10px rgba(0,0,0,0.5);
+      padding: 15px;
+      margin-bottom: 15px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .btn {
+      background: #8b0000;
+      color: white;
+      border: none;
+      padding: 8px 12px;
+      border-radius: 5px;
+      cursor: pointer;
+      font-weight: bold;
+    }
+
+    .form-box {
+      max-width: 400px;
+      margin: 30px auto;
+      background: #1e1e1e;
+      padding: 20px;
+      border-radius: 8px;
     }
     input {
       width: 100%;
       padding: 12px;
       margin: 10px 0;
-      border-radius: 5px;
-      border: 1px solid #333;
       background: #2b2b2b;
+      border: 1px solid #333;
       color: #fff;
-      box-sizing: border-box;
-    }
-    button {
-      width: 100%;
-      padding: 12px;
-      background-color: #8b0000;
-      border: none;
-      color: white;
-      font-weight: bold;
       border-radius: 5px;
-      cursor: pointer;
-      margin-top: 10px;
     }
+
+    nav {
+      position: fixed;
+      bottom: 0;
+      width: 100%;
+      background: #000;
+      display: flex;
+      justify-content: space-around;
+      padding: 10px 0;
+      border-top: 1px solid #222;
+    }
+    nav button {
+      background: none;
+      border: none;
+      color: #888;
+      font-size: 12px;
+      cursor: pointer;
+    }
+    nav button.active { color: #8b0000; font-weight: bold; }
   </style>
 </head>
 <body>
 
-  <header>K.D KA KHANA GHAR TAK</header>
+  <header>
+    <div class="header-title">K.D KA KHANA GHAR TAK</div>
+    <div>🛒 <span class="cart-badge" id="cart-count">0</span></div>
+  </header>
 
-  <div class="container">
-    <h2>Login / Register</h2>
-    <input type="email" id="email" placeholder="Email Address">
-    <input type="password" id="password" placeholder="Password">
-    <button onclick="handleLogin()">Login / Register</button>
-    <p id="status" style="margin-top:15px; text-align:center; font-size:14px;"></p>
+  <!-- HOME PAGE -->
+  <div id="home-page" class="page active">
+    <h2>Menu</h2>
+    <br>
+    <div class="food-card">
+      <div>
+        <h3>Special Thali</h3>
+        <p>₹150</p>
+      </div>
+      <button class="btn" onclick="addToCart('Special Thali', 150)">Add to Cart</button>
+    </div>
+    <div class="food-card">
+      <div>
+        <h3>Chicken Biryani</h3>
+        <p>₹200</p>
+      </div>
+      <button class="btn" onclick="addToCart('Chicken Biryani', 200)">Add to Cart</button>
+    </div>
   </div>
 
-  <!-- Firebase Scripts (Compat Version for Web) -->
+  <!-- WATCHLIST PAGE -->
+  <div id="watchlist-page" class="page">
+    <h2>Watchlist / Favorites</h2>
+    <br>
+    <p style="color:#aaa;">Koi favorite item saved nahi hai.</p>
+  </div>
+
+  <!-- CART PAGE -->
+  <div id="cart-page" class="page">
+    <h2>Your Cart</h2>
+    <br>
+    <div id="cart-items">
+      <p style="color:#aaa;">Cart khali hai.</p>
+    </div>
+  </div>
+
+  <!-- ACCOUNT PAGE -->
+  <div id="account-page" class="page">
+    <div class="form-box">
+      <h2>Customer / Admin Login</h2>
+      <input type="email" id="email" placeholder="Email Address" value="kdrabha2000@gmail.com">
+      <input type="password" id="password" placeholder="Password">
+      <button class="btn" style="width:100%" onclick="handleLogin()">Login / Register</button>
+      <p id="status" style="margin-top:15px; text-align:center; font-size:14px;"></p>
+    </div>
+  </div>
+
+  <!-- BOTTOM NAVIGATION -->
+  <nav>
+    <button id="nav-home" class="active" onclick="showPage('home-page', 'nav-home')">🏠<br>Home</button>
+    <button id="nav-watchlist" onclick="showPage('watchlist-page', 'nav-watchlist')">❤️<br>Watchlist</button>
+    <button id="nav-cart" onclick="showPage('cart-page', 'nav-cart')">🛒<br>Cart</button>
+    <button id="nav-account" onclick="showPage('account-page', 'nav-account')">👤<br>Account</button>
+  </nav>
+
+  <!-- Firebase Compat Scripts -->
   <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-auth-compat.js"></script>
 
   <script>
-    // Aapka Firebase Config
     const firebaseConfig = {
       apiKey: "AIzaSyDDTFzD8eaxS6hsQ_W5akOWRWixyZdjkSo",
       authDomain: "kd-ka-khana-ghar-tak.firebaseapp.com",
@@ -79,9 +160,24 @@
       appId: "1:69933070653:web:f9b93ba827d794bb376d54"
     };
 
-    // Initialize Firebase
     firebase.initializeApp(firebaseConfig);
     const auth = firebase.auth();
+
+    let cartCount = 0;
+
+    function showPage(pageId, navId) {
+      document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+      document.querySelectorAll('nav button').forEach(b => b.classList.remove('active'));
+      
+      document.getElementById(pageId).classList.add('active');
+      document.getElementById(navId).classList.add('active');
+    }
+
+    function addToCart(itemName, price) {
+      cartCount++;
+      document.getElementById('cart-count').innerText = cartCount;
+      alert(itemName + " Cart mein add ho gaya!");
+    }
 
     function handleLogin() {
       const email = document.getElementById('email').value;
@@ -98,10 +194,9 @@
       auth.signInWithEmailAndPassword(email, password)
         .then(() => {
           status.innerText = "Login Successful!";
-          alert("Login ho gaya!");
+          alert("Login successful!");
         })
         .catch((error) => {
-          // Agar user nahi hai, toh account bana do
           if (error.code === 'auth/user-not-found' || error.code === 'auth/invalid-credential') {
             auth.createUserWithEmailAndPassword(email, password)
               .then(() => {
