@@ -4,52 +4,186 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>K.D KA KHANA GHAR TAK</title>
-  <!-- SwiperJS CSS (Banner Slider Ke Liye) -->
+
+  <!-- SwiperJS CSS for Banners -->
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css" />
+
   <style>
-    body { font-family: Arial, sans-serif; margin: 0; background-color: #121212; color: #fff; }
-    .header { background: #e50914; padding: 15px; text-align: center; font-size: 20px; font-weight: bold; }
-    .swiper { width: 100%; height: 180px; margin-top: 10px; }
-    .swiper-slide img { width: 100%; height: 100%; object-fit: cover; border-radius: 8px; }
-    .container { padding: 15px; }
-    .card { background: #1e1e1e; padding: 10px; border-radius: 8px; margin-bottom: 10px; display: flex; justify-content: space-between; align-items: center; }
-    .btn { background: #e50914; color: #fff; border: none; padding: 8px 12px; border-radius: 5px; font-weight: bold; }
+    * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
+    body { background-color: #121212; color: #ffffff; padding-bottom: 70px; }
+    
+    /* Header */
+    .header { background: #e50914; padding: 15px; text-align: center; font-size: 20px; font-weight: bold; position: sticky; top: 0; z-index: 100; box-shadow: 0 2px 10px rgba(0,0,0,0.5); }
+    
+    /* Auto Slider Banner */
+    .swiper { width: 95%; height: 180px; margin: 12px auto; border-radius: 12px; overflow: hidden; }
+    .swiper-slide img { width: 100%; height: 100%; object-fit: cover; }
+    
+    /* Main Layout */
+    .container { padding: 12px; }
+    .section-title { font-size: 18px; margin: 15px 0 10px; color: #ff4757; }
+    
+    /* Food Card */
+    .food-card { background: #1e1e1e; border-radius: 10px; padding: 12px; margin-bottom: 12px; display: flex; justify-content: space-between; align-items: center; border: 1px solid #2a2a2a; }
+    .food-info h4 { font-size: 16px; margin-bottom: 4px; }
+    .food-info p { color: #2ed573; font-weight: bold; }
+    .add-btn { background: #e50914; color: #fff; border: none; padding: 8px 16px; border-radius: 6px; font-weight: bold; cursor: pointer; }
+    
+    /* Auth Form & Panels */
+    .panel { display: none; background: #1e1e1e; padding: 20px; margin: 15px; border-radius: 10px; border: 1px solid #333; }
+    .panel.active { display: block; }
+    input { width: 100%; padding: 10px; margin: 8px 0; background: #2b2b2b; border: 1px solid #444; color: white; border-radius: 5px; }
+    .submit-btn { width: 100%; background: #e50914; color: white; padding: 10px; border: none; border-radius: 5px; font-weight: bold; margin-top: 10px; cursor: pointer; }
+    
+    /* Navigation Bar */
+    .nav-bar { position: fixed; bottom: 0; left: 0; right: 0; background: #1a1a1a; display: flex; justify-content: space-around; padding: 10px 0; border-top: 1px solid #333; }
+    .nav-item { color: #aaa; text-decoration: none; font-size: 12px; text-align: center; cursor: pointer; }
+    .nav-item.active { color: #e50914; font-weight: bold; }
   </style>
 </head>
 <body>
 
-  <!-- Header -->
+  <!-- App Header -->
   <div class="header">K.D KA KHANA GHAR TAK</div>
 
-  <!-- Auto-Sliding Banner Section -->
-  <div class="swiper mySwiper">
-    <div class="swiper-wrapper">
-      <div class="swiper-slide"><img src="https://via.placeholder.com/400x180/e50914/fff?text=Flat+50%25+OFF+On+First+Order" alt="Banner 1"></div>
-      <div class="swiper-slide"><img src="https://via.placeholder.com/400x180/1e1e1e/fff?text=Fastest+Delivery+Ghar+Tak" alt="Banner 2"></div>
+  <!-- Main Customer View -->
+  <div id="customerView">
+    <!-- Auto-Sliding Banner Section -->
+    <div class="swiper mySwiper">
+      <div class="swiper-wrapper">
+        <div class="swiper-slide"><img src="https://images.unsplash.com/photo-1504674900247-0877df9cc836?w=600" alt="Special Offer"></div>
+        <div class="swiper-slide"><img src="https://images.unsplash.com/photo-1565299624946-b28f40a0ae38?w=600" alt="Fast Delivery"></div>
+      </div>
+      <div class="swiper-pagination"></div>
     </div>
-    <div class="swiper-pagination"></div>
+
+    <!-- Menu List -->
+    <div class="container">
+      <h3 class="section-title">🔥 Popular Dishes</h3>
+      <div class="food-card">
+        <div class="food-info">
+          <h4>Chicken Pakora (Full)</h4>
+          <p>₹100</p>
+        </div>
+        <button class="add-btn">ADD +</button>
+      </div>
+      <div class="food-card">
+        <div class="food-info">
+          <h4>Chicken Pakora (Half)</h4>
+          <p>₹50</p>
+        </div>
+        <button class="add-btn">ADD +</button>
+      </div>
+    </div>
   </div>
 
-  <!-- Menu Preview -->
-  <div class="container">
-    <h3>Top Dishes</h3>
-    <div class="card">
-      <div>
-        <h4>Chicken Pakora</h4>
-        <p>₹100</p>
-      </div>
-      <button class="btn">ADD +</button>
-    </div>
+  <!-- Login/Sign Up Panel -->
+  <div id="authPanel" class="panel">
+    <h3>Customer Login / Sign Up</h3>
+    <input type="email" id="authEmail" placeholder="Email Address">
+    <input type="password" id="authPassword" placeholder="Password">
+    <button class="submit-btn" onclick="handleAuth()">Login / Register</button>
+  </div>
+
+  <!-- Secret Admin Panel -->
+  <div id="adminPanel" class="panel">
+    <h3 style="color:#2ed573;">🛠️ Secret Admin Control Panel</h3>
+    <p style="margin-top:5px; font-size:12px; color:#aaa;">Log in as Admin: kdrabha2000@gmail.com</p>
+    
+    <h4 style="margin-top:15px;">Add New Seller / Restaurant</h4>
+    <input type="text" placeholder="Restaurant Name">
+    <input type="text" placeholder="Owner Name">
+    <input type="text" placeholder="Assign Seller Email">
+    <button class="submit-btn">Create Seller Account</button>
+  </div>
+
+  <!-- Bottom Navigation -->
+  <div class="nav-bar">
+    <div class="nav-item active" onclick="showTab('customerView')">🏠<br>Home</div>
+    <div class="nav-item" onclick="showTab('authPanel')">👤<br>Account</div>
+    <div class="nav-item" id="adminNavTab" style="display:none;" onclick="showTab('adminPanel')">⚙️<br>Admin</div>
   </div>
 
   <!-- SwiperJS Script -->
   <script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
+
+  <!-- Firebase Scripts -->
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+    import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
+    import { getFirestore } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+
+    // Firebase Configuration
+    const firebaseConfig = {
+      apiKey: "AIzaSyDDTFzD8eaxS6hsQ_N5akOWRNixyZdjkSo",
+      authDomain: "kd-ka-khana-ghar-tak.firebaseapp.com",
+      projectId: "kd-ka-khana-ghar-tak",
+      storageBucket: "kd-ka-khana-ghar-tak.firebasestorage.app",
+      messagingSenderId: "69933070653",
+      appId: "1:69933070653:web:f9b93ba827d794bb376d54"
+    };
+
+    // Initialize Firebase
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const db = getFirestore(app);
+
+    // Master Admin Email
+    const ADMIN_EMAIL = "kdrabha2000@gmail.com";
+
+    // Track User Login State
+    onAuthStateChanged(auth, (user) => {
+      if (user) {
+        if (user.email === ADMIN_EMAIL) {
+          document.getElementById('adminNavTab').style.display = 'block';
+          alert('Welcome Boss! Admin Panel Unlocked.');
+        } else {
+          document.getElementById('adminNavTab').style.display = 'none';
+        }
+      }
+    });
+
+    // Auth Function
+    window.handleAuth = async () => {
+      const email = document.getElementById('authEmail').value;
+      const pass = document.getElementById('authPassword').value;
+
+      try {
+        await signInWithEmailAndPassword(auth, email, pass);
+        alert('Successfully Logged In!');
+        showTab('customerView');
+      } catch (e) {
+        try {
+          await createUserWithEmailAndPassword(auth, email, pass);
+          alert('New Account Created Successfully!');
+          showTab('customerView');
+        } catch (err) {
+          alert('Error: ' + err.message);
+        }
+      }
+    };
+  </script>
+
+  <!-- UI Navigation Script -->
   <script>
+    // Initialize Auto-slide Banner
     var swiper = new Swiper(".mySwiper", {
       autoplay: { delay: 3000, disableOnInteraction: false },
       pagination: { el: ".swiper-pagination", clickable: true },
       loop: true
     });
+
+    function showTab(tabId) {
+      document.getElementById('customerView').style.display = 'none';
+      document.getElementById('authPanel').classList.remove('active');
+      document.getElementById('adminPanel').classList.remove('active');
+
+      if (tabId === 'customerView') {
+        document.getElementById('customerView').style.display = 'block';
+      } else {
+        document.getElementById(tabId).classList.add('active');
+      }
+    }
   </script>
 </body>
 </html>
