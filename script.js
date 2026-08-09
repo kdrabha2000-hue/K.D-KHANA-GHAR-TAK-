@@ -8,33 +8,26 @@ const firebaseConfig = {
   appId: "1:69933070653:web:f9b93ba827d794bb376d54"
 };
 
-if (typeof firebase !== 'undefined' && firebase.apps && !firebase.apps.length) {
-  firebase.initializeApp(firebaseConfig);
-}
+firebase.initializeApp(firebaseConfig);
+const auth = firebase.auth();
 
+// GOOGLE 1-CLICK & OTP AUTH
 function googleLogin() {
-  if (typeof firebase === 'undefined') {
-    alert("Firebase loading...");
-    return;
-  }
   const provider = new firebase.auth.GoogleAuthProvider();
-  firebase.auth().signInWithPopup(provider)
+  auth.signInWithPopup(provider)
     .then((result) => {
       const user = result.user;
       alert("Welcome " + (user.displayName || "User") + "!");
-      const nameInp = document.getElementById('user-name-input');
-      const emailInp = document.getElementById('user-email-input');
-      if (nameInp) nameInp.value = user.displayName || "";
-      if (emailInp) emailInp.value = user.email || "";
-      const vipTag = document.getElementById('vip-tag');
-      if (vipTag) vipTag.innerHTML = "<span style='color:gold; font-weight:bold;'>👑 VIP MEMBER</span>";
+      document.getElementById('user-name-input').value = user.displayName || "";
+      document.getElementById('user-email-input').value = user.email || "";
+      document.getElementById('vip-tag').innerHTML = "<span style='color:gold; font-weight:bold;'>👑 VIP MEMBER</span>";
     })
     .catch((error) => {
       alert("Login Error: " + error.message);
     });
 }
 
-// LIVE BANNER ROTATION
+// LIVE AUTO SLIDING BANNERS
 let liveBanners = [
   "🔥 TODAY'S SPECIAL: Chicken Butter Masala @ ₹380",
   "🎉 FLAT 30% OFF - Use Promo Code: FIRST30",
@@ -43,11 +36,8 @@ let liveBanners = [
 let currentBannerIdx = 0;
 
 setInterval(() => {
-  const bannerElem = document.getElementById('home-banner');
-  if (bannerElem) {
-    currentBannerIdx = (currentBannerIdx + 1) % liveBanners.length;
-    bannerElem.innerText = liveBanners[currentBannerIdx];
-  }
+  currentBannerIdx = (currentBannerIdx + 1) % liveBanners.length;
+  document.getElementById('home-banner').innerText = liveBanners[currentBannerIdx];
 }, 3000);
 
 // MENU DATA
@@ -200,28 +190,25 @@ let currentCat = "All";
 // NAVIGATION LOGIC
 function showPage(pageId) {
   document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
-  const target = document.getElementById(pageId);
-  if (target) target.classList.add('active');
-
-  if (pageId === 'cart') renderCart();
-  if (pageId === 'wishlist') renderWishlist();
-  if (pageId === 'orders') renderOrders();
+  document.getElementById(pageId).classList.add('active');
+  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+  if(pageId === 'cart') renderCart();
+  if(pageId === 'wishlist') renderWishlist();
+  if(pageId === 'orders') renderOrders();
 }
 
 function toggleNotifications() {
   const box = document.getElementById('notif-box');
-  if (box) box.style.display = box.style.display === 'block' ? 'none' : 'block';
+  box.style.display = box.style.display === 'block' ? 'none' : 'block';
 }
 
-// CATEGORY BAR
+// RENDER CATEGORIES
 function renderCategories() {
   const categories = ["All", "Breads & Naan", "Dal & Gravy", "Main Course", "Pasta", "Breakfast & Snacks", "Tea & Coffee", "Chowmein & Rolls", "Fried Rice", "Momos", "Starters & Tandoor", "Juices & Drinks", "Desserts"];
   const bar = document.getElementById('category-bar');
-  if (bar) {
-    bar.innerHTML = categories.map(c => `
-      <div class="cat-chip ${c === currentCat ? 'active' : ''}" onclick="selectCategory('${c}')">${c}</div>
-    `).join('');
-  }
+  bar.innerHTML = categories.map(c => `
+    <div class="cat-chip ${c === currentCat ? 'active' : ''}" onclick="selectCategory('${c}')">${c}</div>
+  `).join('');
 }
 
 function selectCategory(cat) {
@@ -233,10 +220,9 @@ function selectCategory(cat) {
 // RENDER MENU
 function renderMenu() {
   const container = document.getElementById('menu-container');
-  if (!container) return;
   let filtered = menu;
-  if (currentCat !== "All") filtered = menu.filter(m => m.cat === currentCat);
-
+  if(currentCat !== "All") filtered = menu.filter(m => m.cat === currentCat);
+  
   container.innerHTML = filtered.map(item => `
     <div class="food-card">
       <img src="${item.img}" class="food-img">
@@ -253,11 +239,8 @@ function renderMenu() {
 }
 
 function filterMenu() {
-  const inputElem = document.getElementById('search-input');
-  if (!inputElem) return;
-  const query = inputElem.value.toLowerCase();
+  const query = document.getElementById('search-input').value.toLowerCase();
   const container = document.getElementById('menu-container');
-  if (!container) return;
   const filtered = menu.filter(m => m.name.toLowerCase().includes(query));
   container.innerHTML = filtered.map(item => `
     <div class="food-card">
@@ -271,35 +254,27 @@ function filterMenu() {
   `).join('');
 }
 
-// CART
+// CART & CHECKOUT
 function addToCart(id) {
   const item = menu.find(m => m.id === id);
-  if (!item) return;
   const exist = cart.find(c => c.id === id);
-  if (exist) exist.qty++;
-  else cart.push({ ...item, qty: 1 });
+  if(exist) exist.qty++;
+  else cart.push({...item, qty: 1});
   updateCartCount();
   alert(item.name + " added to cart!");
 }
 
 function updateCartCount() {
-  const countElem = document.getElementById('cart-count');
-  if (countElem) {
-    countElem.innerText = cart.reduce((s, i) => s + i.qty, 0);
-  }
+  document.getElementById('cart-count').innerText = cart.reduce((s, i) => s + i.qty, 0);
 }
 
 function renderCart() {
   const container = document.getElementById('cart-items');
-  const summary = document.getElementById('bill-summary');
-  if (!container) return;
-
-  if (cart.length === 0) {
+  if(cart.length === 0) {
     container.innerHTML = "<p>Your cart is empty.</p>";
-    if (summary) summary.innerHTML = "";
+    document.getElementById('bill-summary').innerHTML = "";
     return;
   }
-
   container.innerHTML = cart.map(i => `
     <div class="food-card">
       <div class="food-info">
@@ -312,40 +287,33 @@ function renderCart() {
       </div>
     </div>
   `).join('');
-
+  
   const subtotal = cart.reduce((s, i) => s + (i.price * i.qty), 0);
   const finalTotal = Math.max(0, subtotal - discount);
-  if (summary) {
-    summary.innerHTML = `
-      <div>Subtotal: ₹${subtotal}</div>
-      <div>Discount: -₹${discount}</div>
-      <div><b>Total Payable: ₹${finalTotal}</b></div>
-    `;
-  }
+  document.getElementById('bill-summary').innerHTML = `
+    <div>Subtotal: ₹${subtotal}</div>
+    <div>Discount: -₹${discount}</div>
+    <div><b>Total Payable: ₹${finalTotal}</b></div>
+  `;
 }
 
 function changeQty(id, delta) {
   const item = cart.find(c => c.id === id);
-  if (!item) return;
+  if(!item) return;
   item.qty += delta;
-  if (item.qty <= 0) cart = cart.filter(c => c.id !== id);
+  if(item.qty <= 0) cart = cart.filter(c => c.id !== id);
   updateCartCount();
   renderCart();
 }
 
 function useSavedAddress() {
-  const dropdown = document.getElementById('saved-address-dropdown');
-  const addressBox = document.getElementById('del-address');
-  if (dropdown && addressBox && dropdown.value) {
-    addressBox.value = dropdown.value;
-  }
+  const val = document.getElementById('saved-address-dropdown').value;
+  if(val) document.getElementById('del-address').value = val;
 }
 
 function applyCoupon() {
-  const codeInp = document.getElementById('coupon-code');
-  if (!codeInp) return;
-  const code = codeInp.value.toUpperCase();
-  if (coupons[code]) {
+  const code = document.getElementById('coupon-code').value.toUpperCase();
+  if(coupons[code]) {
     discount = coupons[code];
     alert("Coupon Applied! ₹" + discount + " OFF");
   } else {
@@ -355,20 +323,13 @@ function applyCoupon() {
 }
 
 function placeOrder() {
-  const nameInp = document.getElementById('del-name');
-  const phoneInp = document.getElementById('del-phone');
-  const addressInp = document.getElementById('del-address');
-  const payInp = document.getElementById('payment-mode');
-
-  if (!nameInp || !phoneInp || !addressInp) return;
-
-  const name = nameInp.value;
-  const phone = phoneInp.value;
-  const address = addressInp.value;
-  const pay = payInp ? payInp.value : "COD";
-
-  if (!name || !phone || !address) return alert("Please fill all delivery details!");
-  if (cart.length === 0) return alert("Cart is empty!");
+  const name = document.getElementById('del-name').value;
+  const phone = document.getElementById('del-phone').value;
+  const address = document.getElementById('del-address').value;
+  const pay = document.getElementById('payment-mode').value;
+  
+  if(!name || !phone || !address) return alert("Please fill all delivery details!");
+  if(cart.length === 0) return alert("Cart is empty!");
 
   const newOrder = {
     id: "ORD" + Date.now().toString().slice(-5),
@@ -387,16 +348,15 @@ function placeOrder() {
 
 // WISHLIST & PROFILE
 function toggleWishlist(id) {
-  if (wishlist.includes(id)) wishlist = wishlist.filter(x => x !== id);
+  if(wishlist.includes(id)) wishlist = wishlist.filter(x => x !== id);
   else wishlist.push(id);
   renderMenu();
 }
 
 function renderWishlist() {
   const container = document.getElementById('wishlist-container');
-  if (!container) return;
   const items = menu.filter(m => wishlist.includes(m.id));
-  if (items.length === 0) return container.innerHTML = "<p>No items in wishlist.</p>";
+  if(items.length === 0) return container.innerHTML = "<p>No items in wishlist.</p>";
   container.innerHTML = items.map(i => `
     <div class="food-card">
       <img src="${i.img}" class="food-img">
@@ -410,8 +370,7 @@ function renderWishlist() {
 
 function renderOrders() {
   const container = document.getElementById('my-orders-list');
-  if (!container) return;
-  if (orders.length === 0) return container.innerHTML = "<p>No live orders.</p>";
+  if(orders.length === 0) return container.innerHTML = "<p>No live orders.</p>";
   container.innerHTML = orders.map(o => `
     <div class="order-card">
       <div><b>Order ID:</b> ${o.id}</div>
@@ -425,15 +384,12 @@ function saveProfile() {
   alert("Profile Details Saved!");
 }
 
-// ADMIN AUTH
+// ADMIN AUTHENTICATION & CONTROLS
 function loginAdmin() {
-  const emailInp = document.getElementById('admin-email');
-  const passInp = document.getElementById('admin-pass');
-  if (!emailInp || !passInp) return;
-
-  if (emailInp.value === 'kdrabha2000@gmail.com' && passInp.value === 'admin123') {
-    const adminPanel = document.getElementById('admin-panel');
-    if (adminPanel) adminPanel.style.display = 'block';
+  const email = document.getElementById('admin-email').value;
+  const pass = document.getElementById('admin-pass').value;
+  if(email === 'kdrabha2000@gmail.com' && pass === 'admin123') {
+    document.getElementById('admin-panel').style.display = 'block';
     alert("Welcome Admin!");
     renderAdmin();
   } else {
@@ -442,69 +398,59 @@ function loginAdmin() {
 }
 
 function renderAdmin() {
-  const totalElem = document.getElementById('stat-total');
-  const pendingElem = document.getElementById('stat-pending');
-  const earningElem = document.getElementById('stat-earning');
+  // Feature 9: Sales Overview
+  document.getElementById('stat-total').innerText = orders.length;
+  document.getElementById('stat-pending').innerText = orders.filter(o => o.status === 'Pending').length;
+  document.getElementById('stat-earning').innerText = orders.reduce((s, o) => s + o.total, 0);
 
-  if (totalElem) totalElem.innerText = orders.length;
-  if (pendingElem) pendingElem.innerText = orders.filter(o => o.status === 'Pending').length;
-  if (earningElem) earningElem.innerText = orders.reduce((s, o) => s + o.total, 0);
-
+  // Feature 1, 2, 10: Live Order Control + Status Updater + Direct Call Action
   const container = document.getElementById('admin-orders-list');
-  if (container) {
-    container.innerHTML = orders.length === 0 ? "<p>No incoming orders.</p>" : orders.map(o => `
-      <div class="order-card">
-        <b>${o.id}</b> - ${o.name} <a href="tel:${o.phone}" style="color:gold;">📞 Call Direct (${o.phone})</a><br>
-        Address: ${o.address}<br>
-        Items: ${o.items.map(i => i.name + ' x' + i.qty).join(', ')}<br>
-        Status: <b>${o.status}</b><br>
-        <button class="btn-sec" onclick="updateStatus('${o.id}', 'Accepted')">Accept Order</button>
-        <button class="btn-sec" onclick="updateStatus('${o.id}', 'Out for Delivery')">Out for Delivery</button>
-        <button class="btn-sec" onclick="updateStatus('${o.id}', 'Delivered')">Delivered</button>
-        <button class="btn-sec" style="background:red;" onclick="updateStatus('${o.id}', 'Rejected')">Reject Order</button>
-      </div>
-    `).join('');
-  }
+  container.innerHTML = orders.length === 0 ? "<p>No incoming orders.</p>" : orders.map(o => `
+    <div class="order-card">
+      <b>${o.id}</b> - ${o.name} <a href="tel:${o.phone}" style="color:gold;">📞 Call Direct (${o.phone})</a><br>
+      Address: ${o.address}<br>
+      Items: ${o.items.map(i => i.name + ' x' + i.qty).join(', ')}<br>
+      Status: <b>${o.status}</b><br>
+      <button class="btn-sec" onclick="updateStatus('${o.id}', 'Accepted')">Accept Order</button>
+      <button class="btn-sec" onclick="updateStatus('${o.id}', 'Out for Delivery')">Out for Delivery</button>
+      <button class="btn-sec" onclick="updateStatus('${o.id}', 'Delivered')">Delivered</button>
+      <button class="btn-sec" style="background:red;" onclick="updateStatus('${o.id}', 'Rejected')">Reject Order</button>
+    </div>
+  `).join('');
 
+  // Feature 4 & 5: Item Delete & Price Manager
   const menuContainer = document.getElementById('admin-menu-list');
-  if (menuContainer) {
-    menuContainer.innerHTML = menu.map(m => `
-      <div class="admin-item-row">
-        <span>${m.name} (₹<input type="number" id="price-${m.id}" value="${m.price}" style="width:60px; padding:2px; display:inline;">)</span>
-        <div>
-          <button onclick="adminEditPrice(${m.id})" style="background:#2196F3; color:white; border:none; padding:4px 6px; border-radius:4px;">Save Price</button>
-          <button onclick="adminDeleteItem(${m.id})" style="background:red; color:white; border:none; padding:4px 6px; border-radius:4px;">🗑️ Delete</button>
-        </div>
+  menuContainer.innerHTML = menu.map(m => `
+    <div class="admin-item-row">
+      <span>${m.name} (₹<input type="number" id="price-${m.id}" value="${m.price}" style="width:60px; padding:2px; display:inline;">)</span>
+      <div>
+        <button onclick="adminEditPrice(${m.id})" style="background:#2196F3; color:white; border:none; padding:4px 6px; border-radius:4px;">Save Price</button>
+        <button onclick="adminDeleteItem(${m.id})" style="background:red; color:white; border:none; padding:4px 6px; border-radius:4px;">🗑️ Delete</button>
       </div>
-    `).join('');
-  }
+    </div>
+  `).join('');
 }
 
 function updateStatus(id, st) {
   const ord = orders.find(o => o.id === id);
-  if (ord) ord.status = st;
+  if(ord) ord.status = st;
   renderAdmin();
 }
 
+// Feature 3: Add Item
 function adminAddItem() {
-  const nameInp = document.getElementById('add-item-name');
-  const priceInp = document.getElementById('add-item-price');
-  const catInp = document.getElementById('add-item-cat');
-
-  if (!nameInp || !priceInp || !catInp) return;
-
-  const name = nameInp.value;
-  const price = Number(priceInp.value);
-  const cat = catInp.value;
-
-  if (!name || !price) return alert("Fill item details!");
-
+  const name = document.getElementById('add-item-name').value;
+  const price = Number(document.getElementById('add-item-price').value);
+  const cat = document.getElementById('add-item-cat').value;
+  if(!name || !price) return alert("Fill item details!");
+  
   menu.push({ id: Date.now(), name, price, cat, img: "https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=200" });
   alert("Item added to live menu!");
   renderMenu();
   renderAdmin();
 }
 
+// Feature 4: Delete Item
 function adminDeleteItem(id) {
   menu = menu.filter(m => m.id !== id);
   alert("Item deleted from live menu!");
@@ -512,47 +458,42 @@ function adminDeleteItem(id) {
   renderAdmin();
 }
 
+// Feature 5: Edit Price
 function adminEditPrice(id) {
-  const priceInp = document.getElementById(`price-${id}`);
-  if (!priceInp) return;
-  const newPrice = Number(priceInp.value);
+  const newPrice = Number(document.getElementById(`price-${id}`).value);
   const item = menu.find(m => m.id === id);
-  if (item && newPrice) {
+  if(item && newPrice) {
     item.price = newPrice;
     alert("Price updated for " + item.name + "!");
     renderMenu();
   }
 }
 
+// Feature 6: VIP Manager
 function adminAssignVIP() {
-  const phoneInp = document.getElementById('vip-user-phone');
-  if (!phoneInp || !phoneInp.value) return alert("Enter phone number!");
-  alert("Customer (" + phoneInp.value + ") is now a 👑 VIP Member!");
+  const phone = document.getElementById('vip-user-phone').value;
+  if(!phone) return alert("Enter phone number!");
+  alert("Customer (" + phone + ") is now a 👑 VIP Member!");
 }
 
+// Feature 7: Coupon Generator
 function adminCreateCoupon() {
-  const codeInp = document.getElementById('new-coupon-code');
-  const discInp = document.getElementById('new-coupon-discount');
-  if (!codeInp || !discInp) return;
-
-  const code = codeInp.value.toUpperCase();
-  const disc = Number(discInp.value);
-  if (!code || !disc) return alert("Enter valid code and discount!");
+  const code = document.getElementById('new-coupon-code').value.toUpperCase();
+  const disc = Number(document.getElementById('new-coupon-discount').value);
+  if(!code || !disc) return alert("Enter valid code and discount!");
   coupons[code] = disc;
   alert("Coupon " + code + " created for ₹" + disc + " OFF!");
 }
 
+// Feature 8: Banner Manager
 function adminUpdateBanner() {
-  const textInp = document.getElementById('new-banner-text');
-  if (!textInp || !textInp.value) return alert("Enter banner text!");
-  liveBanners.push("🔥 " + textInp.value);
-  const bannerElem = document.getElementById('home-banner');
-  if (bannerElem) bannerElem.innerText = "🔥 " + textInp.value;
+  const text = document.getElementById('new-banner-text').value;
+  if(!text) return alert("Enter banner text!");
+  liveBanners.push("🔥 " + text);
+  document.getElementById('home-banner').innerText = "🔥 " + text;
   alert("New Offer Banner added to slideshow!");
 }
 
 // INITIAL LOAD
-window.onload = function() {
-  renderCategories();
-  renderMenu();
-};
+renderCategories();
+renderMenu();
