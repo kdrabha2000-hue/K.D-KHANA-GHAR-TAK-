@@ -72,7 +72,7 @@
       <div class="banner-slide" id="live-banner" style="background-image: linear-gradient(rgba(0,0,0,0.6), rgba(0,0,0,0.6)), url('https://images.unsplash.com/photo-1555396273-367ea4eb4db5?w=500');">
         <h2 id="banner-title">🎉 SPECIAL OFFERS & DISCOUNTS</h2>
         <p id="banner-desc">Use coupon code on Checkout for extra discount!</p>
-        <span class="coupon-badge">USE CODE: KDFOOD20 (20% OFF)</span>
+        <span class="coupon-badge" id="banner-coupon-text">USE CODE: KDFOOD20 (20% OFF)</span>
       </div>
     </div>
 
@@ -95,9 +95,9 @@
     
     <div class="coupon-box">
       <h3 style="font-size: 0.9rem; color: #ff8c00; margin-bottom: 4px;">🏷️ Apply Coupon Code</h3>
-      <p style="font-size: 11px; color: #aaa; margin-bottom: 6px;">Available Codes: <b>FIRST30</b> (30% OFF) | <b>KDFOOD20</b> (20% OFF)</p>
+      <p style="font-size: 11px; color: #aaa; margin-bottom: 6px;" id="available-coupons-text">Available Codes: FIRST30 (30% OFF) | KDFOOD20 (20% OFF)</p>
       <div style="display: flex; gap: 6px;">
-        <input type="text" id="coupon-input" placeholder="Enter Code (e.g. KDFOOD20)" style="margin:0;">
+        <input type="text" id="coupon-input" placeholder="Enter Coupon Code" style="margin:0;">
         <button class="btn-add" style="background:#ff8c00; color:#000; padding: 0 15px;" onclick="applyCoupon()">APPLY</button>
       </div>
       <p id="coupon-msg" style="font-size: 11px; margin-top: 6px; font-weight: bold;"></p>
@@ -117,7 +117,7 @@
     </div>
   </div>
 
-  <!-- ACCOUNT PAGE & ADMIN PANEL -->
+  <!-- ACCOUNT PAGE & LOGIN -->
   <div id="account-page" class="page">
     <div class="form-box">
       
@@ -138,8 +138,8 @@
 
       <!-- ADMIN LOGIN -->
       <div id="admin-login-section">
-        <h3 style="font-size: 0.9rem; text-align: center; color: #888;">👑 Admin Login (Email Only)</h3>
-        <input type="email" id="admin-email" placeholder="Admin Email" value="kdrabha2000@gmail.com">
+        <h3 style="font-size: 0.9rem; text-align: center; color: #888;">👑 Admin Login Only</h3>
+        <input type="email" id="admin-email" placeholder="Admin Email Address">
         <input type="password" id="admin-pass" placeholder="Password">
         <button class="btn-add" style="width:100%; padding: 8px; margin-top: 4px;" onclick="adminLogin()">Login as Admin</button>
       </div>
@@ -153,10 +153,11 @@
         <a href="https://wa.me/918453270362" target="_blank" style="background:#25D366; color:#fff; border:none; padding:8px; border-radius:5px; text-decoration:none; display:block; margin-top:8px; font-weight:bold; text-align:center;">💬 Chat on WhatsApp</a>
       </div>
 
-      <!-- ADMIN CONTROL PANEL (ADD NEW ITEMS & MANAGE ORDERS) -->
+      <!-- ADMIN CONTROL PANEL -->
       <div id="admin-panel" class="admin-card" style="display: none;">
         <h3 style="color:#ff8c00; font-size: 1rem; margin-bottom: 8px;">👑 Admin Control Panel</h3>
         
+        <!-- 1. ADD NEW FOOD ITEM -->
         <p style="font-size: 12px; font-weight: bold; color: #00ff00; margin-top: 10px;">1. Add New Food Item To Menu:</p>
         <input type="text" id="new-food-name" placeholder="Food Name (e.g. Chicken Biryani)">
         <input type="number" id="new-food-price" placeholder="Price in ₹ (e.g. 180)">
@@ -173,7 +174,18 @@
 
         <hr style="border: 0.5px solid #333; margin: 15px 0;">
 
-        <p style="font-size: 12px; font-weight: bold; color: #ff8c00;">2. Live Customer Orders & Address:</p>
+        <!-- 2. COUPON CODE DISCOUNT MANAGEMENT -->
+        <p style="font-size: 12px; font-weight: bold; color: #ff8c00;">2. Create New Coupon / Discount Code:</p>
+        <input type="text" id="new-coupon-code" placeholder="Coupon Name (e.g. FESTIVE30)">
+        <input type="number" id="new-coupon-pct" placeholder="Discount % (e.g. 30)">
+        <button class="btn-add" style="width: 100%; background: #ff8c00; color: #000; margin-top: 5px;" onclick="addNewCoupon()">🏷️ Add New Coupon Code</button>
+        
+        <div id="admin-coupons-list" style="margin-top: 8px;"></div>
+
+        <hr style="border: 0.5px solid #333; margin: 15px 0;">
+
+        <!-- 3. LIVE CUSTOMER ORDERS -->
+        <p style="font-size: 12px; font-weight: bold; color: #00ff00;">3. Live Customer Orders & Address:</p>
         <div id="admin-orders-list" style="margin-top: 5px;">
           <p style="font-size: 11px; color: #777;">Koi naya live order nahi hai.</p>
         </div>
@@ -211,6 +223,11 @@
       { name: "Chicken Momo (Full)", price: 70, category: "Momos & Rolls", img: "https://images.unsplash.com/photo-1625220194771-7ebdea0b70b9?w=200" }
     ];
 
+    let activeCoupons = [
+      { code: "FIRST30", pct: 30 },
+      { code: "KDFOOD20", pct: 20 }
+    ];
+
     let cart = [];
     let liveOrders = [];
     let appliedDiscount = 0;
@@ -221,6 +238,7 @@
       window.recaptchaVerifier = new firebase.auth.RecaptchaVerifier('recaptcha-container', {
         'size': 'invisible'
       });
+      updateAvailableCouponsUI();
     };
 
     function renderMenu(items) {
@@ -268,6 +286,64 @@
       }
     }
 
+    function addNewCoupon() {
+      const code = document.getElementById('new-coupon-code').value.trim().toUpperCase();
+      const pct = parseFloat(document.getElementById('new-coupon-pct').value);
+
+      if(!code || isNaN(pct)) return alert("Kripya sahi Coupon Code aur Discount % bharein!");
+
+      activeCoupons.push({ code, pct });
+      updateAvailableCouponsUI();
+      renderAdminCoupons();
+      alert("Naya Coupon Code '" + code + "' (" + pct + "% OFF) Active Ho Gaya!");
+
+      document.getElementById('new-coupon-code').value = "";
+      document.getElementById('new-coupon-pct').value = "";
+    }
+
+    function deleteCoupon(index) {
+      if(confirm("Kya aap is coupon ko delete karna chahte hain?")) {
+        activeCoupons.splice(index, 1);
+        updateAvailableCouponsUI();
+        renderAdminCoupons();
+      }
+    }
+
+    function renderAdminCoupons() {
+      const container = document.getElementById('admin-coupons-list');
+      let html = "<p style='font-size:11px; color:#aaa; margin-bottom:4px;'>Active Coupons List:</p>";
+      activeCoupons.forEach((c, idx) => {
+        html += `<div style="display:flex; justify-content:space-between; background:#222; padding:5px 8px; border-radius:4px; margin-bottom:4px; font-size:11px;">
+          <span><b>${c.code}</b> (${c.pct}% OFF)</span>
+          <button style="background:#dc3545; color:#fff; border:none; border-radius:3px; padding:2px 5px; cursor:pointer;" onclick="deleteCoupon(${idx})">Delete</button>
+        </div>`;
+      });
+      container.innerHTML = html;
+    }
+
+    function updateAvailableCouponsUI() {
+      const listText = activeCoupons.map(c => `${c.code} (${c.pct}% OFF)`).join(' | ');
+      document.getElementById('available-coupons-text').innerText = "Available Codes: " + (listText || "Koi active coupon nahi hai");
+    }
+
+    function applyCoupon() {
+      const inputCode = document.getElementById('coupon-input').value.trim().toUpperCase();
+      const msg = document.getElementById('coupon-msg');
+
+      const foundCoupon = activeCoupons.find(c => c.code === inputCode);
+
+      if (foundCoupon) {
+        appliedDiscount = foundCoupon.pct;
+        msg.style.color = "#00ff00";
+        msg.innerText = "🎉 " + foundCoupon.code + " Applied! Flat " + foundCoupon.pct + "% OFF!";
+      } else {
+        appliedDiscount = 0;
+        msg.style.color = "#ff4444";
+        msg.innerText = "❌ Galat ya expired Coupon Code!";
+      }
+      renderCart();
+    }
+
     function addToCart(name, price) {
       cart.push({ name, price });
       document.getElementById('cart-count').innerText = cart.length;
@@ -304,26 +380,6 @@
           <h3 style="display:flex; justify-content:space-between; font-size:1rem; color:#ff8c00;"><span>Final Total:</span> <span>₹${finalTotal.toFixed(0)}</span></h3>
         </div>
       `;
-    }
-
-    function applyCoupon() {
-      const code = document.getElementById('coupon-input').value.trim().toUpperCase();
-      const msg = document.getElementById('coupon-msg');
-
-      if (code === "FIRST30") {
-        appliedDiscount = 30;
-        msg.style.color = "#00ff00";
-        msg.innerText = "🎉 FIRST30 Applied! Flat 30% OFF!";
-      } else if (code === "KDFOOD20") {
-        appliedDiscount = 20;
-        msg.style.color = "#00ff00";
-        msg.innerText = "🎉 KDFOOD20 Applied! Flat 20% OFF!";
-      } else {
-        appliedDiscount = 0;
-        msg.style.color = "#ff4444";
-        msg.innerText = "❌ Galat Coupon Code!";
-      }
-      renderCart();
     }
 
     function placeOrder() {
@@ -365,7 +421,7 @@
             <p><b>Order ID:</b> ${ord.id} (${ord.status})</p>
             <p style="font-size:11px; color:#ccc;">Items: ${ord.items.map(i => i.name).join(', ')}</p>
             <p style="font-size:11px; color:#ff8c00;"><b>Address:</b> ${ord.address} (Landmark: ${ord.landmark})</p>
-            <p style="font-size:12px; color:#00ff00; font-weight:bold;">Total: ₹${ord.amount}</p>
+            <p style="font-size:12px; color:#00ff00; font-weight:bold;">Total Bill: ₹${ord.amount}</p>
             <div style="margin-top:5px;">
               <button class="btn-accept" onclick="updateOrderStatus(${idx}, 'Accepted')">Accept</button>
               <button class="btn-reject" onclick="updateOrderStatus(${idx}, 'Rejected')">Reject</button>
@@ -416,6 +472,8 @@
       const pass = document.getElementById('admin-pass').value;
       const status = document.getElementById('status');
 
+      if (!email || !pass) return status.innerText = "Admin Email aur Password dono daalein.";
+
       auth.signInWithEmailAndPassword(email, pass)
         .then(() => {
           status.innerText = "Admin Login Successful!";
@@ -424,6 +482,7 @@
             isAdminLoggedIn = true;
             document.getElementById('admin-panel').style.display = 'block';
             renderMenu(foodItems);
+            renderAdminCoupons();
             renderAdminOrders();
           }
         })
