@@ -8,10 +8,12 @@
     * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
     body { background-color: #0d0d0d; color: #ffffff; padding-bottom: 70px; }
     
-    /* Header */
+    /* Header with Watchlist & Cart on Top Right */
     header { background: #8b0000; padding: 12px 15px; display: flex; justify-content: space-between; align-items: center; position: sticky; top: 0; z-index: 100; box-shadow: 0 2px 10px rgba(0,0,0,0.8); }
-    .header-title { font-weight: bold; font-size: 1.1rem; color: #fff; letter-spacing: 0.5px; }
-    .cart-badge { background: #fff; color: #8b0000; padding: 2px 8px; border-radius: 12px; font-weight: bold; font-size: 12px; }
+    .header-title { font-weight: bold; font-size: 1rem; color: #fff; letter-spacing: 0.5px; }
+    .header-icons { display: flex; gap: 12px; align-items: center; }
+    .icon-btn { background: #1a0000; border: 1px solid #ff4d4d; color: #fff; padding: 4px 8px; border-radius: 15px; font-weight: bold; font-size: 12px; cursor: pointer; }
+    .badge { background: #fff; color: #8b0000; padding: 1px 6px; border-radius: 10px; font-size: 11px; margin-left: 2px; }
 
     /* Notice Bar */
     .delivery-notice { background: linear-gradient(90deg, #d32f2f, #ff8c00); color: #fff; text-align: center; padding: 6px; font-weight: 600; font-size: 12px; }
@@ -38,20 +40,22 @@
     .page.active { display: block; }
 
     /* Food Cards */
-    .food-card { background: #181818; border-radius: 12px; padding: 10px; margin-bottom: 12px; display: flex; align-items: center; justify-content: space-between; border: 1px solid #262626; box-shadow: 0 4px 8px rgba(0,0,0,0.4); }
+    .food-card { background: #181818; border-radius: 12px; padding: 10px; margin-bottom: 12px; display: flex; align-items: center; justify-content: space-between; border: 1px solid #262626; box-shadow: 0 4px 8px rgba(0,0,0,0.4); position: relative; }
     .food-img { width: 75px; height: 75px; border-radius: 10px; object-fit: cover; margin-right: 12px; }
     .food-info { flex: 1; }
     .food-info h3 { font-size: 0.95rem; font-weight: 600; color: #eee; }
     .food-info p { color: #ff4d4d; font-weight: bold; font-size: 0.9rem; margin-top: 4px; }
     
-    .btn-add { background: #8b0000; color: white; border: none; padding: 6px 14px; border-radius: 6px; font-weight: bold; font-size: 12px; cursor: pointer; }
+    .card-actions { display: flex; flex-direction: column; gap: 6px; align-items: flex-end; }
+    .btn-add { background: #8b0000; color: white; border: none; padding: 6px 12px; border-radius: 6px; font-weight: bold; font-size: 12px; cursor: pointer; }
+    .btn-heart { background: none; border: none; font-size: 18px; cursor: pointer; }
 
     /* Coupon Box & Checkout Box */
     .checkout-box { background: #181818; border-radius: 10px; padding: 15px; border: 1px solid #333; margin-top: 15px; }
     .coupon-box { background: #222; padding: 12px; border-radius: 8px; border: 1px dashed #ff8c00; margin-bottom: 15px; }
     .upi-tag { background: #222; padding: 10px; border-radius: 6px; color: #ff8c00; font-family: monospace; font-size: 13px; text-align: center; margin: 10px 0; border: 1px dashed #ff8c00; }
 
-    /* Contact Box (Login Required) */
+    /* Contact Box */
     .contact-card { background: #181818; padding: 15px; border-radius: 10px; border: 1px solid #333; margin-top: 15px; text-align: center; }
     .btn-whatsapp { background: #25D366; color: white; border: none; padding: 10px; border-radius: 6px; font-weight: bold; width: 100%; display: block; text-decoration: none; margin-top: 10px; }
 
@@ -67,9 +71,13 @@
 </head>
 <body>
 
+  <!-- HEADER WITH TOP RIGHT WATCHLIST AND CART -->
   <header>
     <div class="header-title">KD KA KHANA GHAR TAK</div>
-    <div>🛒 <span class="cart-badge" id="cart-count">0</span></div>
+    <div class="header-icons">
+      <button class="icon-btn" onclick="showPage('watchlist-page', '')">❤️ Wishlist <span class="badge" id="wishlist-count">0</span></button>
+      <button class="icon-btn" onclick="showPage('cart-page', '')">🛒 Cart <span class="badge" id="cart-count">0</span></button>
+    </div>
   </header>
   <div class="delivery-notice">🛵 Freshly Made, Especially for You • Delivery 5-10 km</div>
 
@@ -107,9 +115,15 @@
     <div id="menu-list" style="margin-top: 10px;"></div>
   </div>
 
+  <!-- WATCHLIST / WISHLIST SCREEN -->
+  <div id="watchlist-page" class="page">
+    <h2 style="font-size: 1.2rem; color: #ff4d4d; margin-bottom: 10px;">❤️ YOUR WATCHLIST</h2>
+    <div id="watchlist-items"></div>
+  </div>
+
   <!-- CART & CHECKOUT SCREEN -->
   <div id="cart-page" class="page">
-    <h2 style="font-size: 1.2rem; color: #ff4d4d; margin-bottom: 10px;">YOUR CART</h2>
+    <h2 style="font-size: 1.2rem; color: #ff4d4d; margin-bottom: 10px;">🛒 YOUR CART</h2>
     
     <!-- Coupon Box -->
     <div class="coupon-box">
@@ -151,7 +165,6 @@
   <!-- BOTTOM NAVIGATION BAR -->
   <nav>
     <button id="nav-home" class="active" onclick="showPage('home-page', 'nav-home')">🏠<br>Home</button>
-    <button id="nav-cart" onclick="showPage('cart-page', 'nav-cart')">🛒<br>Cart</button>
     <button id="nav-account" onclick="showPage('account-page', 'nav-account')">👤<br>Profile</button>
   </nav>
 
@@ -172,28 +185,24 @@
     firebase.initializeApp(firebaseConfig);
     const auth = firebase.auth();
 
-    // Menu Item Database with Categories
     const foodItems = [
-      // Breads
       { name: "Plain Tawa Roti", price: 10, category: "Breads", img: "https://images.unsplash.com/photo-1626074353765-517a681e40be?w=200" },
       { name: "Butter Naan", price: 80, category: "Breads", img: "https://images.unsplash.com/photo-1601050690597-df0568f70950?w=200" },
-      // Main Course
       { name: "Chicken Biryani", price: 180, category: "Main Course", img: "https://images.unsplash.com/photo-1563379091339-03b21ab4a4f8?w=200" },
       { name: "Butter Chicken", price: 200, category: "Main Course", img: "https://images.unsplash.com/photo-1603894584373-5ac82b2ae398?w=200" },
       { name: "Paneer Butter Masala", price: 200, category: "Main Course", img: "https://images.unsplash.com/photo-1631452180519-c014fe946bc7?w=200" },
       { name: "Dal Makhani", price: 200, category: "Main Course", img: "https://images.unsplash.com/photo-1546833999-b9f581a1996d?w=200" },
-      // Fast Food
       { name: "Chicken Momo (Full)", price: 70, category: "Fast Food", img: "https://images.unsplash.com/photo-1625220194771-7ebdea0b70b9?w=200" },
       { name: "Chicken Roll", price: 80, category: "Fast Food", img: "https://images.unsplash.com/photo-1626777552726-4a6b54c97e46?w=200" },
       { name: "Red Sauce Pasta", price: 100, category: "Fast Food", img: "https://images.unsplash.com/photo-1551183053-bf91a1d81141?w=200" },
-      // Drinks & Coffee
       { name: "Cold Coffee", price: 70, category: "Drinks & Coffee", img: "https://images.unsplash.com/photo-1517701604599-bb29b565090c?w=200" },
       { name: "Fresh Lime Water", price: 50, category: "Drinks & Coffee", img: "https://images.unsplash.com/photo-1513558161293-cdaf765ed2fd?w=200" }
     ];
 
     let cart = [];
+    let wishlist = [];
 
-    // Banner Slider Logic
+    // Banner Slider
     let currentSlide = 0;
     const slides = document.querySelectorAll('.banner-slide');
     setInterval(() => {
@@ -215,7 +224,10 @@
               <h3>${item.name}</h3>
               <p>₹${item.price}</p>
             </div>
-            <button class="btn-add" onclick="addToCart('${item.name}', ${item.price})">ADD +</button>
+            <div class="card-actions">
+              <button class="btn-heart" onclick="toggleWishlist('${item.name}', ${item.price}, '${item.img}')">🤍</button>
+              <button class="btn-add" onclick="addToCart('${item.name}', ${item.price})">ADD +</button>
+            </div>
           </div>
         `;
       });
@@ -234,9 +246,11 @@
 
     function showPage(pageId, navId) {
       document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
-      document.querySelectorAll('nav button').forEach(b => b.classList.remove('active'));
+      if(navId) {
+        document.querySelectorAll('nav button').forEach(b => b.classList.remove('active'));
+        document.getElementById(navId).classList.add('active');
+      }
       document.getElementById(pageId).classList.add('active');
-      document.getElementById(navId).classList.add('active');
     }
 
     function addToCart(name, price) {
@@ -246,11 +260,46 @@
       alert(name + " added to cart!");
     }
 
+    function toggleWishlist(name, price, img) {
+      const index = wishlist.findIndex(item => item.name === name);
+      if(index === -1) {
+        wishlist.push({ name, price, img });
+        alert(name + " Watchlist mein add ho gaya!");
+      } else {
+        wishlist.splice(index, 1);
+        alert(name + " Watchlist se hata diya gaya!");
+      }
+      document.getElementById('wishlist-count').innerText = wishlist.length;
+      renderWishlist();
+    }
+
+    function renderWishlist() {
+      const container = document.getElementById('watchlist-items');
+      if (wishlist.length === 0) {
+        container.innerHTML = "<p style='color:#888;'>Watchlist khali hai.</p>";
+        return;
+      }
+      let html = "";
+      wishlist.forEach(item => {
+        html += `
+          <div class="food-card">
+            <img src="${item.img}" class="food-img" alt="food">
+            <div class="food-info">
+              <h3>${item.name}</h3>
+              <p>₹${item.price}</p>
+            </div>
+            <button class="btn-add" onclick="addToCart('${item.name}', ${item.price})">ADD TO CART</button>
+          </div>
+        `;
+      });
+      container.innerHTML = html;
+    }
+
     function renderCart() {
       const container = document.getElementById('cart-items');
       const summary = document.getElementById('cart-summary');
       if (cart.length === 0) {
-        container.innerHTML = "<p style='color:#888;'>Cart is empty.</p>";
+        container.innerHTML = "<p style='color:#888;'>Cart khali hai.</p>";
         summary.innerHTML = "";
         return;
       }
@@ -321,7 +370,6 @@
         });
     }
 
-    // Initial Load
     renderMenu(foodItems);
   </script>
 </body>
