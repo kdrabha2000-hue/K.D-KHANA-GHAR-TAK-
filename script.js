@@ -493,6 +493,21 @@ function adminUpdateBanner() {
   document.getElementById('home-banner').innerText = "🔥 " + text;
   alert("New Offer Banner added to slideshow!");
 }
+// LIVE AUTO SLIDING BANNERS LOGIC
+let liveBanners = [
+  "🔥 TODAY'S SPECIAL: Chicken Butter Masala @ ₹380",
+  "🎉 FLAT 30% OFF - Use Promo Code: FIRST30",
+  "⚡ FASTEST DELIVERY: 8:00 AM to 9:30 PM in Udalguri!"
+];
+let currentBannerIdx = 0;
+
+setInterval(() => {
+  const bannerElem = document.getElementById('home-banner');
+  if (bannerElem) {
+    currentBannerIdx = (currentBannerIdx + 1) % liveBanners.length;
+    bannerElem.innerText = liveBanners[currentBannerIdx];
+  }
+}, 3000);
 
 // INITIAL LOAD
 renderCategories();
