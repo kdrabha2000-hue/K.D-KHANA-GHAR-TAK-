@@ -53,38 +53,3 @@ input, textarea, select { width: 100%; padding: 10px; margin: 5px 0; background:
 .admin-stats { display: flex; justify-content: space-between; background: #181818; padding: 10px; border-radius: 6px; font-size: 0.8rem; margin-bottom: 15px; }
 .order-card { background: var(--card-dark); padding: 12px; border-radius: 6px; margin-bottom: 10px; border-left: 4px solid var(--primary-red); font-size: 0.85rem; }
 .admin-item-row { display: flex; justify-content: space-between; align-items: center; background: #181818; padding: 8px; margin-bottom: 5px; border-radius: 4px; font-size: 0.8rem; }
-/* BACKGROUND SLIDESHOW ANIMATION */
-.bg-slideshow {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100vw;
-  height: 100vh;
-  z-index: -1;
-  overflow: hidden;
-}
-
-.bg-slide {
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background-size: cover;
-  background-position: center;
-  opacity: 0;
-  animation: bgFade 15s infinite ease-in-out;
-  filter: brightness(0.25) blur(3px);
-}
-
-.bg-slide:nth-child(1) { animation-delay: 0s; }
-.bg-slide:nth-child(2) { animation-delay: 5s; }
-.bg-slide:nth-child(3) { animation-delay: 10s; }
-
-@keyframes bgFade {
-  0% { opacity: 0; transform: scale(1); }
-  10% { opacity: 0.35; }
-  33% { opacity: 0.35; }
-  43% { opacity: 0; transform: scale(1.08); }
-  100% { opacity: 0; }
-}
