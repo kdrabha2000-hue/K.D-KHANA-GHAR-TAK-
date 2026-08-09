@@ -25,22 +25,36 @@
     .header-title { font-weight: bold; font-size: 1.1rem; }
     .cart-badge { background: #fff; color: #8b0000; padding: 2px 8px; border-radius: 12px; font-weight: bold; }
     
-    /* Live Offer Banner Styles */
-    .banner-slider {
-      background: linear-gradient(45deg, #ff4500, #8b0000);
-      padding: 15px;
+    /* Big Myntra-style Banner Slider */
+    .banner-container {
+      width: 100%;
+      height: 180px;
+      position: relative;
+      overflow: hidden;
+      margin-bottom: 10px;
+    }
+    .banner-slide {
+      width: 100%;
+      height: 100%;
+      position: absolute;
+      opacity: 0;
+      transition: opacity 0.8s ease-in-out;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
       text-align: center;
+      padding: 20px;
       font-weight: bold;
-      border-radius: 8px;
-      margin: 15px;
-      box-shadow: 0 4px 10px rgba(255, 69, 0, 0.3);
-      animation: pulse 2s infinite;
     }
-    @keyframes pulse {
-      0% { opacity: 0.9; }
-      50% { opacity: 1; }
-      100% { opacity: 0.9; }
-    }
+    .banner-slide.active { opacity: 1; }
+    .slide-1 { background: linear-gradient(135deg, #ff416c, #ff4b2b); }
+    .slide-2 { background: linear-gradient(135deg, #8a2387, #e94057, #f27121); }
+    .slide-3 { background: linear-gradient(135deg, #11998e, #38ef7d); }
+
+    .banner-slide h2 { font-size: 1.5rem; text-shadow: 2px 2px 4px rgba(0,0,0,0.5); }
+    .banner-slide p { margin-top: 5px; font-size: 0.9rem; }
+    .coupon-tag { background: #fff; color: #000; padding: 3px 8px; border-radius: 4px; margin-top: 8px; display: inline-block; }
 
     .section-title { margin: 15px 15px 5px 15px; font-size: 1.2rem; color: #ff8c00; }
     
@@ -78,7 +92,6 @@
       font-weight: bold;
     }
 
-    /* Coupon Section */
     .coupon-box {
       background: #252525;
       padding: 15px;
@@ -86,18 +99,10 @@
       margin: 15px 0;
       border: 1px dashed #ff8c00;
     }
-    .coupon-code {
-      background: #333;
-      padding: 5px 10px;
-      color: #ff8c00;
-      font-family: monospace;
-      font-weight: bold;
-      border-radius: 4px;
-    }
 
     .form-box {
       max-width: 400px;
-      margin: 30px auto;
+      margin: 20px auto;
       background: #1e1e1e;
       padding: 20px;
       border-radius: 8px;
@@ -105,11 +110,21 @@
     input {
       width: 100%;
       padding: 12px;
-      margin: 10px 0;
+      margin: 8px 0;
       background: #2b2b2b;
       border: 1px solid #333;
       color: #fff;
       border-radius: 5px;
+    }
+
+    /* Admin Dashboard Panel */
+    #admin-panel {
+      display: none;
+      background: #2c1a1a;
+      border: 2px solid #8b0000;
+      padding: 15px;
+      border-radius: 8px;
+      margin-top: 15px;
     }
 
     nav {
@@ -142,9 +157,23 @@
   <!-- HOME PAGE -->
   <div id="home-page" class="page active">
     
-    <!-- Live Offer Banner -->
-    <div class="banner-slider">
-      🔥 LIVE OFFER: Use Code <span class="coupon-code">KDFOOD20</span> & Get 20% OFF!
+    <!-- Big Myntra-style Auto Slider -->
+    <div class="banner-container">
+      <div class="banner-slide slide-1 active">
+        <h2>🔥 MEGA FOOD SALE</h2>
+        <p>Get Flat 30% OFF on First Order</p>
+        <span class="coupon-tag">Code: FIRST30</span>
+      </div>
+      <div class="banner-slide slide-2">
+        <h2>🍗 CHICKEN FESTIVAL</h2>
+        <p>Buy 1 Special Thali & Get Free Beverage</p>
+        <span class="coupon-tag">Code: KDFOOD20</span>
+      </div>
+      <div class="banner-slide slide-3">
+        <h2>🚀 LIGHTNING FAST DELIVERY</h2>
+        <p>Ghar Jaisa Swad Direct Aapke Darwaze Par</p>
+        <span class="coupon-tag">Free Delivery On All Orders</span>
+      </div>
     </div>
 
     <h2 class="section-title">🔥 Best Sellers (Sabse Jyada Bikne Wala)</h2>
@@ -168,13 +197,14 @@
     </div>
 
     <h2 class="section-title">🍱 Regular Menu</h2>
-
-    <div class="food-card">
-      <div>
-        <h3>Paneer Butter Masala Combo</h3>
-        <p>₹160</p>
+    <div id="menu-container">
+      <div class="food-card">
+        <div>
+          <h3>Paneer Butter Masala Combo</h3>
+          <p>₹160</p>
+        </div>
+        <button class="btn" onclick="addToCart('Paneer Butter Masala Combo', 160)">Add to Cart</button>
       </div>
-      <button class="btn" onclick="addToCart('Paneer Butter Masala Combo', 160)">Add to Cart</button>
     </div>
   </div>
 
@@ -184,24 +214,21 @@
     <p style="color:#aaa; padding:10px;">Koi favorite item saved nahi hai.</p>
   </div>
 
-  <!-- CART & COUPON PAGE -->
+  <!-- CART PAGE -->
   <div id="cart-page" class="page">
     <h2 style="padding:10px;">🛒 Your Cart</h2>
-    
-    <!-- Coupon Apply Box -->
     <div class="coupon-box">
       <p style="margin-bottom:8px; font-weight:bold;">Have a Coupon Code?</p>
       <input type="text" id="coupon-input" placeholder="Enter Coupon Code (e.g. KDFOOD20)">
       <button class="btn" style="width:100%; background:#ff8c00; color:#000;" onclick="applyCoupon()">Apply Coupon</button>
       <p id="coupon-msg" style="margin-top:8px; font-size:13px;"></p>
     </div>
-
     <div id="cart-items" style="padding:10px;">
       <p style="color:#aaa;">Cart khali hai.</p>
     </div>
   </div>
 
-  <!-- ACCOUNT PAGE -->
+  <!-- ACCOUNT & ADMIN PAGE -->
   <div id="account-page" class="page">
     <div class="form-box">
       <h2>Customer / Admin Login</h2>
@@ -209,10 +236,19 @@
       <input type="password" id="password" placeholder="Password">
       <button class="btn" style="width:100%" onclick="handleLogin()">Login / Register</button>
       <p id="status" style="margin-top:15px; text-align:center; font-size:14px;"></p>
+
+      <!-- ADMIN DASHBOARD (Only shows for Admin Email) -->
+      <div id="admin-panel">
+        <h3 style="color:#ff8c00; margin-bottom:10px;">👑 Admin Control Panel</h3>
+        <p style="font-size:12px; color:#ccc; margin-bottom:10px;">Add New Menu Item Live:</p>
+        <input type="text" id="item-name" placeholder="Item Name (e.g. Biryani)">
+        <input type="number" id="item-price" placeholder="Item Price (e.g. 200)">
+        <button class="btn" style="width:100%; background:#ff8c00; color:#000;" onclick="addNewItem()">Add Item to Live Menu</button>
+      </div>
     </div>
   </div>
 
-  <!-- BOTTOM NAVIGATION -->
+  <!-- NAVIGATION BAR -->
   <nav>
     <button id="nav-home" class="active" onclick="showPage('home-page', 'nav-home')">🏠<br>Home</button>
     <button id="nav-watchlist" onclick="showPage('watchlist-page', 'nav-watchlist')">❤️<br>Watchlist</button>
@@ -239,6 +275,15 @@
 
     let cartCount = 0;
 
+    // Myntra-style Auto Slider Logic
+    let currentSlide = 0;
+    const slides = document.querySelectorAll('.banner-slide');
+    setInterval(() => {
+      slides[currentSlide].classList.remove('active');
+      currentSlide = (currentSlide + 1) % slides.length;
+      slides[currentSlide].classList.add('active');
+    }, 3500);
+
     function showPage(pageId, navId) {
       document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
       document.querySelectorAll('nav button').forEach(b => b.classList.remove('active'));
@@ -257,12 +302,12 @@
       const code = document.getElementById('coupon-input').value.trim();
       const msg = document.getElementById('coupon-msg');
       
-      if (code === "KDFOOD20") {
+      if (code === "KDFOOD20" || code === "FIRST30") {
         msg.style.color = "#00ff00";
-        msg.innerText = "🎉 Coupon Applied! You got 20% Discount!";
+        msg.innerText = "🎉 Coupon Applied Successfully!";
       } else {
         msg.style.color = "#ff4444";
-        msg.innerText = "❌ Invalid Coupon Code. Try KDFOOD20";
+        msg.innerText = "❌ Invalid Coupon Code.";
       }
     }
 
@@ -279,9 +324,14 @@
       status.innerText = "Processing...";
 
       auth.signInWithEmailAndPassword(email, password)
-        .then(() => {
+        .then((userCredential) => {
           status.innerText = "Login Successful!";
           alert("Login successful!");
+          
+          // Check Admin
+          if (email === "kdrabha2000@gmail.com") {
+            document.getElementById('admin-panel').style.display = 'block';
+          }
         })
         .catch((error) => {
           if (error.code === 'auth/user-not-found' || error.code === 'auth/invalid-credential') {
@@ -289,12 +339,39 @@
               .then(() => {
                 status.innerText = "Account Created & Logged In!";
                 alert("Naya account ban gaya!");
+                if (email === "kdrabha2000@gmail.com") {
+                  document.getElementById('admin-panel').style.display = 'block';
+                }
               })
               .catch(err => status.innerText = "Error: " + err.message);
           } else {
             status.innerText = "Error: " + error.message;
           }
         });
+    }
+
+    // Admin Feature: Add Item Live
+    function addNewItem() {
+      const name = document.getElementById('item-name').value;
+      const price = document.getElementById('item-price').value;
+
+      if (!name || !price) {
+        alert("Item ka naam aur price dono bharein!");
+        return;
+      }
+
+      const container = document.getElementById('menu-container');
+      const newCard = document.createElement('div');
+      newCard.className = 'food-card';
+      newCard.innerHTML = `
+        <div>
+          <h3>${name}</h3>
+          <p>₹${price}</p>
+        </div>
+        <button class="btn" onclick="addToCart('${name}', ${price})">Add to Cart</button>
+      `;
+      container.appendChild(newCard);
+      alert("Naya Food Item Live Menu mein add ho gaya!");
     }
   </script>
 </body>
