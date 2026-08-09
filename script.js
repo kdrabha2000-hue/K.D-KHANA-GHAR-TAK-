@@ -1,4 +1,4 @@
-// FIREBASE INITIALIZATION
+// FIREBASE SETUP
 const firebaseConfig = {
   apiKey: "AIzaSyDDTFzD8eaxS6hsQ_W5akOWRWixyZdjkSo",
   authDomain: "kd-ka-khana-ghar-tak.firebaseapp.com",
@@ -11,7 +11,7 @@ const firebaseConfig = {
 firebase.initializeApp(firebaseConfig);
 const auth = firebase.auth();
 
-// GOOGLE SIGN-IN FUNCTION
+// GOOGLE 1-CLICK & OTP AUTH
 function googleLogin() {
   const provider = new firebase.auth.GoogleAuthProvider();
   auth.signInWithPopup(provider)
@@ -19,15 +19,28 @@ function googleLogin() {
       const user = result.user;
       alert("Welcome " + (user.displayName || "User") + "!");
       document.getElementById('user-name-input').value = user.displayName || "";
+      document.getElementById('user-email-input').value = user.email || "";
       document.getElementById('vip-tag').innerHTML = "<span style='color:gold; font-weight:bold;'>👑 VIP MEMBER</span>";
     })
     .catch((error) => {
-      console.error(error);
       alert("Login Error: " + error.message);
     });
 }
 
-// MASTER MENU DATA CATEGORY-WISE
+// LIVE AUTO SLIDING BANNERS
+let liveBanners = [
+  "🔥 TODAY'S SPECIAL: Chicken Butter Masala @ ₹380",
+  "🎉 FLAT 30% OFF - Use Promo Code: FIRST30",
+  "⚡ FASTEST DELIVERY: 8:00 AM to 9:30 PM in Udalguri!"
+];
+let currentBannerIdx = 0;
+
+setInterval(() => {
+  currentBannerIdx = (currentBannerIdx + 1) % liveBanners.length;
+  document.getElementById('home-banner').innerText = liveBanners[currentBannerIdx];
+}, 3000);
+
+// MENU DATA
 let menu = [
   // Breads & Naan
   { id: 1, name: "Plain Tawa Roti", price: 10, cat: "Breads & Naan", img: "https://images.unsplash.com/photo-1626074353765-517a681e40be?w=200" },
@@ -170,6 +183,7 @@ let menu = [
 let cart = [];
 let wishlist = [];
 let orders = [];
+let coupons = { 'FIRST30': 30 };
 let discount = 0;
 let currentCat = "All";
 
@@ -188,7 +202,7 @@ function toggleNotifications() {
   box.style.display = box.style.display === 'block' ? 'none' : 'block';
 }
 
-// RENDER CATEGORY BAR
+// RENDER CATEGORIES
 function renderCategories() {
   const categories = ["All", "Breads & Naan", "Dal & Gravy", "Main Course", "Pasta", "Breakfast & Snacks", "Tea & Coffee", "Chowmein & Rolls", "Fried Rice", "Momos", "Starters & Tandoor", "Juices & Drinks", "Desserts"];
   const bar = document.getElementById('category-bar');
@@ -292,11 +306,16 @@ function changeQty(id, delta) {
   renderCart();
 }
 
+function useSavedAddress() {
+  const val = document.getElementById('saved-address-dropdown').value;
+  if(val) document.getElementById('del-address').value = val;
+}
+
 function applyCoupon() {
   const code = document.getElementById('coupon-code').value.toUpperCase();
-  if(code === 'FIRST30') {
-    discount = 30;
-    alert("Coupon Applied! ₹30 OFF");
+  if(coupons[code]) {
+    discount = coupons[code];
+    alert("Coupon Applied! ₹" + discount + " OFF");
   } else {
     alert("Invalid Coupon Code!");
   }
@@ -327,7 +346,7 @@ function placeOrder() {
   showPage('orders');
 }
 
-// WISHLIST
+// WISHLIST & PROFILE
 function toggleWishlist(id) {
   if(wishlist.includes(id)) wishlist = wishlist.filter(x => x !== id);
   else wishlist.push(id);
@@ -349,24 +368,23 @@ function renderWishlist() {
   `).join('');
 }
 
-// LIVE ORDERS TRACKING
 function renderOrders() {
   const container = document.getElementById('my-orders-list');
   if(orders.length === 0) return container.innerHTML = "<p>No live orders.</p>";
   container.innerHTML = orders.map(o => `
     <div class="order-card">
       <div><b>Order ID:</b> ${o.id}</div>
-      <div><b>Status:</b> <span style="color:var(--accent-red);">${o.status}</span></div>
+      <div><b>Status:</b> <span style="color:var(--accent-red); font-weight:bold;">${o.status}</span></div>
       <div><b>Total:</b> ₹${o.total} (${o.pay})</div>
     </div>
   `).join('');
 }
 
-// PROFILE & ADMIN SETUP
 function saveProfile() {
-  alert("Profile Saved!");
+  alert("Profile Details Saved!");
 }
 
+// ADMIN AUTHENTICATION & CONTROLS
 function loginAdmin() {
   const email = document.getElementById('admin-email').value;
   const pass = document.getElementById('admin-pass').value;
@@ -380,19 +398,35 @@ function loginAdmin() {
 }
 
 function renderAdmin() {
+  // Feature 9: Sales Overview
   document.getElementById('stat-total').innerText = orders.length;
   document.getElementById('stat-pending').innerText = orders.filter(o => o.status === 'Pending').length;
   document.getElementById('stat-earning').innerText = orders.reduce((s, o) => s + o.total, 0);
 
+  // Feature 1, 2, 10: Live Order Control + Status Updater + Direct Call Action
   const container = document.getElementById('admin-orders-list');
-  container.innerHTML = orders.map(o => `
+  container.innerHTML = orders.length === 0 ? "<p>No incoming orders.</p>" : orders.map(o => `
     <div class="order-card">
-      <b>${o.id}</b> - ${o.name} (${o.phone})<br>
+      <b>${o.id}</b> - ${o.name} <a href="tel:${o.phone}" style="color:gold;">📞 Call Direct (${o.phone})</a><br>
       Address: ${o.address}<br>
+      Items: ${o.items.map(i => i.name + ' x' + i.qty).join(', ')}<br>
       Status: <b>${o.status}</b><br>
-      <button class="btn-sec" onclick="updateStatus('${o.id}', 'Accepted')">Accept</button>
+      <button class="btn-sec" onclick="updateStatus('${o.id}', 'Accepted')">Accept Order</button>
       <button class="btn-sec" onclick="updateStatus('${o.id}', 'Out for Delivery')">Out for Delivery</button>
       <button class="btn-sec" onclick="updateStatus('${o.id}', 'Delivered')">Delivered</button>
+      <button class="btn-sec" style="background:red;" onclick="updateStatus('${o.id}', 'Rejected')">Reject Order</button>
+    </div>
+  `).join('');
+
+  // Feature 4 & 5: Item Delete & Price Manager
+  const menuContainer = document.getElementById('admin-menu-list');
+  menuContainer.innerHTML = menu.map(m => `
+    <div class="admin-item-row">
+      <span>${m.name} (₹<input type="number" id="price-${m.id}" value="${m.price}" style="width:60px; padding:2px; display:inline;">)</span>
+      <div>
+        <button onclick="adminEditPrice(${m.id})" style="background:#2196F3; color:white; border:none; padding:4px 6px; border-radius:4px;">Save Price</button>
+        <button onclick="adminDeleteItem(${m.id})" style="background:red; color:white; border:none; padding:4px 6px; border-radius:4px;">🗑️ Delete</button>
+      </div>
     </div>
   `).join('');
 }
@@ -403,6 +437,7 @@ function updateStatus(id, st) {
   renderAdmin();
 }
 
+// Feature 3: Add Item
 function adminAddItem() {
   const name = document.getElementById('add-item-name').value;
   const price = Number(document.getElementById('add-item-price').value);
@@ -410,8 +445,53 @@ function adminAddItem() {
   if(!name || !price) return alert("Fill item details!");
   
   menu.push({ id: Date.now(), name, price, cat, img: "https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=200" });
-  alert("Item added live!");
+  alert("Item added to live menu!");
   renderMenu();
+  renderAdmin();
+}
+
+// Feature 4: Delete Item
+function adminDeleteItem(id) {
+  menu = menu.filter(m => m.id !== id);
+  alert("Item deleted from live menu!");
+  renderMenu();
+  renderAdmin();
+}
+
+// Feature 5: Edit Price
+function adminEditPrice(id) {
+  const newPrice = Number(document.getElementById(`price-${id}`).value);
+  const item = menu.find(m => m.id === id);
+  if(item && newPrice) {
+    item.price = newPrice;
+    alert("Price updated for " + item.name + "!");
+    renderMenu();
+  }
+}
+
+// Feature 6: VIP Manager
+function adminAssignVIP() {
+  const phone = document.getElementById('vip-user-phone').value;
+  if(!phone) return alert("Enter phone number!");
+  alert("Customer (" + phone + ") is now a 👑 VIP Member!");
+}
+
+// Feature 7: Coupon Generator
+function adminCreateCoupon() {
+  const code = document.getElementById('new-coupon-code').value.toUpperCase();
+  const disc = Number(document.getElementById('new-coupon-discount').value);
+  if(!code || !disc) return alert("Enter valid code and discount!");
+  coupons[code] = disc;
+  alert("Coupon " + code + " created for ₹" + disc + " OFF!");
+}
+
+// Feature 8: Banner Manager
+function adminUpdateBanner() {
+  const text = document.getElementById('new-banner-text').value;
+  if(!text) return alert("Enter banner text!");
+  liveBanners.push("🔥 " + text);
+  document.getElementById('home-banner').innerText = "🔥 " + text;
+  alert("New Offer Banner added to slideshow!");
 }
 
 // INITIAL LOAD
