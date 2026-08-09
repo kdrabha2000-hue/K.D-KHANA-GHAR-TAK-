@@ -8,7 +8,7 @@
     * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
     body { background-color: #0d0d0d; color: #ffffff; padding-bottom: 70px; }
     
-    /* Premium Header */
+    /* Header */
     header { background: #8b0000; padding: 12px 15px; display: flex; justify-content: space-between; align-items: center; position: sticky; top: 0; z-index: 100; box-shadow: 0 2px 10px rgba(0,0,0,0.8); }
     .header-title { font-weight: bold; font-size: 1.1rem; color: #fff; letter-spacing: 0.5px; }
     .cart-badge { background: #fff; color: #8b0000; padding: 2px 8px; border-radius: 12px; font-weight: bold; font-size: 12px; }
@@ -16,7 +16,19 @@
     /* Notice Bar */
     .delivery-notice { background: linear-gradient(90deg, #d32f2f, #ff8c00); color: #fff; text-align: center; padding: 6px; font-weight: 600; font-size: 12px; }
 
-    /* Category Filter Pills (Like Screenshot) */
+    /* Myntra-style Auto Slider */
+    .banner-container { width: 100%; height: 160px; position: relative; overflow: hidden; }
+    .banner-slide { width: 100%; height: 100%; position: absolute; opacity: 0; transition: opacity 0.8s ease-in-out; display: flex; flex-direction: column; justify-content: center; align-items: center; text-align: center; background-size: cover; background-position: center; color: #fff; text-shadow: 2px 2px 5px #000; }
+    .banner-slide.active { opacity: 1; }
+    .slide-1 { background-image: linear-gradient(rgba(0,0,0,0.5), rgba(0,0,0,0.5)), url('https://images.unsplash.com/photo-1555396273-367ea4eb4db5?w=500'); }
+    .slide-2 { background-image: linear-gradient(rgba(0,0,0,0.5), rgba(0,0,0,0.5)), url('https://images.unsplash.com/photo-1565299624946-b28f40a0ae38?w=500'); }
+    .slide-3 { background-image: linear-gradient(rgba(0,0,0,0.5), rgba(0,0,0,0.5)), url('https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?w=500'); }
+
+    .banner-slide h2 { font-size: 1.3rem; color: #fff; text-shadow: 2px 2px 4px #000; }
+    .banner-slide p { font-size: 0.85rem; margin-top: 4px; }
+    .coupon-tag { background: #ff8c00; color: #000; padding: 2px 8px; border-radius: 4px; font-weight: bold; font-size: 11px; margin-top: 6px; }
+
+    /* Category Tabs Filter */
     .category-tabs { display: flex; overflow-x: auto; padding: 10px 15px; gap: 8px; background: #141414; border-bottom: 1px solid #222; }
     .category-tabs::-webkit-scrollbar { display: none; }
     .tab-btn { background: #222; color: #ccc; border: 1px solid #333; padding: 6px 14px; border-radius: 20px; font-size: 12px; font-weight: bold; white-space: nowrap; cursor: pointer; }
@@ -25,7 +37,7 @@
     .page { display: none; padding: 12px; }
     .page.active { display: block; }
 
-    /* Food Cards (S&A Style) */
+    /* Food Cards */
     .food-card { background: #181818; border-radius: 12px; padding: 10px; margin-bottom: 12px; display: flex; align-items: center; justify-content: space-between; border: 1px solid #262626; box-shadow: 0 4px 8px rgba(0,0,0,0.4); }
     .food-img { width: 75px; height: 75px; border-radius: 10px; object-fit: cover; margin-right: 12px; }
     .food-info { flex: 1; }
@@ -33,17 +45,17 @@
     .food-info p { color: #ff4d4d; font-weight: bold; font-size: 0.9rem; margin-top: 4px; }
     
     .btn-add { background: #8b0000; color: white; border: none; padding: 6px 14px; border-radius: 6px; font-weight: bold; font-size: 12px; cursor: pointer; }
-    .btn-add:hover { background: #b20710; }
 
-    /* Cart & Checkout Box */
+    /* Coupon Box & Checkout Box */
     .checkout-box { background: #181818; border-radius: 10px; padding: 15px; border: 1px solid #333; margin-top: 15px; }
+    .coupon-box { background: #222; padding: 12px; border-radius: 8px; border: 1px dashed #ff8c00; margin-bottom: 15px; }
     .upi-tag { background: #222; padding: 10px; border-radius: 6px; color: #ff8c00; font-family: monospace; font-size: 13px; text-align: center; margin: 10px 0; border: 1px dashed #ff8c00; }
 
     /* Contact Box (Login Required) */
     .contact-card { background: #181818; padding: 15px; border-radius: 10px; border: 1px solid #333; margin-top: 15px; text-align: center; }
     .btn-whatsapp { background: #25D366; color: white; border: none; padding: 10px; border-radius: 6px; font-weight: bold; width: 100%; display: block; text-decoration: none; margin-top: 10px; }
 
-    /* Login Box */
+    /* Form Inputs */
     .form-box { max-width: 400px; margin: 10px auto; background: #181818; padding: 20px; border-radius: 10px; border: 1px solid #262626; }
     input { width: 100%; padding: 11px; margin: 8px 0; background: #262626; border: 1px solid #333; color: #fff; border-radius: 6px; }
 
@@ -63,6 +75,26 @@
 
   <!-- HOME / MENU SCREEN -->
   <div id="home-page" class="page active">
+    
+    <!-- Myntra Style Sliding Banner -->
+    <div class="banner-container">
+      <div class="banner-slide slide-1 active">
+        <h2>🔥 MEGA FOOD SALE</h2>
+        <p>Get Flat 30% OFF on First Order</p>
+        <span class="coupon-tag">Use Code: FIRST30</span>
+      </div>
+      <div class="banner-slide slide-2">
+        <h2>🍗 SPECIAL DISCOUNTS</h2>
+        <p>Flat 20% OFF on Orders Above ₹200</p>
+        <span class="coupon-tag">Use Code: KDFOOD20</span>
+      </div>
+      <div class="banner-slide slide-3">
+        <h2>🚀 LIGHTNING FAST DELIVERY</h2>
+        <p>Ghar Jaisa Swad Direct Aapke Ghar Tak</p>
+        <span class="coupon-tag">Delivery Within 10-12 KM</span>
+      </div>
+    </div>
+
     <!-- Category Tabs Filter -->
     <div class="category-tabs">
       <button class="tab-btn active" onclick="filterCategory('All', this)">All</button>
@@ -78,6 +110,15 @@
   <!-- CART & CHECKOUT SCREEN -->
   <div id="cart-page" class="page">
     <h2 style="font-size: 1.2rem; color: #ff4d4d; margin-bottom: 10px;">YOUR CART</h2>
+    
+    <!-- Coupon Box -->
+    <div class="coupon-box">
+      <p style="font-size: 12px; font-weight: bold; margin-bottom: 6px;">Have a Coupon Code?</p>
+      <input type="text" id="coupon-input" placeholder="Enter Code (e.g. KDFOOD20 / FIRST30)">
+      <button class="btn-add" style="width:100%; margin-top:5px; background:#ff8c00; color:#000;" onclick="applyCoupon()">Apply Coupon</button>
+      <p id="coupon-msg" style="margin-top:6px; font-size:12px;"></p>
+    </div>
+
     <div id="cart-items"></div>
     <div id="cart-summary"></div>
 
@@ -152,6 +193,17 @@
 
     let cart = [];
 
+    // Banner Slider Logic
+    let currentSlide = 0;
+    const slides = document.querySelectorAll('.banner-slide');
+    setInterval(() => {
+      if (slides.length > 0) {
+        slides[currentSlide].classList.remove('active');
+        currentSlide = (currentSlide + 1) % slides.length;
+        slides[currentSlide].classList.add('active');
+      }
+    }, 3500);
+
     function renderMenu(items) {
       const container = document.getElementById('menu-list');
       container.innerHTML = "";
@@ -215,6 +267,18 @@
       summary.innerHTML = `<h3 style="margin-top:10px; text-align:right;">Total Amount: ₹${total}</h3>`;
     }
 
+    function applyCoupon() {
+      const code = document.getElementById('coupon-input').value.trim();
+      const msg = document.getElementById('coupon-msg');
+      if (code === "KDFOOD20" || code === "FIRST30") {
+        msg.style.color = "#00ff00";
+        msg.innerText = "🎉 Coupon Applied Successfully!";
+      } else {
+        msg.style.color = "#ff4444";
+        msg.innerText = "❌ Invalid Coupon Code.";
+      }
+    }
+
     function placeOrder() {
       if (cart.length === 0) {
         alert("Cart is empty!");
@@ -241,7 +305,6 @@
       auth.signInWithEmailAndPassword(email, password)
         .then(() => {
           status.innerText = "Login Successful!";
-          // Show WhatsApp Contact Box ONLY AFTER LOGIN
           document.getElementById('contact-section').style.display = 'block';
         })
         .catch((error) => {
