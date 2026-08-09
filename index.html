@@ -34,8 +34,9 @@
 
   <!-- HOME / MENU PAGE -->
   <div id="home" class="page active container">
-    <div class="banner">
-      🔥 TODAY'S SPECIAL: Chicken Butter Masala @ ₹380
+    <!-- AUTO SLIDING LIVE BANNER -->
+    <div class="banner-slider">
+      <div class="banner" id="home-banner">🔥 TODAY'S SPECIAL: Chicken Butter Masala @ ₹380</div>
     </div>
 
     <!-- CATEGORY FILTERS -->
@@ -55,13 +56,20 @@
   <div id="cart" class="page container">
     <h3>🛒 My Cart</h3>
     <div id="cart-items"></div>
-    <div class="coupon-box">
+    
+    <div class="coupon-box" style="margin-top:10px;">
       <input type="text" id="coupon-code" placeholder="Apply Coupon (e.g. FIRST30)">
-      <button class="btn-sec" onclick="applyCoupon()">Apply</button>
+      <button class="btn-sec" onclick="applyCoupon()">Apply Promo Code</button>
     </div>
     <div id="bill-summary" class="bill-summary"></div>
     
-    <h4>📍 Delivery Details</h4>
+    <h4>📍 Saved Delivery Addresses</h4>
+    <select id="saved-address-dropdown" onchange="useSavedAddress()">
+      <option value="">Choose Saved Address (Optional)</option>
+      <option value="Home: Near Petrol Pump, U.T. Road, Udalguri">Home: Near Petrol Pump, Udalguri</option>
+      <option value="Work: Main Market Shop #12, Udalguri">Work: Main Market Shop #12</option>
+    </select>
+
     <input type="text" id="del-name" placeholder="Full Name">
     <input type="text" id="del-phone" placeholder="Phone Number">
     <textarea id="del-address" placeholder="Complete Delivery Address"></textarea>
@@ -87,14 +95,22 @@
       <button class="btn-primary" style="background:#4285F4; margin-bottom:10px;" onclick="googleLogin()">Login with Google</button>
       <input type="text" id="user-name-input" placeholder="Your Name">
       <input type="text" id="user-phone-input" placeholder="Phone Number">
+      <input type="email" id="user-email-input" placeholder="Your Email ID">
       <button class="btn-sec" onclick="saveProfile()">Save Profile</button>
       <div id="vip-tag" style="margin-top:10px;"></div>
     </div>
 
-    <div class="help-section" style="margin-top:20px;">
+    <!-- MY COUPONS SECTION -->
+    <div class="help-section" style="margin-top:15px; background:#181818; padding:10px; border-radius:6px;">
+      <h4>🏷️ Available Coupons</h4>
+      <p style="font-size:0.8rem; color:#aaa;">Use <b>FIRST30</b> for ₹30 OFF on your order.</p>
+    </div>
+
+    <!-- HELP CENTRE -->
+    <div class="help-section" style="margin-top:15px;">
       <h4>💬 Help Centre & Support</h4>
       <a href="https://wa.me/918453270362" target="_blank" class="btn-whatsapp">Chat on WhatsApp (+91 8453270362)</a>
-      <a href="tel:+918453270362" class="btn-sec" style="display:block; text-align:center; margin-top:8px;">Call Support</a>
+      <a href="tel:+918453270362" class="btn-sec" style="display:block; text-align:center; margin-top:8px;">Call Support Direct</a>
     </div>
 
     <!-- SECRET ADMIN LOGIN -->
@@ -105,18 +121,22 @@
       <button class="btn-sec" onclick="loginAdmin()">Login Admin</button>
     </div>
 
-    <!-- ADMIN PANEL (SECRET) -->
+    <!-- ADMIN PANEL (FULL 10 FEATURES) -->
     <div id="admin-panel">
       <h2>👑 KD ADMIN PANEL</h2>
+      
+      <!-- 1. LIVE SALES ANALYTICS -->
       <div class="admin-stats">
         <div>Total Orders: <b id="stat-total">0</b></div>
         <div>Pending: <b id="stat-pending">0</b></div>
         <div>Earnings: <b>₹<span id="stat-earning">0</span></b></div>
       </div>
 
+      <!-- 2 & 10. LIVE ORDERS CONTROL & DIRECT CALL ACTION -->
       <h4>📦 Live Customer Orders</h4>
       <div id="admin-orders-list"></div>
 
+      <!-- 3. ADD NEW MENU ITEM -->
       <h4 style="margin-top:15px;">➕ Add New Menu Item</h4>
       <input type="text" id="add-item-name" placeholder="Item Name">
       <input type="number" id="add-item-price" placeholder="Price (₹)">
@@ -134,7 +154,27 @@
         <option value="Juices & Drinks">Juices & Drinks</option>
         <option value="Desserts">Desserts</option>
       </select>
-      <button class="btn-primary" onclick="adminAddItem()">Add to Menu</button>
+      <button class="btn-primary" onclick="adminAddItem()">Add to Live Menu</button>
+
+      <!-- 4 & 5. DELETE & PRICE EDIT MANAGER -->
+      <h4 style="margin-top:15px;">🗑️ Delete & Edit Active Menu</h4>
+      <div id="admin-menu-list"></div>
+
+      <!-- 6. VIP USER MANAGER -->
+      <h4 style="margin-top:15px;">👑 VIP Customer Manager</h4>
+      <input type="text" id="vip-user-phone" placeholder="Enter Customer Phone">
+      <button class="btn-sec" onclick="adminAssignVIP()">Assign VIP Tag</button>
+
+      <!-- 7. COUPON GENERATOR -->
+      <h4 style="margin-top:15px;">🏷️ Coupon Generator</h4>
+      <input type="text" id="new-coupon-code" placeholder="Coupon Code (e.g. KDFOOD20)">
+      <input type="number" id="new-coupon-discount" placeholder="Discount Amount (₹)">
+      <button class="btn-sec" onclick="adminCreateCoupon()">Save Promo Code</button>
+
+      <!-- 8. OFFER BANNER MANAGER -->
+      <h4 style="margin-top:15px;">📢 Update Home Offer Banners</h4>
+      <input type="text" id="new-banner-text" placeholder="Enter New Live Offer Banner">
+      <button class="btn-sec" onclick="adminUpdateBanner()">Update Banner Live</button>
     </div>
   </div>
 
@@ -151,7 +191,7 @@
   <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-auth-compat.js"></script>
 
-  <!-- YOUR JS FILE -->
+  <!-- SCRIPT -->
   <script src="script.js"></script>
 </body>
 </html>
