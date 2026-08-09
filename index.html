@@ -20,6 +20,7 @@
     .banner-slide { width: 100%; height: 100%; position: absolute; opacity: 1; display: flex; flex-direction: column; justify-content: center; align-items: center; text-align: center; background-size: cover; background-position: center; color: #fff; text-shadow: 2px 2px 5px #000; padding: 10px; }
     .banner-slide h2 { font-size: 1.3rem; color: #ff8c00; }
     .banner-slide p { font-size: 0.85rem; margin-top: 4px; }
+    .coupon-badge { background: #ff8c00; color: #000; padding: 3px 8px; border-radius: 4px; font-size: 11px; font-weight: bold; margin-top: 6px; }
 
     .category-tabs { display: flex; overflow-x: auto; padding: 10px 15px; gap: 8px; background: #141414; border-bottom: 1px solid #222; }
     .category-tabs::-webkit-scrollbar { display: none; }
@@ -37,9 +38,8 @@
     
     .card-actions { display: flex; flex-direction: column; gap: 4px; align-items: flex-end; }
     .btn-add { background: #8b0000; color: white; border: none; padding: 5px 10px; border-radius: 5px; font-weight: bold; font-size: 11px; cursor: pointer; }
-    .btn-heart { background: none; border: none; font-size: 16px; cursor: pointer; }
+    .btn-delete { background: #dc3545; color: white; border: none; padding: 3px 6px; border-radius: 4px; font-size: 10px; font-weight: bold; cursor: pointer; margin-top: 4px; }
 
-    /* Admin Box */
     .admin-card { background: #181818; padding: 15px; border-radius: 10px; border: 1px solid #ff8c00; margin-top: 15px; }
     .order-item-box { background: #222; padding: 10px; border-radius: 8px; margin-bottom: 8px; border-left: 3px solid #ff8c00; text-align: left; }
     .btn-accept { background: #28a745; color: #fff; border: none; padding: 5px 10px; border-radius: 4px; font-weight: bold; cursor: pointer; margin-right: 5px; }
@@ -49,7 +49,7 @@
     .upi-tag { background: #222; padding: 10px; border-radius: 6px; color: #ff8c00; font-family: monospace; font-size: 13px; text-align: center; margin: 10px 0; border: 1px dashed #ff8c00; }
 
     .form-box { max-width: 400px; margin: 10px auto; background: #181818; padding: 20px; border-radius: 10px; border: 1px solid #262626; }
-    input { width: 100%; padding: 10px; margin: 6px 0; background: #262626; border: 1px solid #333; color: #fff; border-radius: 6px; }
+    input, select { width: 100%; padding: 10px; margin: 6px 0; background: #262626; border: 1px solid #333; color: #fff; border-radius: 6px; }
 
     nav { position: fixed; bottom: 0; width: 100%; background: #000; display: flex; justify-content: space-around; padding: 8px 0; border-top: 1px solid #222; z-index: 100; }
     nav button { background: none; border: none; color: #888; font-size: 11px; cursor: pointer; }
@@ -61,18 +61,18 @@
   <header>
     <div class="header-title">KD KA KHANA GHAR TAK</div>
     <div class="header-icons">
-      <button class="icon-btn" onclick="showPage('watchlist-page', '')">❤️ Wishlist <span class="badge" id="wishlist-count">0</span></button>
       <button class="icon-btn" onclick="showPage('cart-page', '')">🛒 Cart <span class="badge" id="cart-count">0</span></button>
     </div>
   </header>
-  <div class="delivery-notice">🛵 Delivery available within 10-12 KM only!</div>
+  <div class="delivery-notice">🛵 Free Home Delivery within 10-12 KM!</div>
 
   <!-- HOME PAGE -->
   <div id="home-page" class="page active">
     <div class="banner-container">
       <div class="banner-slide" id="live-banner" style="background-image: linear-gradient(rgba(0,0,0,0.6), rgba(0,0,0,0.6)), url('https://images.unsplash.com/photo-1555396273-367ea4eb4db5?w=500');">
-        <h2 id="banner-title">🔥 SPECIAL DINNER OFFER</h2>
-        <p id="banner-desc">Get Fresh & Delicious Meal Delivered Fast!</p>
+        <h2 id="banner-title">🎉 SPECIAL OFFERS & DISCOUNTS</h2>
+        <p id="banner-desc">Use coupon code on Checkout for extra discount!</p>
+        <span class="coupon-badge">USE CODE: KDFOOD20 (20% OFF)</span>
       </div>
     </div>
 
@@ -89,51 +89,96 @@
     <div id="menu-list" style="margin-top: 10px;"></div>
   </div>
 
-  <!-- WATCHLIST PAGE -->
-  <div id="watchlist-page" class="page">
-    <h2 style="font-size: 1.1rem; color: #ff4d4d; margin-bottom: 10px;">❤️ YOUR WATCHLIST</h2>
-    <div id="watchlist-items"></div>
-  </div>
-
-  <!-- CART PAGE -->
+  <!-- CART PAGE & CHECKOUT -->
   <div id="cart-page" class="page">
     <h2 style="font-size: 1.1rem; color: #ff4d4d; margin-bottom: 10px;">🛒 YOUR CART</h2>
-    <div id="cart-items"></div>
+    
+    <div class="coupon-box">
+      <h3 style="font-size: 0.9rem; color: #ff8c00; margin-bottom: 4px;">🏷️ Apply Coupon Code</h3>
+      <p style="font-size: 11px; color: #aaa; margin-bottom: 6px;">Available Codes: <b>FIRST30</b> (30% OFF) | <b>KDFOOD20</b> (20% OFF)</p>
+      <div style="display: flex; gap: 6px;">
+        <input type="text" id="coupon-input" placeholder="Enter Code (e.g. KDFOOD20)" style="margin:0;">
+        <button class="btn-add" style="background:#ff8c00; color:#000; padding: 0 15px;" onclick="applyCoupon()">APPLY</button>
+      </div>
+      <p id="coupon-msg" style="font-size: 11px; margin-top: 6px; font-weight: bold;"></p>
+    </div>
+
+    <div id="cart-items" style="margin-top: 10px;"></div>
     <div id="cart-summary"></div>
 
     <div class="checkout-box">
-      <h3 style="font-size: 0.9rem;">PAYMENT METHOD</h3>
+      <h3 style="font-size: 0.9rem; color: #ff8c00;">📍 DELIVERY ADDRESS</h3>
+      <input type="text" id="cust-address" placeholder="Enter Full House Address / Village">
+      <input type="text" id="cust-landmark" placeholder="Nearby Landmark (Optional)">
+
+      <h3 style="font-size: 0.9rem; margin-top: 10px;">PAYMENT METHOD</h3>
       <div class="upi-tag">UPI ID: 6000026478@okbizaxis</div>
-      <button class="btn-add" style="width: 100%; padding: 10px; margin-top: 10px; background: #28a745;" onclick="placeOrder()">PROCEED TO CHECKOUT</button>
+      <button class="btn-add" style="width: 100%; padding: 10px; margin-top: 10px; background: #28a745; font-size: 13px;" onclick="placeOrder()">PROCEED TO CHECKOUT</button>
     </div>
   </div>
 
   <!-- ACCOUNT PAGE & ADMIN PANEL -->
   <div id="account-page" class="page">
     <div class="form-box">
-      <h2 style="font-size: 1rem; text-align: center; margin-bottom: 10px;">Customer / Admin Login</h2>
-      <input type="email" id="email" placeholder="Email Address" value="kdrabha2000@gmail.com">
-      <input type="password" id="password" placeholder="Password">
-      <button class="btn-add" style="width:100%; padding: 10px;" onclick="handleLogin()">Login / Register</button>
-      <p id="status" style="margin-top:8px; text-align:center; font-size:11px; color: #ff8c00;"></p>
+      
+      <!-- CUSTOMER PHONE LOGIN -->
+      <div id="customer-login-section">
+        <h2 style="font-size: 1.1rem; text-align: center; margin-bottom: 10px; color: #ff8c00;">📱 Customer Phone Login</h2>
+        <input type="text" id="phone-number" placeholder="+91 Mobile Number (e.g. +918453270362)">
+        <div id="recaptcha-container" style="margin: 8px 0;"></div>
+        <button class="btn-add" style="width:100%; padding: 10px; background:#ff8c00; color:#000;" onclick="sendOTP()">Send OTP</button>
 
-      <!-- ADMIN CONTROL PANEL -->
+        <div id="otp-verify-box" style="display: none; margin-top: 10px;">
+          <input type="text" id="otp-code" placeholder="Enter 6-digit OTP">
+          <button class="btn-add" style="width:100%; padding: 10px; background:#28a745;" onclick="verifyOTP()">Verify OTP & Login</button>
+        </div>
+      </div>
+
+      <hr style="border: 0.5px solid #333; margin: 20px 0;">
+
+      <!-- ADMIN LOGIN -->
+      <div id="admin-login-section">
+        <h3 style="font-size: 0.9rem; text-align: center; color: #888;">👑 Admin Login (Email Only)</h3>
+        <input type="email" id="admin-email" placeholder="Admin Email" value="kdrabha2000@gmail.com">
+        <input type="password" id="admin-pass" placeholder="Password">
+        <button class="btn-add" style="width:100%; padding: 8px; margin-top: 4px;" onclick="adminLogin()">Login as Admin</button>
+      </div>
+
+      <p id="status" style="margin-top:10px; text-align:center; font-size:12px; color: #ff8c00; font-weight:bold;"></p>
+
+      <!-- CONTACT SECTION -->
+      <div id="contact-section" class="contact-card" style="display: none;">
+        <h3 style="color:#ff4d4d; font-size: 0.95rem;">📞 Support & Contact</h3>
+        <p style="font-size:12px; margin-top: 4px; color: #ccc;">Call / WhatsApp: <b>+91 8453270362</b></p>
+        <a href="https://wa.me/918453270362" target="_blank" style="background:#25D366; color:#fff; border:none; padding:8px; border-radius:5px; text-decoration:none; display:block; margin-top:8px; font-weight:bold; text-align:center;">💬 Chat on WhatsApp</a>
+      </div>
+
+      <!-- ADMIN CONTROL PANEL (ADD NEW ITEMS & MANAGE ORDERS) -->
       <div id="admin-panel" class="admin-card" style="display: none;">
         <h3 style="color:#ff8c00; font-size: 1rem; margin-bottom: 8px;">👑 Admin Control Panel</h3>
         
-        <p style="font-size: 12px; font-weight: bold; color: #00ff00; margin-top: 10px;">1. Customer Live Orders Control:</p>
-        <div id="admin-orders-list" style="margin-top: 5px;">
-          <p style="font-size: 11px; color: #777;">Koi naya live order nahi hai.</p>
-        </div>
+        <p style="font-size: 12px; font-weight: bold; color: #00ff00; margin-top: 10px;">1. Add New Food Item To Menu:</p>
+        <input type="text" id="new-food-name" placeholder="Food Name (e.g. Chicken Biryani)">
+        <input type="number" id="new-food-price" placeholder="Price in ₹ (e.g. 180)">
+        <select id="new-food-cat">
+          <option value="Breads & Rotis">Breads & Rotis</option>
+          <option value="Rice & Dal">Rice & Dal</option>
+          <option value="Main Course">Main Course</option>
+          <option value="Snacks & Pasta">Snacks & Pasta</option>
+          <option value="Momos & Rolls">Momos & Rolls</option>
+          <option value="Beverages">Beverages</option>
+        </select>
+        <input type="text" id="new-food-img" placeholder="Photo URL Link">
+        <button class="btn-add" style="width: 100%; background: #00ff00; color: #000; margin-top: 5px;" onclick="addNewFoodItem()">➕ Add New Food Item</button>
 
         <hr style="border: 0.5px solid #333; margin: 15px 0;">
 
-        <p style="font-size: 12px; font-weight: bold; color: #ff8c00;">2. Change Live Dinner/Special Banner:</p>
-        <input type="text" id="admin-banner-title" placeholder="Banner Title (e.g. SPECIAL NIGHT DINNER)">
-        <input type="text" id="admin-banner-desc" placeholder="Offer Details (e.g. Flat 30% OFF Tonight)">
-        <input type="text" id="admin-banner-img" placeholder="Photo URL Link">
-        <button class="btn-add" style="width: 100%; background: #ff8c00; color: #000; margin-top: 5px;" onclick="updateBannerLive()">Update Live Banner</button>
+        <p style="font-size: 12px; font-weight: bold; color: #ff8c00;">2. Live Customer Orders & Address:</p>
+        <div id="admin-orders-list" style="margin-top: 5px;">
+          <p style="font-size: 11px; color: #777;">Koi naya live order nahi hai.</p>
+        </div>
       </div>
+
     </div>
   </div>
 
@@ -158,26 +203,31 @@
     firebase.initializeApp(firebaseConfig);
     const auth = firebase.auth();
 
-    const foodItems = [
+    let foodItems = [
       { name: "Plain Tawa Roti", price: 10, category: "Breads & Rotis", img: "https://images.unsplash.com/photo-1626074353765-517a681e40be?w=200" },
       { name: "Butter Naan", price: 80, category: "Breads & Rotis", img: "https://images.unsplash.com/photo-1601050690597-df0568f70950?w=200" },
       { name: "Plain Rice", price: 140, category: "Rice & Dal", img: "https://images.unsplash.com/photo-1516684732162-798a0062be99?w=200" },
-      { name: "Dal Makhani", price: 200, category: "Rice & Dal", img: "https://images.unsplash.com/photo-1546833999-b9f581a1996d?w=200" },
       { name: "Chicken Butter Masala (Full)", price: 380, category: "Main Course", img: "https://images.unsplash.com/photo-1603894584373-5ac82b2ae398?w=200" },
-      { name: "Mutton Curry (Full)", price: 400, category: "Main Course", img: "https://images.unsplash.com/photo-1544025162-d76694265947?w=200" },
-      { name: "Red Sauce Pasta (Full)", price: 100, category: "Snacks & Pasta", img: "https://images.unsplash.com/photo-1551183053-bf91a1d81141?w=200" },
-      { name: "Chicken Momo (Full)", price: 70, category: "Momos & Rolls", img: "https://images.unsplash.com/photo-1625220194771-7ebdea0b70b9?w=200" },
-      { name: "Cold Coffee", price: 70, category: "Beverages", img: "https://images.unsplash.com/photo-1517701604599-bb29b565090c?w=200" }
+      { name: "Chicken Momo (Full)", price: 70, category: "Momos & Rolls", img: "https://images.unsplash.com/photo-1625220194771-7ebdea0b70b9?w=200" }
     ];
 
     let cart = [];
-    let wishlist = [];
     let liveOrders = [];
+    let appliedDiscount = 0;
+    let confirmationResultObj = null;
+    let isAdminLoggedIn = false;
+
+    window.onload = function() {
+      window.recaptchaVerifier = new firebase.auth.RecaptchaVerifier('recaptcha-container', {
+        'size': 'invisible'
+      });
+    };
 
     function renderMenu(items) {
       const container = document.getElementById('menu-list');
       container.innerHTML = "";
-      items.forEach(item => {
+      items.forEach((item, index) => {
+        let deleteBtn = isAdminLoggedIn ? `<button class="btn-delete" onclick="deleteFoodItem(${index})">🗑️ Delete</button>` : '';
         container.innerHTML += `
           <div class="food-card">
             <img src="${item.img}" class="food-img" alt="food">
@@ -186,28 +236,36 @@
               <p>₹${item.price}</p>
             </div>
             <div class="card-actions">
-              <button class="btn-heart" onclick="toggleWishlist('${item.name}', ${item.price}, '${item.img}')">🤍</button>
               <button class="btn-add" onclick="addToCart('${item.name}', ${item.price})">ADD +</button>
+              ${deleteBtn}
             </div>
           </div>
         `;
       });
     }
 
-    function filterCategory(cat, btn) {
-      document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
-      btn.classList.add('active');
-      if (cat === 'All') renderMenu(foodItems);
-      else renderMenu(foodItems.filter(item => item.category === cat));
+    function addNewFoodItem() {
+      const name = document.getElementById('new-food-name').value.trim();
+      const price = parseFloat(document.getElementById('new-food-price').value);
+      const category = document.getElementById('new-food-cat').value;
+      const img = document.getElementById('new-food-img').value.trim() || 'https://images.unsplash.com/photo-1555396273-367ea4eb4db5?w=200';
+
+      if (!name || isNaN(price)) return alert("Kripya sahi Food Name aur Price bharein!");
+
+      foodItems.push({ name, price, category, img });
+      renderMenu(foodItems);
+      alert(name + " menu mein add ho gaya!");
+
+      document.getElementById('new-food-name').value = "";
+      document.getElementById('new-food-price').value = "";
+      document.getElementById('new-food-img').value = "";
     }
 
-    function showPage(pageId, navId) {
-      document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
-      if(navId) {
-        document.querySelectorAll('nav button').forEach(b => b.classList.remove('active'));
-        document.getElementById(navId).classList.add('active');
+    function deleteFoodItem(index) {
+      if(confirm("Kya aap is item ko menu se hatana chahte hain?")) {
+        foodItems.splice(index, 1);
+        renderMenu(foodItems);
       }
-      document.getElementById(pageId).classList.add('active');
     }
 
     function addToCart(name, price) {
@@ -217,21 +275,78 @@
       alert(name + " cart mein add ho gaya!");
     }
 
+    function renderCart() {
+      const container = document.getElementById('cart-items');
+      const summary = document.getElementById('cart-summary');
+      if (cart.length === 0) {
+        container.innerHTML = "<p style='color:#888; text-align:center;'>Cart khali hai.</p>";
+        summary.innerHTML = "";
+        return;
+      }
+      let subtotal = cart.reduce((sum, item) => sum + item.price, 0);
+      let discountAmount = (subtotal * appliedDiscount) / 100;
+      let finalTotal = subtotal - discountAmount;
+
+      let html = "";
+      cart.forEach((item) => {
+        html += `<div style="display:flex; justify-content:space-between; margin-bottom:8px; border-bottom:1px solid #222; padding-bottom:5px;">
+          <span>${item.name}</span>
+          <span style="color:#ff4d4d; font-weight:bold;">₹${item.price}</span>
+        </div>`;
+      });
+      container.innerHTML = html;
+
+      summary.innerHTML = `
+        <div style="background:#222; padding:10px; border-radius:6px; margin-top:10px;">
+          <p style="display:flex; justify-content:space-between; font-size:12px;"><span>Subtotal:</span> <span>₹${subtotal}</span></p>
+          <p style="display:flex; justify-content:space-between; font-size:12px; color:#00ff00;"><span>Discount:</span> <span>-₹${discountAmount.toFixed(0)}</span></p>
+          <hr style="border:0.5px solid #333; margin:6px 0;">
+          <h3 style="display:flex; justify-content:space-between; font-size:1rem; color:#ff8c00;"><span>Final Total:</span> <span>₹${finalTotal.toFixed(0)}</span></h3>
+        </div>
+      `;
+    }
+
+    function applyCoupon() {
+      const code = document.getElementById('coupon-input').value.trim().toUpperCase();
+      const msg = document.getElementById('coupon-msg');
+
+      if (code === "FIRST30") {
+        appliedDiscount = 30;
+        msg.style.color = "#00ff00";
+        msg.innerText = "🎉 FIRST30 Applied! Flat 30% OFF!";
+      } else if (code === "KDFOOD20") {
+        appliedDiscount = 20;
+        msg.style.color = "#00ff00";
+        msg.innerText = "🎉 KDFOOD20 Applied! Flat 20% OFF!";
+      } else {
+        appliedDiscount = 0;
+        msg.style.color = "#ff4444";
+        msg.innerText = "❌ Galat Coupon Code!";
+      }
+      renderCart();
+    }
+
     function placeOrder() {
       if (cart.length === 0) return alert("Cart khali hai!");
-      
+      const address = document.getElementById('cust-address').value.trim();
+      if (!address) return alert("Kripya apna delivery address bharein!");
+
       const orderId = "ORD#" + Math.floor(1000 + Math.random() * 9000);
-      const totalAmount = cart.reduce((sum, item) => sum + item.price, 0);
-      
+      let subtotal = cart.reduce((sum, item) => sum + item.price, 0);
+      let finalTotal = subtotal - ((subtotal * appliedDiscount) / 100);
+
       liveOrders.push({
         id: orderId,
         items: [...cart],
-        amount: totalAmount,
+        amount: finalTotal.toFixed(0),
+        address: address,
+        landmark: document.getElementById('cust-landmark').value.trim() || 'N/A',
         status: "Pending"
       });
 
       alert("Order Placed Successfully! ID: " + orderId);
       cart = [];
+      appliedDiscount = 0;
       document.getElementById('cart-count').innerText = 0;
       renderCart();
       renderAdminOrders();
@@ -249,6 +364,7 @@
           <div class="order-item-box">
             <p><b>Order ID:</b> ${ord.id} (${ord.status})</p>
             <p style="font-size:11px; color:#ccc;">Items: ${ord.items.map(i => i.name).join(', ')}</p>
+            <p style="font-size:11px; color:#ff8c00;"><b>Address:</b> ${ord.address} (Landmark: ${ord.landmark})</p>
             <p style="font-size:12px; color:#00ff00; font-weight:bold;">Total: ₹${ord.amount}</p>
             <div style="margin-top:5px;">
               <button class="btn-accept" onclick="updateOrderStatus(${idx}, 'Accepted')">Accept</button>
@@ -266,35 +382,68 @@
       renderAdminOrders();
     }
 
-    function updateBannerLive() {
-      const title = document.getElementById('admin-banner-title').value;
-      const desc = document.getElementById('admin-banner-desc').value;
-      const img = document.getElementById('admin-banner-img').value;
+    function sendOTP() {
+      const phoneNumber = document.getElementById('phone-number').value.trim();
+      const status = document.getElementById('status');
+      if (!phoneNumber.startsWith('+91') || phoneNumber.length < 13) return status.innerText = "Kripya +91 ke saath 10-digit number daalein.";
 
-      if (title) document.getElementById('banner-title').innerText = title;
-      if (desc) document.getElementById('banner-desc').innerText = desc;
-      if (img) document.getElementById('live-banner').style.backgroundImage = `linear-gradient(rgba(0,0,0,0.6), rgba(0,0,0,0.6)), url('${img}')`;
-
-      alert("Live Banner Updated Successfully!");
+      status.innerText = "OTP bhej rahe hain...";
+      auth.signInWithPhoneNumber(phoneNumber, window.recaptchaVerifier)
+        .then((confirmationResult) => {
+          confirmationResultObj = confirmationResult;
+          document.getElementById('otp-verify-box').style.display = 'block';
+          status.innerText = "OTP bhej diya gaya hai!";
+        })
+        .catch(error => status.innerText = "OTP Error: " + error.message);
     }
 
-    function handleLogin() {
-      const email = document.getElementById('email').value.trim();
-      const password = document.getElementById('password').value;
+    function verifyOTP() {
+      const otp = document.getElementById('otp-code').value.trim();
       const status = document.getElementById('status');
+      if (!otp) return status.innerText = "OTP daalein.";
 
-      if (!email || !password) return status.innerText = "Please enter email & password.";
-
-      status.innerText = "Logging in...";
-      auth.signInWithEmailAndPassword(email, password)
+      confirmationResultObj.confirm(otp)
         .then(() => {
           status.innerText = "Login Successful!";
+          document.getElementById('contact-section').style.display = 'block';
+          document.getElementById('customer-login-section').style.display = 'none';
+        })
+        .catch(() => status.innerText = "Galat OTP!");
+    }
+
+    function adminLogin() {
+      const email = document.getElementById('admin-email').value.trim();
+      const pass = document.getElementById('admin-pass').value;
+      const status = document.getElementById('status');
+
+      auth.signInWithEmailAndPassword(email, pass)
+        .then(() => {
+          status.innerText = "Admin Login Successful!";
+          document.getElementById('contact-section').style.display = 'block';
           if (email === "kdrabha2000@gmail.com") {
+            isAdminLoggedIn = true;
             document.getElementById('admin-panel').style.display = 'block';
+            renderMenu(foodItems);
             renderAdminOrders();
           }
         })
-        .catch(err => status.innerText = "Error: " + err.message);
+        .catch(err => status.innerText = "Admin Error: " + err.message);
+    }
+
+    function filterCategory(cat, btn) {
+      document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      if (cat === 'All') renderMenu(foodItems);
+      else renderMenu(foodItems.filter(item => item.category === cat));
+    }
+
+    function showPage(pageId, navId) {
+      document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+      if(navId) {
+        document.querySelectorAll('nav button').forEach(b => b.classList.remove('active'));
+        document.getElementById(navId).classList.add('active');
+      }
+      document.getElementById(pageId).classList.add('active');
     }
 
     renderMenu(foodItems);
