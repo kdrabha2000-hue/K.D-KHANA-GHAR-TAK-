@@ -10,108 +10,133 @@
 
   <style>
     * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
-    body { background-color: #121212; color: #ffffff; padding-bottom: 70px; }
+    body { background-color: #121212; color: #ffffff; padding-bottom: 80px; }
     
-    /* Header */
-    .header { background: #e50914; padding: 15px; text-align: center; font-size: 20px; font-weight: bold; position: sticky; top: 0; z-index: 100; box-shadow: 0 2px 10px rgba(0,0,0,0.5); }
+    /* Top Header */
+    .header { background: #e50914; padding: 15px; text-align: center; font-size: 18px; font-weight: bold; position: sticky; top: 0; z-index: 100; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 2px 10px rgba(0,0,0,0.5); }
+    .cart-top { font-size: 22px; cursor: pointer; }
     
     /* Auto Slider Banner */
     .swiper { width: 95%; height: 180px; margin: 12px auto; border-radius: 12px; overflow: hidden; }
     .swiper-slide img { width: 100%; height: 100%; object-fit: cover; }
     
-    /* Main Layout */
+    /* Food Cards Layout */
     .container { padding: 12px; }
-    .section-title { font-size: 18px; margin: 15px 0 10px; color: #ff4757; }
-    
-    /* Food Card */
     .food-card { background: #1e1e1e; border-radius: 10px; padding: 12px; margin-bottom: 12px; display: flex; justify-content: space-between; align-items: center; border: 1px solid #2a2a2a; }
+    .food-details { display: flex; align-items: center; }
+    .food-card img { width: 60px; height: 60px; border-radius: 8px; object-fit: cover; margin-right: 12px; }
     .food-info h4 { font-size: 16px; margin-bottom: 4px; }
     .food-info p { color: #2ed573; font-weight: bold; }
     .add-btn { background: #e50914; color: #fff; border: none; padding: 8px 16px; border-radius: 6px; font-weight: bold; cursor: pointer; }
+    .heart-btn { background: none; border: none; color: #ff4757; font-size: 20px; cursor: pointer; margin-right: 10px; }
     
-    /* Auth Form & Panels */
+    /* Panels */
     .panel { display: none; background: #1e1e1e; padding: 20px; margin: 15px; border-radius: 10px; border: 1px solid #333; }
     .panel.active { display: block; }
-    input { width: 100%; padding: 10px; margin: 8px 0; background: #2b2b2b; border: 1px solid #444; color: white; border-radius: 5px; }
+    input, textarea, select { width: 100%; padding: 10px; margin: 8px 0; background: #2b2b2b; color: white; border: 1px solid #444; border-radius: 5px; }
     .submit-btn { width: 100%; background: #e50914; color: white; padding: 10px; border: none; border-radius: 5px; font-weight: bold; margin-top: 10px; cursor: pointer; }
     
-    /* Navigation Bar */
-    .nav-bar { position: fixed; bottom: 0; left: 0; right: 0; background: #1a1a1a; display: flex; justify-content: space-around; padding: 10px 0; border-top: 1px solid #333; }
+    /* Order Cards */
+    .order-card { background: #2a2a2a; padding: 12px; border-radius: 8px; margin-bottom: 12px; border-left: 4px solid #2ed573; }
+    .status-badge { display: inline-block; padding: 3px 8px; border-radius: 4px; font-size: 11px; font-weight: bold; background: #e50914; color: white; margin-top: 4px; }
+    
+    /* Bottom Navigation Bar */
+    .nav-bar { position: fixed; bottom: 0; left: 0; right: 0; background: #1a1a1a; display: flex; justify-content: space-around; padding: 10px 0; border-top: 1px solid #333; z-index: 100; }
     .nav-item { color: #aaa; text-decoration: none; font-size: 12px; text-align: center; cursor: pointer; }
     .nav-item.active { color: #e50914; font-weight: bold; }
   </style>
 </head>
 <body>
 
-  <!-- App Header -->
-  <div class="header">K.D KA KHANA GHAR TAK</div>
+  <!-- Top Header -->
+  <div class="header">
+    <span>K.D KA KHANA GHAR TAK</span>
+    <span class="cart-top" onclick="window.showTab('cartPanel')">🛒</span>
+  </div>
 
-  <!-- Main Customer View -->
-  <div id="customerView">
-    <!-- Auto-Sliding Banner Section -->
+  <!-- Customer Home View -->
+  <div id="customerView" style="display:block;">
     <div class="swiper mySwiper">
       <div class="swiper-wrapper">
-        <div class="swiper-slide"><img src="https://images.unsplash.com/photo-1504674900247-0877df9cc836?w=600" alt="Special Offer"></div>
-        <div class="swiper-slide"><img src="https://images.unsplash.com/photo-1565299624946-b28f40a0ae38?w=600" alt="Fast Delivery"></div>
+        <div class="swiper-slide"><img src="https://images.unsplash.com/photo-1504674900247-0877df9cc836?w=600" alt="Banner 1"></div>
+        <div class="swiper-slide"><img src="https://images.unsplash.com/photo-1565299624946-b28f40a0ae38?w=600" alt="Banner 2"></div>
       </div>
       <div class="swiper-pagination"></div>
     </div>
-
-    <!-- Menu List -->
     <div class="container">
-      <h3 class="section-title">🔥 Popular Dishes</h3>
-      <div class="food-card">
-        <div class="food-info">
-          <h4>Chicken Pakora (Full)</h4>
-          <p>₹100</p>
-        </div>
-        <button class="add-btn">ADD +</button>
-      </div>
-      <div class="food-card">
-        <div class="food-info">
-          <h4>Chicken Pakora (Half)</h4>
-          <p>₹50</p>
-        </div>
-        <button class="add-btn">ADD +</button>
-      </div>
+      <h3 style="color:#ff4757; margin-bottom:10px;">🔥 Popular Dishes</h3>
+      <div id="menuContainer">Loading menu...</div>
     </div>
   </div>
 
-  <!-- Login/Sign Up Panel -->
-  <div id="authPanel" class="panel">
-    <h3>Customer / Admin Login</h3>
-    <input type="email" id="authEmail" placeholder="Email Address">
-    <input type="password" id="authPassword" placeholder="Password">
-    <button class="submit-btn" onclick="handleAuth()">Login / Register</button>
+  <!-- Watchlist Panel -->
+  <div id="wishlistPanel" class="panel">
+    <h3 style="color:#ff4757;">❤️ My Watchlist</h3>
+    <div id="wishlistItems" style="margin-top:10px;"></div>
   </div>
 
-  <!-- Secret Admin Panel -->
+  <!-- Cart Panel -->
+  <div id="cartPanel" class="panel">
+    <h3 style="color:#ff4757;">🛒 Your Shopping Cart</h3>
+    <div id="cartItemsList" style="margin-top:10px;"></div>
+    <h4 id="cartTotal" style="margin-top:15px; color:#2ed573;">Total: ₹0</h4>
+
+    <h4 style="margin-top:15px;">Delivery Details</h4>
+    <input type="text" id="custName" placeholder="Your Name">
+    <input type="text" id="custPhone" placeholder="Mobile Number">
+    <textarea id="custAddress" placeholder="Full Delivery Address"></textarea>
+    <button class="submit-btn" onclick="window.placeOrder()">PLACE ORDER NOW</button>
+  </div>
+
+  <!-- Account / Login / My Orders Panel -->
+  <div id="authPanel" class="panel">
+    <div id="loginForm">
+      <h3>Customer / Admin Login</h3>
+      <input type="email" id="authEmail" placeholder="Email Address">
+      <input type="password" id="authPassword" placeholder="Password">
+      <button class="submit-btn" onclick="window.handleAuth()">Login / Register</button>
+    </div>
+    <div id="myOrdersSection" style="display:none;">
+      <h3 style="color:#2ed573;">📦 My Orders (Live Tracking)</h3>
+      <div id="myOrdersList" style="margin-top:10px;"></div>
+      <button class="submit-btn" style="background:#444;" onclick="window.logout()">Logout</button>
+    </div>
+  </div>
+
+  <!-- Admin Panel -->
   <div id="adminPanel" class="panel">
     <h3 style="color:#2ed573;">🛠️ Secret Admin Control Panel</h3>
-    <p style="margin-top:5px; font-size:12px; color:#aaa;">Logged in as Boss: kdrabha2000@gmail.com</p>
+    <p style="margin-top:5px; font-size:12px; color:#aaa;">Boss: kdrabha2000@gmail.com</p>
     
-    <h4 style="margin-top:15px;">Add New Seller / Restaurant</h4>
-    <input type="text" placeholder="Restaurant Name">
-    <input type="text" placeholder="Owner Name">
-    <input type="text" placeholder="Assign Seller Email">
-    <button class="submit-btn">Create Seller Account</button>
+    <h4 style="margin-top:15px; color:#ff4757;">📦 Manage Customer Orders</h4>
+    <div id="adminOrdersContainer" style="margin-top:10px;"></div>
+
+    <hr style="border-color:#333; margin:20px 0;">
+
+    <h4 style="color:#2ed573;">➕ Add New Dish To Menu</h4>
+    <input type="text" id="foodName" placeholder="Dish Name (e.g. Chicken Biryani)">
+    <input type="text" id="foodPrice" placeholder="Price (e.g. 150)">
+    <input type="text" id="foodImg" placeholder="Image URL (Link)">
+    <button class="submit-btn" onclick="window.addFoodToMenu()">Add To Menu</button>
   </div>
 
-  <!-- Bottom Navigation -->
+  <!-- Bottom Navigation Bar -->
   <div class="nav-bar">
-    <div class="nav-item active" onclick="showTab('customerView')">🏠<br>Home</div>
-    <div class="nav-item" onclick="showTab('authPanel')">👤<br>Account</div>
-    <div class="nav-item" id="adminNavTab" style="display:none;" onclick="showTab('adminPanel')">⚙️<br>Admin</div>
+    <div class="nav-item active" onclick="window.showTab('customerView')">🏠<br>Home</div>
+    <div class="nav-item" onclick="window.showTab('wishlistPanel')">❤️<br>Watchlist</div>
+    <div class="nav-item" onclick="window.showTab('cartPanel')">🛒<br>Cart</div>
+    <div class="nav-item" onclick="window.showTab('authPanel')">👤<br>Account</div>
+    <div class="nav-item" id="adminNavTab" style="display:none;" onclick="window.showTab('adminPanel')">⚙️<br>Admin</div>
   </div>
 
   <!-- SwiperJS Script -->
   <script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
 
-  <!-- Firebase Scripts -->
+  <!-- Firebase & App Script -->
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-    import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
-    import { getFirestore } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+    import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
+    import { getFirestore, collection, addDoc, getDocs, doc, updateDoc, query, where } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
     // Firebase Configuration
     const firebaseConfig = {
@@ -128,54 +153,15 @@
     const auth = getAuth(app);
     const db = getFirestore(app);
 
-    // Master Admin Credentials
     const ADMIN_EMAIL = "kdrabha2000@gmail.com";
-    const ADMIN_PASSWORD = "Kd@.com.60000";
+    let cart = [];
+    let wishlist = JSON.parse(localStorage.getItem('kd_wishlist')) || [];
 
-    // Track User Login State
-    onAuthStateChanged(auth, (user) => {
-      if (user) {
-        if (user.email === ADMIN_EMAIL) {
-          document.getElementById('adminNavTab').style.display = 'block';
-          alert('Welcome Boss! Secret Admin Panel Unlocked.');
-        } else {
-          document.getElementById('adminNavTab').style.display = 'none';
-        }
-      }
-    });
-
-    // Auth Function
-    window.handleAuth = async () => {
-      const email = document.getElementById('authEmail').value;
-      const pass = document.getElementById('authPassword').value;
-
-      try {
-        await signInWithEmailAndPassword(auth, email, pass);
-        alert('Successfully Logged In!');
-        showTab('customerView');
-      } catch (e) {
-        try {
-          await createUserWithEmailAndPassword(auth, email, pass);
-          alert('New Account Created Successfully!');
-          showTab('customerView');
-        } catch (err) {
-          alert('Error: ' + err.message);
-        }
-      }
-    };
-  </script>
-
-  <!-- UI Navigation Script -->
-  <script>
-    // Initialize Auto-slide Banner
-    var swiper = new Swiper(".mySwiper", {
-      autoplay: { delay: 3000, disableOnInteraction: false },
-      pagination: { el: ".swiper-pagination", clickable: true },
-      loop: true
-    });
-
-    function showTab(tabId) {
+    // Global UI Tab Switching Function
+    window.showTab = function(tabId) {
       document.getElementById('customerView').style.display = 'none';
+      document.getElementById('wishlistPanel').classList.remove('active');
+      document.getElementById('cartPanel').classList.remove('active');
       document.getElementById('authPanel').classList.remove('active');
       document.getElementById('adminPanel').classList.remove('active');
 
@@ -184,7 +170,250 @@
       } else {
         document.getElementById(tabId).classList.add('active');
       }
+    };
+
+    // Auth Change Tracking
+    onAuthStateChanged(auth, (user) => {
+      if (user) {
+        document.getElementById('loginForm').style.display = 'none';
+        document.getElementById('myOrdersSection').style.display = 'block';
+        loadMyOrders(user.email);
+
+        if (user.email === ADMIN_EMAIL) {
+          document.getElementById('adminNavTab').style.display = 'block';
+          loadAdminOrders();
+        } else {
+          document.getElementById('adminNavTab').style.display = 'none';
+        }
+      } else {
+        document.getElementById('loginForm').style.display = 'block';
+        document.getElementById('myOrdersSection').style.display = 'none';
+        document.getElementById('adminNavTab').style.display = 'none';
+      }
+    });
+
+    window.logout = () => signOut(auth).then(() => location.reload());
+
+    window.handleAuth = async () => {
+      const email = document.getElementById('authEmail').value;
+      const pass = document.getElementById('authPassword').value;
+      if (!email || !pass) return alert("Email aur Password daalein!");
+
+      try {
+        await signInWithEmailAndPassword(auth, email, pass);
+        alert('Login Successful!');
+      } catch (e) {
+        try {
+          await createUserWithEmailAndPassword(auth, email, pass);
+          alert('New Account Created!');
+        } catch (err) {
+          alert('Error: ' + err.message);
+        }
+      }
+    };
+
+    // Load Food Menu from Firestore
+    const loadMenu = async () => {
+      try {
+        const querySnapshot = await getDocs(collection(db, "menu"));
+        const container = document.getElementById('menuContainer');
+        container.innerHTML = "";
+
+        if (querySnapshot.empty) {
+          container.innerHTML = "<p style='color:#aaa;'>Menu khali hai. Admin panel se dishes add karein!</p>";
+          return;
+        }
+
+        querySnapshot.forEach((docSnap) => {
+          const item = docSnap.data();
+          const card = document.createElement('div');
+          card.className = "food-card";
+          card.innerHTML = `
+            <div class="food-details">
+              <img src="${item.img}" alt="${item.name}">
+              <div class="food-info">
+                <h4>${item.name}</h4>
+                <p>₹${item.price}</p>
+              </div>
+            </div>
+            <div>
+              <button class="heart-btn" id="heart-${docSnap.id}">❤️</button>
+              <button class="add-btn" id="add-${docSnap.id}">ADD +</button>
+            </div>
+          `;
+          container.appendChild(card);
+
+          document.getElementById(`heart-${docSnap.id}`).onclick = () => addToWishlist(item);
+          document.getElementById(`add-${docSnap.id}`).onclick = () => addToCart(item);
+        });
+      } catch(err) {
+        console.error("Menu load error:", err);
+      }
+    };
+
+    function addToWishlist(item) {
+      if (!wishlist.some(w => w.name === item.name)) {
+        wishlist.push(item);
+        localStorage.setItem('kd_wishlist', JSON.stringify(wishlist));
+        alert(`${item.name} Watchlist mein add ho gaya! ❤️`);
+      } else {
+        alert("Pehle se Watchlist mein hai!");
+      }
+      renderWishlist();
     }
+
+    function renderWishlist() {
+      const container = document.getElementById('wishlistItems');
+      container.innerHTML = wishlist.length ? "" : "<p style='color:#aaa;'>Watchlist khali hai!</p>";
+      wishlist.forEach((item) => {
+        container.innerHTML += `
+          <div style="display:flex; justify-content:space-between; margin-bottom:8px; background:#2b2b2b; padding:10px; border-radius:5px;">
+            <span>❤️ ${item.name}</span>
+            <span style="color:#2ed573;">₹${item.price}</span>
+          </div>
+        `;
+      });
+    }
+
+    function addToCart(item) {
+      cart.push(item);
+      updateCartUI();
+      alert(`${item.name} Cart mein add ho gaya!`);
+    }
+
+    function updateCartUI() {
+      const cartList = document.getElementById('cartItemsList');
+      cartList.innerHTML = "";
+      let total = 0;
+      cart.forEach((item) => {
+        total += Number(item.price);
+        cartList.innerHTML += `
+          <div style="display:flex; justify-content:space-between; margin-bottom:8px; background:#2b2b2b; padding:8px; border-radius:5px;">
+            <span>${item.name}</span>
+            <span style="color:#2ed573;">₹${item.price}</span>
+          </div>
+        `;
+      });
+      document.getElementById('cartTotal').innerText = `Total: ₹${total}`;
+    }
+
+    window.placeOrder = async () => {
+      if (!auth.currentUser) return alert("Pehle Account tab par jaakar Login karein!");
+      const name = document.getElementById('custName').value;
+      const phone = document.getElementById('custPhone').value;
+      const address = document.getElementById('custAddress').value;
+
+      if (cart.length === 0) return alert("Cart khali hai!");
+      if (!name || !phone || !address) return alert("Sari details bharein!");
+
+      try {
+        await addDoc(collection(db, "orders"), {
+          customerEmail: auth.currentUser.email,
+          customerName: name,
+          phone: phone,
+          address: address,
+          items: cart,
+          status: "Order Received ⏳",
+          orderDate: new Date().toLocaleString()
+        });
+        alert("🎉 Order Place Ho Gaya!");
+        cart = [];
+        updateCartUI();
+        window.showTab('authPanel');
+      } catch (err) {
+        alert("Error: " + err.message);
+      }
+    };
+
+    const loadMyOrders = async (email) => {
+      try {
+        const q = query(collection(db, "orders"), where("customerEmail", "==", email));
+        const snap = await getDocs(q);
+        const list = document.getElementById('myOrdersList');
+        list.innerHTML = snap.empty ? "<p style='color:#aaa;'>Koi order nahi hai.</p>" : "";
+
+        snap.forEach(docSnap => {
+          const order = docSnap.data();
+          let itemsStr = order.items.map(i => i.name).join(", ");
+          list.innerHTML += `
+            <div class="order-card">
+              <h4>🍲 ${itemsStr}</h4>
+              <p style="font-size:12px; color:#aaa; margin-top:4px;">📅 ${order.orderDate}</p>
+              <span class="status-badge">Status: ${order.status || 'Processing'}</span>
+            </div>
+          `;
+        });
+      } catch(e) { console.error(e); }
+    };
+
+    window.addFoodToMenu = async () => {
+      const name = document.getElementById('foodName').value;
+      const price = document.getElementById('foodPrice').value;
+      let img = document.getElementById('foodImg').value || "https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=200";
+
+      if (!name || !price) return alert("Dish Name aur Price bharein!");
+      await addDoc(collection(db, "menu"), { name, price: Number(price), img });
+      alert("Dish Added!");
+      location.reload();
+    };
+
+    const loadAdminOrders = async () => {
+      try {
+        const snap = await getDocs(collection(db, "orders"));
+        const container = document.getElementById('adminOrdersContainer');
+        container.innerHTML = snap.empty ? "<p style='color:#aaa;'>Koi order nahi aaya hai.</p>" : "";
+
+        snap.forEach((docSnap) => {
+          const order = docSnap.data();
+          const docId = docSnap.id;
+          let itemsStr = order.items.map(i => i.name).join(", ");
+
+          container.innerHTML += `
+            <div class="order-card">
+              <h4>👤 ${order.customerName} (${order.phone})</h4>
+              <p style="font-size:12px; color:#aaa;">📍 ${order.address}</p>
+              <p style="margin-top:5px; color:#ff4757;">🍲 ${itemsStr}</p>
+              <p style="font-size:11px; color:#2ed573;">Current: ${order.status || 'Order Received'}</p>
+              
+              <select id="status-select-${docId}" style="margin-top:8px;">
+                <option value="Order Received ⏳">Order Received ⏳</option>
+                <option value="Preparing Food 🍳">Preparing Food 🍳</option>
+                <option value="Out For Delivery 🛵">Out For Delivery 🛵</option>
+                <option value="Delivered ✅">Delivered ✅</option>
+                <option value="Cancelled ❌">Cancelled ❌</option>
+              </select>
+              <button class="submit-btn" id="btn-update-${docId}">Update Status</button>
+            </div>
+          `;
+          
+          setTimeout(() => {
+            const btn = document.getElementById(`btn-update-${docId}`);
+            if (btn) btn.onclick = () => updateOrderStatus(docId);
+          }, 100);
+        });
+      } catch(e) { console.error(e); }
+    };
+
+    async function updateOrderStatus(docId) {
+      const newStatus = document.getElementById(`status-select-${docId}`).value;
+      try {
+        await updateDoc(doc(db, "orders", docId), { status: newStatus });
+        alert("Status Updated!");
+        loadAdminOrders();
+      } catch (err) {
+        alert("Error: " + err.message);
+      }
+    }
+
+    // Initialize Menu & Swiper
+    loadMenu();
+    renderWishlist();
+
+    var swiper = new Swiper(".mySwiper", {
+      autoplay: { delay: 3000, disableOnInteraction: false },
+      pagination: { el: ".swiper-pagination", clickable: true },
+      loop: true
+    });
   </script>
 </body>
 </html>
