@@ -8,29 +8,20 @@
     * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
     body { background-color: #0d0d0d; color: #ffffff; padding-bottom: 70px; }
     
-    /* Header with Watchlist & Cart on Top Right */
     header { background: #8b0000; padding: 12px 15px; display: flex; justify-content: space-between; align-items: center; position: sticky; top: 0; z-index: 100; box-shadow: 0 2px 10px rgba(0,0,0,0.8); }
-    .header-title { font-weight: bold; font-size: 1rem; color: #fff; letter-spacing: 0.5px; }
-    .header-icons { display: flex; gap: 12px; align-items: center; }
-    .icon-btn { background: #1a0000; border: 1px solid #ff4d4d; color: #fff; padding: 4px 8px; border-radius: 15px; font-weight: bold; font-size: 12px; cursor: pointer; }
-    .badge { background: #fff; color: #8b0000; padding: 1px 6px; border-radius: 10px; font-size: 11px; margin-left: 2px; }
+    .header-title { font-weight: bold; font-size: 0.95rem; color: #fff; }
+    .header-icons { display: flex; gap: 8px; align-items: center; }
+    .icon-btn { background: #1a0000; border: 1px solid #ff4d4d; color: #fff; padding: 4px 8px; border-radius: 15px; font-weight: bold; font-size: 11px; cursor: pointer; }
+    .badge { background: #fff; color: #8b0000; padding: 1px 6px; border-radius: 10px; font-size: 10px; margin-left: 2px; }
 
-    /* Notice Bar */
     .delivery-notice { background: linear-gradient(90deg, #d32f2f, #ff8c00); color: #fff; text-align: center; padding: 6px; font-weight: 600; font-size: 12px; }
 
-    /* Myntra-style Auto Slider */
-    .banner-container { width: 100%; height: 160px; position: relative; overflow: hidden; }
+    .banner-container { width: 100%; height: 150px; position: relative; overflow: hidden; }
     .banner-slide { width: 100%; height: 100%; position: absolute; opacity: 0; transition: opacity 0.8s ease-in-out; display: flex; flex-direction: column; justify-content: center; align-items: center; text-align: center; background-size: cover; background-position: center; color: #fff; text-shadow: 2px 2px 5px #000; }
     .banner-slide.active { opacity: 1; }
     .slide-1 { background-image: linear-gradient(rgba(0,0,0,0.5), rgba(0,0,0,0.5)), url('https://images.unsplash.com/photo-1555396273-367ea4eb4db5?w=500'); }
     .slide-2 { background-image: linear-gradient(rgba(0,0,0,0.5), rgba(0,0,0,0.5)), url('https://images.unsplash.com/photo-1565299624946-b28f40a0ae38?w=500'); }
-    .slide-3 { background-image: linear-gradient(rgba(0,0,0,0.5), rgba(0,0,0,0.5)), url('https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?w=500'); }
-
-    .banner-slide h2 { font-size: 1.3rem; color: #fff; text-shadow: 2px 2px 4px #000; }
-    .banner-slide p { font-size: 0.85rem; margin-top: 4px; }
-    .coupon-tag { background: #ff8c00; color: #000; padding: 2px 8px; border-radius: 4px; font-weight: bold; font-size: 11px; margin-top: 6px; }
-
-    /* Category Tabs Filter */
+    
     .category-tabs { display: flex; overflow-x: auto; padding: 10px 15px; gap: 8px; background: #141414; border-bottom: 1px solid #222; }
     .category-tabs::-webkit-scrollbar { display: none; }
     .tab-btn { background: #222; color: #ccc; border: 1px solid #333; padding: 6px 14px; border-radius: 20px; font-size: 12px; font-weight: bold; white-space: nowrap; cursor: pointer; }
@@ -39,31 +30,26 @@
     .page { display: none; padding: 12px; }
     .page.active { display: block; }
 
-    /* Food Cards */
-    .food-card { background: #181818; border-radius: 12px; padding: 10px; margin-bottom: 12px; display: flex; align-items: center; justify-content: space-between; border: 1px solid #262626; box-shadow: 0 4px 8px rgba(0,0,0,0.4); position: relative; }
-    .food-img { width: 75px; height: 75px; border-radius: 10px; object-fit: cover; margin-right: 12px; }
+    .food-card { background: #181818; border-radius: 12px; padding: 10px; margin-bottom: 10px; display: flex; align-items: center; justify-content: space-between; border: 1px solid #262626; }
+    .food-img { width: 70px; height: 70px; border-radius: 10px; object-fit: cover; margin-right: 10px; }
     .food-info { flex: 1; }
-    .food-info h3 { font-size: 0.95rem; font-weight: 600; color: #eee; }
-    .food-info p { color: #ff4d4d; font-weight: bold; font-size: 0.9rem; margin-top: 4px; }
+    .food-info h3 { font-size: 0.9rem; font-weight: 600; color: #eee; }
+    .food-info p { color: #ff4d4d; font-weight: bold; font-size: 0.85rem; margin-top: 2px; }
     
-    .card-actions { display: flex; flex-direction: column; gap: 6px; align-items: flex-end; }
-    .btn-add { background: #8b0000; color: white; border: none; padding: 6px 12px; border-radius: 6px; font-weight: bold; font-size: 12px; cursor: pointer; }
-    .btn-heart { background: none; border: none; font-size: 18px; cursor: pointer; }
+    .card-actions { display: flex; flex-direction: column; gap: 4px; align-items: flex-end; }
+    .btn-add { background: #8b0000; color: white; border: none; padding: 5px 10px; border-radius: 5px; font-weight: bold; font-size: 11px; cursor: pointer; }
+    .btn-heart { background: none; border: none; font-size: 16px; cursor: pointer; }
 
-    /* Coupon Box & Checkout Box */
     .checkout-box { background: #181818; border-radius: 10px; padding: 15px; border: 1px solid #333; margin-top: 15px; }
     .coupon-box { background: #222; padding: 12px; border-radius: 8px; border: 1px dashed #ff8c00; margin-bottom: 15px; }
     .upi-tag { background: #222; padding: 10px; border-radius: 6px; color: #ff8c00; font-family: monospace; font-size: 13px; text-align: center; margin: 10px 0; border: 1px dashed #ff8c00; }
 
-    /* Contact Box */
     .contact-card { background: #181818; padding: 15px; border-radius: 10px; border: 1px solid #333; margin-top: 15px; text-align: center; }
     .btn-whatsapp { background: #25D366; color: white; border: none; padding: 10px; border-radius: 6px; font-weight: bold; width: 100%; display: block; text-decoration: none; margin-top: 10px; }
 
-    /* Form Inputs */
     .form-box { max-width: 400px; margin: 10px auto; background: #181818; padding: 20px; border-radius: 10px; border: 1px solid #262626; }
-    input { width: 100%; padding: 11px; margin: 8px 0; background: #262626; border: 1px solid #333; color: #fff; border-radius: 6px; }
+    input { width: 100%; padding: 10px; margin: 8px 0; background: #262626; border: 1px solid #333; color: #fff; border-radius: 6px; }
 
-    /* Bottom Nav Bar */
     nav { position: fixed; bottom: 0; width: 100%; background: #000; display: flex; justify-content: space-around; padding: 8px 0; border-top: 1px solid #222; z-index: 100; }
     nav button { background: none; border: none; color: #888; font-size: 11px; cursor: pointer; }
     nav button.active { color: #e50914; font-weight: bold; }
@@ -71,7 +57,6 @@
 </head>
 <body>
 
-  <!-- HEADER WITH TOP RIGHT WATCHLIST AND CART -->
   <header>
     <div class="header-title">KD KA KHANA GHAR TAK</div>
     <div class="header-icons">
@@ -79,96 +64,81 @@
       <button class="icon-btn" onclick="showPage('cart-page', '')">🛒 Cart <span class="badge" id="cart-count">0</span></button>
     </div>
   </header>
-  <div class="delivery-notice">🛵 Freshly Made, Especially for You • Delivery 5-10 km</div>
+  <div class="delivery-notice">🛵 Delivery available within 10-12 KM only!</div>
 
-  <!-- HOME / MENU SCREEN -->
   <div id="home-page" class="page active">
-    
-    <!-- Myntra Style Sliding Banner -->
     <div class="banner-container">
       <div class="banner-slide slide-1 active">
         <h2>🔥 MEGA FOOD SALE</h2>
         <p>Get Flat 30% OFF on First Order</p>
-        <span class="coupon-tag">Use Code: FIRST30</span>
+        <span style="background:#ff8c00; color:#000; padding:2px 6px; border-radius:4px; font-size:10px; font-weight:bold;">Code: FIRST30</span>
       </div>
       <div class="banner-slide slide-2">
         <h2>🍗 SPECIAL DISCOUNTS</h2>
         <p>Flat 20% OFF on Orders Above ₹200</p>
-        <span class="coupon-tag">Use Code: KDFOOD20</span>
-      </div>
-      <div class="banner-slide slide-3">
-        <h2>🚀 LIGHTNING FAST DELIVERY</h2>
-        <p>Ghar Jaisa Swad Direct Aapke Ghar Tak</p>
-        <span class="coupon-tag">Delivery Within 10-12 KM</span>
+        <span style="background:#ff8c00; color:#000; padding:2px 6px; border-radius:4px; font-size:10px; font-weight:bold;">Code: KDFOOD20</span>
       </div>
     </div>
 
     <!-- Category Tabs Filter -->
     <div class="category-tabs">
-      <button class="tab-btn active" onclick="filterCategory('All', this)">All</button>
+      <button class="tab-btn active" onclick="filterCategory('All', this)">All Items</button>
+      <button class="tab-btn" onclick="filterCategory('Breads & Rotis', this)">Breads & Rotis</button>
+      <button class="tab-btn" onclick="filterCategory('Rice & Dal', this)">Rice & Dal</button>
       <button class="tab-btn" onclick="filterCategory('Main Course', this)">Main Course</button>
-      <button class="tab-btn" onclick="filterCategory('Fast Food', this)">Fast Food</button>
-      <button class="tab-btn" onclick="filterCategory('Drinks & Coffee', this)">Drinks & Coffee</button>
-      <button class="tab-btn" onclick="filterCategory('Breads', this)">Breads</button>
+      <button class="tab-btn" onclick="filterCategory('Snacks & Pasta', this)">Snacks & Pasta</button>
+      <button class="tab-btn" onclick="filterCategory('Momos & Rolls', this)">Momos & Rolls</button>
+      <button class="tab-btn" onclick="filterCategory('Beverages', this)">Tea, Coffee & Drinks</button>
     </div>
 
     <div id="menu-list" style="margin-top: 10px;"></div>
   </div>
 
-  <!-- WATCHLIST / WISHLIST SCREEN -->
   <div id="watchlist-page" class="page">
-    <h2 style="font-size: 1.2rem; color: #ff4d4d; margin-bottom: 10px;">❤️ YOUR WATCHLIST</h2>
+    <h2 style="font-size: 1.1rem; color: #ff4d4d; margin-bottom: 10px;">❤️ YOUR WATCHLIST</h2>
     <div id="watchlist-items"></div>
   </div>
 
-  <!-- CART & CHECKOUT SCREEN -->
   <div id="cart-page" class="page">
-    <h2 style="font-size: 1.2rem; color: #ff4d4d; margin-bottom: 10px;">🛒 YOUR CART</h2>
-    
-    <!-- Coupon Box -->
+    <h2 style="font-size: 1.1rem; color: #ff4d4d; margin-bottom: 10px;">🛒 YOUR CART</h2>
     <div class="coupon-box">
-      <p style="font-size: 12px; font-weight: bold; margin-bottom: 6px;">Have a Coupon Code?</p>
-      <input type="text" id="coupon-input" placeholder="Enter Code (e.g. KDFOOD20 / FIRST30)">
-      <button class="btn-add" style="width:100%; margin-top:5px; background:#ff8c00; color:#000;" onclick="applyCoupon()">Apply Coupon</button>
-      <p id="coupon-msg" style="margin-top:6px; font-size:12px;"></p>
+      <p style="font-size: 11px; font-weight: bold;">Have a Coupon Code?</p>
+      <input type="text" id="coupon-input" placeholder="Enter Code (e.g. KDFOOD20)">
+      <button class="btn-add" style="width:100%; margin-top:4px; background:#ff8c00; color:#000;" onclick="applyCoupon()">Apply</button>
+      <p id="coupon-msg" style="margin-top:4px; font-size:11px;"></p>
     </div>
 
     <div id="cart-items"></div>
     <div id="cart-summary"></div>
 
     <div class="checkout-box">
-      <h3 style="font-size: 0.95rem;">PAYMENT METHOD</h3>
+      <h3 style="font-size: 0.9rem;">PAYMENT METHOD</h3>
       <div class="upi-tag">UPI ID: 6000026478@okbizaxis</div>
-      <p style="font-size: 11px; color: #aaa;">GPay / PhonePe / Paytm se pay karke order confirm karein.</p>
-      <button class="btn-add" style="width: 100%; padding: 12px; margin-top: 12px; background: #28a745;" onclick="placeOrder()">PROCEED TO CHECKOUT</button>
+      <button class="btn-add" style="width: 100%; padding: 10px; margin-top: 10px; background: #28a745;" onclick="placeOrder()">PROCEED TO CHECKOUT</button>
     </div>
   </div>
 
-  <!-- ACCOUNT & CONTACT SCREEN -->
   <div id="account-page" class="page">
     <div class="form-box">
-      <h2 style="font-size: 1.1rem; text-align: center; margin-bottom: 10px;">Customer Login</h2>
+      <h2 style="font-size: 1rem; text-align: center; margin-bottom: 10px;">Customer / Admin Login</h2>
       <input type="email" id="email" placeholder="Email Address" value="kdrabha2000@gmail.com">
       <input type="password" id="password" placeholder="Password">
-      <button class="btn-add" style="width:100%; padding: 10px; margin-top: 5px;" onclick="handleLogin()">Login / Register</button>
-      <p id="status" style="margin-top:10px; text-align:center; font-size:12px; color: #ff8c00;"></p>
+      <button class="btn-add" style="width:100%; padding: 10px;" onclick="handleLogin()">Login / Register</button>
+      <p id="status" style="margin-top:8px; text-align:center; font-size:11px; color: #ff8c00;"></p>
 
-      <!-- Contact Us (SHOWS ONLY AFTER LOGIN) -->
       <div id="contact-section" class="contact-card" style="display: none;">
-        <h3 style="color:#ff4d4d; font-size: 1rem;">📞 WhatsApp & Call Support</h3>
-        <p style="font-size:12px; margin-top: 6px; color: #ccc;">Call / WhatsApp: <b>+91 8453270362</b></p>
-        <a href="https://wa.me/918453270362" target="_blank" class="btn-whatsapp">💬 WhatsApp Support On</a>
+        <h3 style="color:#ff4d4d; font-size: 0.95rem;">📞 WhatsApp & Call Support</h3>
+        <p style="font-size:12px; margin-top: 4px; color: #ccc;">Call / WhatsApp: <b>+91 8453270362</b></p>
+        <a href="https://wa.me/918453270362" target="_blank" class="btn-whatsapp">💬 Chat on WhatsApp</a>
       </div>
     </div>
   </div>
 
-  <!-- BOTTOM NAVIGATION BAR -->
   <nav>
     <button id="nav-home" class="active" onclick="showPage('home-page', 'nav-home')">🏠<br>Home</button>
     <button id="nav-account" onclick="showPage('account-page', 'nav-account')">👤<br>Profile</button>
   </nav>
 
-  <!-- Firebase Scripts -->
   <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-auth-compat.js"></script>
 
@@ -185,24 +155,74 @@
     firebase.initializeApp(firebaseConfig);
     const auth = firebase.auth();
 
+    // COMPLETE FULL MENU LIST
     const foodItems = [
-      { name: "Plain Tawa Roti", price: 10, category: "Breads", img: "https://images.unsplash.com/photo-1626074353765-517a681e40be?w=200" },
-      { name: "Butter Naan", price: 80, category: "Breads", img: "https://images.unsplash.com/photo-1601050690597-df0568f70950?w=200" },
-      { name: "Chicken Biryani", price: 180, category: "Main Course", img: "https://images.unsplash.com/photo-1563379091339-03b21ab4a4f8?w=200" },
-      { name: "Butter Chicken", price: 200, category: "Main Course", img: "https://images.unsplash.com/photo-1603894584373-5ac82b2ae398?w=200" },
-      { name: "Paneer Butter Masala", price: 200, category: "Main Course", img: "https://images.unsplash.com/photo-1631452180519-c014fe946bc7?w=200" },
-      { name: "Dal Makhani", price: 200, category: "Main Course", img: "https://images.unsplash.com/photo-1546833999-b9f581a1996d?w=200" },
-      { name: "Chicken Momo (Full)", price: 70, category: "Fast Food", img: "https://images.unsplash.com/photo-1625220194771-7ebdea0b70b9?w=200" },
-      { name: "Chicken Roll", price: 80, category: "Fast Food", img: "https://images.unsplash.com/photo-1626777552726-4a6b54c97e46?w=200" },
-      { name: "Red Sauce Pasta", price: 100, category: "Fast Food", img: "https://images.unsplash.com/photo-1551183053-bf91a1d81141?w=200" },
-      { name: "Cold Coffee", price: 70, category: "Drinks & Coffee", img: "https://images.unsplash.com/photo-1517701604599-bb29b565090c?w=200" },
-      { name: "Fresh Lime Water", price: 50, category: "Drinks & Coffee", img: "https://images.unsplash.com/photo-1513558161293-cdaf765ed2fd?w=200" }
+      // Breads & Rotis
+      { name: "Plain Tawa Roti", price: 10, category: "Breads & Rotis", img: "https://images.unsplash.com/photo-1626074353765-517a681e40be?w=200" },
+      { name: "Tawa Roti Butter", price: 15, category: "Breads & Rotis", img: "https://images.unsplash.com/photo-1626074353765-517a681e40be?w=200" },
+      { name: "Tandoori Roti", price: 25, category: "Breads & Rotis", img: "https://images.unsplash.com/photo-1626074353765-517a681e40be?w=200" },
+      { name: "Tandoori Butter Roti", price: 35, category: "Breads & Rotis", img: "https://images.unsplash.com/photo-1626074353765-517a681e40be?w=200" },
+      { name: "Plain Naan", price: 60, category: "Breads & Rotis", img: "https://images.unsplash.com/photo-1601050690597-df0568f70950?w=200" },
+      { name: "Butter Naan", price: 80, category: "Breads & Rotis", img: "https://images.unsplash.com/photo-1601050690597-df0568f70950?w=200" },
+      { name: "Lacha Paratha", price: 30, category: "Breads & Rotis", img: "https://images.unsplash.com/photo-1626074353765-517a681e40be?w=200" },
+      
+      // Rice & Dal
+      { name: "Plain Rice", price: 140, category: "Rice & Dal", img: "https://images.unsplash.com/photo-1516684732162-798a0062be99?w=200" },
+      { name: "Jeera Rice", price: 160, category: "Rice & Dal", img: "https://images.unsplash.com/photo-1516684732162-798a0062be99?w=200" },
+      { name: "Plain Dal", price: 70, category: "Rice & Dal", img: "https://images.unsplash.com/photo-1546833999-b9f581a1996d?w=200" },
+      { name: "Dal Fry", price: 110, category: "Rice & Dal", img: "https://images.unsplash.com/photo-1546833999-b9f581a1996d?w=200" },
+      { name: "Dal Tarka", price: 140, category: "Rice & Dal", img: "https://images.unsplash.com/photo-1546833999-b9f581a1996d?w=200" },
+      { name: "Dal Makhani", price: 200, category: "Rice & Dal", img: "https://images.unsplash.com/photo-1546833999-b9f581a1996d?w=200" },
+
+      // Main Course
+      { name: "Chole Masala", price: 220, category: "Main Course", img: "https://images.unsplash.com/photo-1588166524941-3bf61a9c41db?w=200" },
+      { name: "Paneer Masala", price: 200, category: "Main Course", img: "https://images.unsplash.com/photo-1631452180519-c014fe946bc7?w=200" },
+      { name: "Shahi Paneer", price: 260, category: "Main Course", img: "https://images.unsplash.com/photo-1631452180519-c014fe946bc7?w=200" },
+      { name: "Palak Paneer", price: 200, category: "Main Course", img: "https://images.unsplash.com/photo-1631452180519-c014fe946bc7?w=200" },
+      { name: "Mix Veg", price: 180, category: "Main Course", img: "https://images.unsplash.com/photo-1540420773420-3366772f4999?w=200" },
+      { name: "Aloo Gobi", price: 160, category: "Main Course", img: "https://images.unsplash.com/photo-1540420773420-3366772f4999?w=200" },
+      { name: "Chicken Butter Masala (Full)", price: 380, category: "Main Course", img: "https://images.unsplash.com/photo-1603894584373-5ac82b2ae398?w=200" },
+      { name: "Chicken Butter Masala (Half)", price: 200, category: "Main Course", img: "https://images.unsplash.com/photo-1603894584373-5ac82b2ae398?w=200" },
+      { name: "Chicken Curry (Full)", price: 240, category: "Main Course", img: "https://images.unsplash.com/photo-1603894584373-5ac82b2ae398?w=200" },
+      { name: "Chicken Curry (Half)", price: 140, category: "Main Course", img: "https://images.unsplash.com/photo-1603894584373-5ac82b2ae398?w=200" },
+      { name: "Mutton Curry (Full)", price: 400, category: "Main Course", img: "https://images.unsplash.com/photo-1544025162-d76694265947?w=200" },
+      { name: "Mutton Curry (Half)", price: 220, category: "Main Course", img: "https://images.unsplash.com/photo-1544025162-d76694265947?w=200" },
+      { name: "Mutton Rogan Josh", price: 300, category: "Main Course", img: "https://images.unsplash.com/photo-1544025162-d76694265947?w=200" },
+      { name: "Pork Curry (Full)", price: 280, category: "Main Course", img: "https://images.unsplash.com/photo-1544025162-d76694265947?w=200" },
+      { name: "Pork Curry (Half)", price: 150, category: "Main Course", img: "https://images.unsplash.com/photo-1544025162-d76694265947?w=200" },
+
+      // Snacks & Pasta
+      { name: "Red Sauce Pasta (Full)", price: 100, category: "Snacks & Pasta", img: "https://images.unsplash.com/photo-1551183053-bf91a1d81141?w=200" },
+      { name: "Red Sauce Pasta (Half)", price: 60, category: "Snacks & Pasta", img: "https://images.unsplash.com/photo-1551183053-bf91a1d81141?w=200" },
+      { name: "White Sauce Pasta (Full)", price: 120, category: "Snacks & Pasta", img: "https://images.unsplash.com/photo-1551183053-bf91a1d81141?w=200" },
+      { name: "Chicken Pasta (Full)", price: 180, category: "Snacks & Pasta", img: "https://images.unsplash.com/photo-1551183053-bf91a1d81141?w=200" },
+      { name: "Veg Sandwich", price: 50, category: "Snacks & Pasta", img: "https://images.unsplash.com/photo-1528735602780-2552fd46c7af?w=200" },
+      { name: "Non-Veg Sandwich", price: 80, category: "Snacks & Pasta", img: "https://images.unsplash.com/photo-1528735602780-2552fd46c7af?w=200" },
+      { name: "Aloo Paratha", price: 50, category: "Snacks & Pasta", img: "https://images.unsplash.com/photo-1626074353765-517a681e40be?w=200" },
+
+      // Momos & Rolls
+      { name: "Veg Momo (Full)", price: 50, category: "Momos & Rolls", img: "https://images.unsplash.com/photo-1625220194771-7ebdea0b70b9?w=200" },
+      { name: "Veg Momo (Half)", price: 30, category: "Momos & Rolls", img: "https://images.unsplash.com/photo-1625220194771-7ebdea0b70b9?w=200" },
+      { name: "Chicken Momo (Full)", price: 70, category: "Momos & Rolls", img: "https://images.unsplash.com/photo-1625220194771-7ebdea0b70b9?w=200" },
+      { name: "Chicken Momo (Half)", price: 40, category: "Momos & Rolls", img: "https://images.unsplash.com/photo-1625220194771-7ebdea0b70b9?w=200" },
+      { name: "Pork Momo (Full)", price: 80, category: "Momos & Rolls", img: "https://images.unsplash.com/photo-1625220194771-7ebdea0b70b9?w=200" },
+      { name: "Paneer Momo (Full)", price: 100, category: "Momos & Rolls", img: "https://images.unsplash.com/photo-1625220194771-7ebdea0b70b9?w=200" },
+      { name: "Veg Roll", price: 40, category: "Momos & Rolls", img: "https://images.unsplash.com/photo-1626777552726-4a6b54c97e46?w=200" },
+      { name: "Egg Roll", price: 60, category: "Momos & Rolls", img: "https://images.unsplash.com/photo-1626777552726-4a6b54c97e46?w=200" },
+      { name: "Chicken Roll", price: 80, category: "Momos & Rolls", img: "https://images.unsplash.com/photo-1626777552726-4a6b54c97e46?w=200" },
+      { name: "Pork Roll", price: 100, category: "Momos & Rolls", img: "https://images.unsplash.com/photo-1626777552726-4a6b54c97e46?w=200" },
+
+      // Beverages
+      { name: "Black Tea", price: 10, category: "Beverages", img: "https://images.unsplash.com/photo-1517701604599-bb29b565090c?w=200" },
+      { name: "Milk Tea", price: 20, category: "Beverages", img: "https://images.unsplash.com/photo-1517701604599-bb29b565090c?w=200" },
+      { name: "Black Coffee", price: 20, category: "Beverages", img: "https://images.unsplash.com/photo-1517701604599-bb29b565090c?w=200" },
+      { name: "Cold Coffee", price: 70, category: "Beverages", img: "https://images.unsplash.com/photo-1517701604599-bb29b565090c?w=200" },
+      { name: "Fresh Lime Water", price: 50, category: "Beverages", img: "https://images.unsplash.com/photo-1513558161293-cdaf765ed2fd?w=200" }
     ];
 
     let cart = [];
     let wishlist = [];
 
-    // Banner Slider
     let currentSlide = 0;
     const slides = document.querySelectorAll('.banner-slide');
     setInterval(() => {
