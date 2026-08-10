@@ -32,7 +32,7 @@
   <div class="notif-box" id="notif-box">
     <h4>Notifications</h4>
     <p>🚀 Welcome to K.D Restaurant!</p>
-    <p>🎂 New 1KG & 2KG Birthday Cakes available now!</p>
+    <p>🎂 New Birthday Cakes & Food Items available now!</p>
   </div>
 
   <!-- MAIN CONTAINER -->
@@ -40,7 +40,6 @@
 
     <!-- HOME PAGE -->
     <div id="home" class="page active">
-      <!-- SEARCH BAR -->
       <div class="search-bar-container">
         <div class="search-box">
           <i class="fas fa-search"></i>
@@ -48,15 +47,11 @@
         </div>
       </div>
 
-      <!-- LIVE BANNER -->
       <div class="live-banner" id="home-banner">
         🔥 TODAY'S SPECIAL: Chicken Butter Masala @ ₹380
       </div>
 
-      <!-- CATEGORY BAR -->
       <div class="category-scroll" id="category-bar"></div>
-
-      <!-- MENU GRID -->
       <div class="menu-grid" id="menu-container"></div>
     </div>
 
@@ -104,10 +99,12 @@
       </div>
     </div>
 
-    <!-- PROFILE PAGE -->
+    <!-- PROFILE PAGE (WITH CUSTOMER PHOTO UPLOAD) -->
     <div id="profile" class="page">
-      <div class="profile-header">
-        <div class="avatar">👤</div>
+      <div class="profile-header" style="display:flex; align-items:center; gap:15px; margin-bottom:15px; background:white; padding:15px; border-radius:8px;">
+        <div class="avatar-container" style="position:relative;">
+          <img id="user-avatar-img" src="https://cdn-icons-png.flaticon.com/512/3135/3135715.png" style="width:70px; height:70px; border-radius:50%; object-fit:cover; border:2px solid var(--accent-red);">
+        </div>
         <div>
           <h2 id="display-name">Guest User</h2>
           <div id="vip-tag"></div>
@@ -121,12 +118,16 @@
         <button class="btn-sec" onclick="customerLogin()">Login securely</button>
       </div>
 
-      <!-- USER DETAILS -->
+      <!-- USER DETAILS & PHOTO UPLOAD -->
       <div class="checkout-form" id="user-details-section" style="display:none;">
-        <h3>My Details</h3>
-        <input type="text" id="user-name-input" placeholder="Your Name">
+        <h3>My Details & Profile Photo</h3>
+        <label style="font-size:0.85rem; color:#555;">Profile Picture Link (URL):</label>
+        <input type="text" id="user-photo-input" placeholder="Paste Image Link / URL here" onchange="previewProfilePhoto()">
+        
+        <input type="text" id="user-name-input" placeholder="Your Full Name">
         <input type="text" id="user-address-input" placeholder="Save Delivery Address">
-        <button class="btn-sec" onclick="saveProfile()">Save Details</button>
+        
+        <button class="btn-sec" style="background:#2ed573;" onclick="saveProfile()">Save Profile & Photo</button>
         <button class="btn-sec" style="background:#ff4757; margin-top:10px;" onclick="deleteAccount()">Delete Account</button>
       </div>
 
@@ -142,37 +143,34 @@
         <button class="btn-sec" onclick="loginAdmin()">Login Admin</button>
       </div>
 
-      <!-- COMPLETE ADMIN PANEL (13 FEATURES) -->
+      <!-- COMPLETE ADMIN PANEL (15 FEATURES) -->
       <div id="admin-panel" style="display:none; margin-top:20px; border-top:2px solid #ccc; padding-top:15px;">
         <h3 style="color:var(--accent-red);">👑 Admin Dashboard</h3>
         
-        <!-- 1. Sales Analytics -->
         <div class="admin-stats">
           <div class="stat-box">Total Orders: <span id="stat-total">0</span></div>
           <div class="stat-box">Pending: <span id="stat-pending">0</span></div>
           <div class="stat-box">Earning: ₹<span id="stat-earning">0</span></div>
         </div>
 
-        <!-- 2. Live Offer Banner Manager -->
         <h4>📢 Update Offer Banner</h4>
         <input type="text" id="new-banner-text" placeholder="Enter new banner offer text">
         <button class="btn-sec" onclick="adminUpdateBanner()">Add Banner Offer</button>
 
-        <!-- 3. VIP Member Manager -->
         <h4 style="margin-top:10px;">👑 Assign VIP Member</h4>
         <input type="number" id="vip-user-phone" placeholder="Customer Phone Number">
         <button class="btn-sec" onclick="adminAssignVIP()">Make VIP</button>
 
-        <!-- 4. Coupon Code Creator -->
         <h4 style="margin-top:10px;">🎟️ Create Promo Coupon</h4>
         <input type="text" id="new-coupon-code" placeholder="Coupon Code (e.g. FIRST30)">
         <input type="number" id="new-coupon-discount" placeholder="Discount Amount (₹)">
         <button class="btn-sec" onclick="adminCreateCoupon()">Create Coupon</button>
 
-        <!-- 5. Add New Item / Birthday Cake -->
-        <h4 style="margin-top:10px;">➕ Add New Item / Birthday Cake</h4>
+        <!-- ADD ITEM WITH CUSTOM PHOTO LINK -->
+        <h4 style="margin-top:10px;">➕ Add Item / Birthday Cake (With Custom Photo)</h4>
         <input type="text" id="add-item-name" placeholder="Item / Cake Name">
         <input type="number" id="add-item-price" placeholder="Price (₹)">
+        <input type="text" id="add-item-img" placeholder="Paste Image URL / Link from Web/Gallery">
         <select id="add-item-cat">
           <option value="Birthday Cakes">Birthday Cakes</option>
           <option value="Breads & Naan">Breads & Naan</option>
@@ -188,17 +186,15 @@
           <option value="Juices & Drinks">Juices & Drinks</option>
           <option value="Desserts">Desserts</option>
         </select>
-        <button class="btn-sec" onclick="adminAddItem()">Add to Menu</button>
+        <button class="btn-sec" onclick="adminAddItem()">Add to Live Menu</button>
 
-        <!-- 6. Realtime Live Orders Stream -->
         <h4 style="margin-top:15px;">📦 Incoming Live Orders</h4>
         <div id="admin-orders-list"></div>
 
-        <!-- 7. Menu Manager & Inline Price Editor -->
-        <h4 style="margin-top:15px;">📋 Menu Manager (Edit Prices / Delete)</h4>
+        <!-- MENU MANAGER WITH DYNAMIC IMAGE EDITING -->
+        <h4 style="margin-top:15px;">📋 Menu Manager (Edit Prices, Photos & Delete)</h4>
         <div id="admin-menu-list"></div>
 
-        <!-- 8. Deleted Accounts Reasons Log -->
         <h4 style="margin-top:15px;">🗑️ Deleted Accounts Reasons Log</h4>
         <div id="admin-delete-logs"></div>
       </div>
