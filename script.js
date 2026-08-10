@@ -15,15 +15,12 @@ const database = firebase.database();
 auth.setPersistence(firebase.auth.Auth.Persistence.LOCAL);
 
 let currentUser = null;
-let selectedModalItem = null;
 let cart = JSON.parse(localStorage.getItem('kd_cart')) || [];
 let wishlist = JSON.parse(localStorage.getItem('kd_wishlist')) || [];
-let discount = 0;
 let currentCat = "All";
 let isStoreOpen = true;
 let currentAdminUPI = "6000026478@okbizaxis";
 
-// Menu Data
 let menu = [
   { id: 106, name: "Sprite / Coca-Cola (200ml)", price: 40, cat: "Cold Drinks & Beverages", img: "https://images.unsplash.com/photo-1622483767028-3f66f32aef97?w=200", isOut: false },
   { id: 107, name: "Fresh Cold Coffee", price: 70, cat: "Cold Drinks & Beverages", img: "https://images.unsplash.com/photo-1509042239860-f550ce710b93?w=200", isOut: false },
@@ -41,35 +38,34 @@ let menu = [
   { id: 120, name: "Gulab Jamun (2 pcs)", price: 50, cat: "Desserts", img: "https://images.unsplash.com/photo-1541781774459-bb2af2f05b55?w=200", isOut: false }
 ];
 
-function syncStorage() {
+function sync() {
   localStorage.setItem('kd_cart', JSON.stringify(cart));
   localStorage.setItem('kd_wishlist', JSON.stringify(wishlist));
+  if(currentUser) database.ref('users/' + currentUser.uid + '/wishlist').set(wishlist);
 }
 
-function loadUserSession(uid, phone, name, photo, address) {
+function loadUserSession(uid, phone, name, photo, address, dbWishlist) {
   currentUser = { uid, phone, name };
+  if(dbWishlist) { wishlist = dbWishlist; sync(); }
   localStorage.setItem('kd_user_phone', phone);
   localStorage.setItem('kd_user_uid', uid);
+  
   if (document.getElementById('auth-section')) document.getElementById('auth-section').style.display = 'none';
   if (document.getElementById('user-details-section')) document.getElementById('user-details-section').style.display = 'block';
-  if (document.getElementById('display-name')) document.getElementById('display-name').innerText = name || "Hi Customer";
-  if (document.getElementById('display-phone')) document.getElementById('display-phone').innerText = "+91-" + phone;
+  if (document.getElementById('display-name')) document.getElementById('display-name').innerText = name;
   if (document.getElementById('user-phone-input')) document.getElementById('user-phone-input').value = phone;
-  if (document.getElementById('user-name-input')) document.getElementById('user-name-input').value = name || "";
+  if (document.getElementById('user-name-input')) document.getElementById('user-name-input').value = name;
   if (document.getElementById('user-address-input')) document.getElementById('user-address-input').value = address || "";
   if (document.getElementById('saved-addr-text')) document.getElementById('saved-addr-text').innerText = address || "No Address Saved";
   if (photo && document.getElementById('user-avatar-img')) document.getElementById('user-avatar-img').src = photo;
-  if (document.getElementById('del-name')) document.getElementById('del-name').value = name || "";
-  if (document.getElementById('del-address')) document.getElementById('del-address').value = address || "";
-  if (document.getElementById('del-phone')) document.getElementById('del-phone').value = phone || "";
-  renderOrders();
+  renderOrders(); renderMenu(); renderWishlist();
 }
 
 auth.onAuthStateChanged((user) => {
   if (user) {
     database.ref('users/' + user.uid).once('value', (snap) => {
       const u = snap.val() || {};
-      loadUserSession(user.uid, u.phone || user.phoneNumber || "8453270362", u.name || user.displayName || "Hi Customer", u.photo || user.photoURL, u.address || "");
+      loadUserSession(user.uid, u.phone || "8453270362", u.name || "Hi Customer", u.photo, u.address, u.wishlist);
     });
   } else {
     const savedPhone = localStorage.getItem('kd_user_phone');
@@ -77,66 +73,51 @@ auth.onAuthStateChanged((user) => {
     if (savedPhone && savedUid) {
       database.ref('users/' + savedUid).once('value', (snap) => {
         const u = snap.val() || {};
-        loadUserSession(savedUid, u.phone || savedPhone, u.name || "Customer " + savedPhone.slice(-4), u.photo, u.address || "");
+        loadUserSession(savedUid, u.phone || savedPhone, u.name || "Customer", u.photo, u.address, u.wishlist);
       });
     }
   }
 });
 
-function loginWithPhoneDirect() {
-  const phone = document.getElementById('auth-phone').value;
-  if (!phone || phone.length < 10) return alert("Please enter valid 10-digit number!");
-  const customUid = "user_" + phone;
-  database.ref('users/' + customUid).update({ phone: phone, name: "Customer " + phone.slice(-4) }).then(() => {
-    loadUserSession(customUid, phone, "Customer " + phone.slice(-4), null, "");
-    alert("Login Successful!");
-  });
+function toggleWishlist(id) {
+  if (wishlist.includes(id)) wishlist = wishlist.filter(x => x !== id);
+  else wishlist.push(id);
+  sync(); renderMenu(); renderWishlist();
+}
+
+function renderMenu() {
+  const container = document.getElementById('menu-container');
+  if (!container) return;
+  // RANDOM SHUFFLE LOGIC
+  let displayList = currentCat === "All" ? [...menu] : menu.filter(m => m.cat === currentCat);
+  displayList = displayList.sort(() => Math.random() - 0.5); 
+  
+  container.innerHTML = displayList.map(item => `
+    <div class="food-card">
+      <span class="wishlist-icon" onclick="toggleWishlist(${item.id})">${wishlist.includes(item.id) ? '❤️' : '🤍'}</span>
+      <img src="${item.img}" style="width:100%; height:100px;">
+      <div style="padding:5px;">${item.name}<br><b>₹${item.price}</b><br><button onclick="addToCart(${item.id})">Add</button></div>
+    </div>
+  `).join('');
 }
 
 function addToCart(id) {
   const item = menu.find(m => m.id === id);
-  if (!item || item.isOut) return;
-  const exist = cart.find(c => c.id === id);
-  if (exist) exist.qty++;
-  else cart.push({ ...item, qty: 1 });
-  syncStorage();
-  updateCartCount();
-  alert("Added to cart!");
-}
-
-function changeQty(id, delta) {
-  const item = cart.find(c => c.id === id);
-  if (!item) return;
-  item.qty += delta;
-  if (item.qty <= 0) cart = cart.filter(c => c.id !== id);
-  syncStorage();
-  updateCartCount();
-  renderCart();
-}
-
-function toggleWishlist(id) {
-  if (wishlist.includes(id)) wishlist = wishlist.filter(x => x !== id);
-  else wishlist.push(id);
-  syncStorage();
-  renderMenu();
-  renderWishlist();
+  if(item) {
+    const ex = cart.find(c => c.id === id);
+    if(ex) ex.qty++; else cart.push({...item, qty:1});
+    sync(); updateCartCount(); alert("Added!");
+  }
 }
 
 function proceedToPayment() {
   const name = document.getElementById('del-name').value;
   const phone = document.getElementById('del-phone').value;
   const address = document.getElementById('del-address').value;
-  const payOption = document.querySelector('input[name="pay-option"]:checked').value;
   if (!name || !address || !phone) return alert("Fill delivery details!");
-  if (cart.length === 0) return alert("Cart empty!");
-  const subtotal = cart.reduce((s, i) => s + (i.price * i.qty), 0);
-  const totalAmount = subtotal + (subtotal >= 200 ? 0 : 30);
-  
-  if (payOption === "UPI") window.location.href = `upi://pay?pa=${currentAdminUPI}&pn=KDKT&am=${totalAmount}&cu=INR`;
-  
   const orderId = "ORD" + Date.now().toString().slice(-5);
-  database.ref('orders/' + orderId).set({ id: orderId, name, phone, address, items: cart, total: totalAmount, status: "Pending", date: new Date().toLocaleString(), uid: (currentUser ? currentUser.uid : "guest") })
-    .then(() => { cart = []; syncStorage(); updateCartCount(); alert("Order Placed! ID: " + orderId); showPage('orders'); });
+  database.ref('orders/' + orderId).set({ id: orderId, name, phone, address, items: cart, total: cart.reduce((s,i)=>s+(i.price*i.qty),0), status: "Pending", date: new Date().toLocaleString(), uid: currentUser ? currentUser.uid : "guest" })
+    .then(() => { cart = []; sync(); updateCartCount(); alert("Order Placed!"); showPage('orders'); });
 }
 
 function renderOrders() {
@@ -145,30 +126,21 @@ function renderOrders() {
   database.ref('orders').on('value', (snap) => {
     const orders = snap.val() ? Object.values(snap.val()).reverse() : [];
     container.innerHTML = orders.length === 0 ? "<p>No orders yet.</p>" : orders.map(o => `
-      <div class="order-card">
-        <b>Order ID:</b> ${o.id}<br><b>Items:</b> ${(o.items || []).map(i => i.name).join(', ')}<br>
-        <b>Status:</b> ${o.status}<br><br>
-        ${o.status === 'Pending' ? `<button onclick="cancelMyOrder('${o.id}')" style="background:red; color:white;">Cancel Order</button>` : ''}
-      </div>`).join('');
+      <div class="order-card"><b>ID:</b> ${o.id}<br><b>Status:</b> ${o.status}<br>
+      ${o.status==='Pending' ? `<button onclick="database.ref('orders/${o.id}').update({status:'Cancelled'})">Cancel</button>`:''}</div>`).join('');
   });
 }
 
-function cancelMyOrder(id) { database.ref('orders/' + id).update({ status: 'Cancelled' }); }
-function showPage(p) { 
-  document.querySelectorAll('.page').forEach(e => e.classList.remove('active'));
-  if(document.getElementById(p)) document.getElementById(p).classList.add('active');
-  if(p==='orders') renderOrders();
-  if(p==='wishlist') renderWishlist();
-  if(p==='cart') renderCart();
-}
-function renderCart() { 
-  const c = document.getElementById('cart-items');
-  if(c) c.innerHTML = cart.map(i => `<div>${i.name} - ₹${i.price} x ${i.qty} <button onclick="changeQty(${i.id}, 1)">+</button></div>`).join('');
-}
 function renderWishlist() {
   const c = document.getElementById('wishlist-container');
-  if(c) c.innerHTML = menu.filter(m => wishlist.includes(m.id)).map(i => `<div>${i.name}</div>`).join('');
+  if(c) {
+    const items = menu.filter(m => wishlist.includes(m.id));
+    c.innerHTML = items.length === 0 ? "<p>Empty.</p>" : items.map(i => `<div>${i.name}</div>`).join('');
+  }
 }
-function updateCartCount() { document.getElementById('cart-count').innerText = cart.reduce((s, i) => s + i.qty, 0); }
-function renderMenu() { /* same as before */ }
-window.onload = () => { renderCategories(); renderMenu(); renderCart(); renderWishlist(); };
+
+function renderCart() { /* add standard cart render here */ }
+function updateCartCount() { if(document.getElementById('cart-count')) document.getElementById('cart-count').innerText = cart.reduce((s,i)=>s+i.qty,0); }
+function showPage(p) { document.querySelectorAll('.page').forEach(e=>e.classList.remove('active')); if(document.getElementById(p)) document.getElementById(p).classList.add('active'); if(p==='orders') renderOrders(); }
+function renderCategories() { /* Categories logic */ }
+window.onload = () => { renderMenu(); renderWishlist(); renderCart(); updateCartCount(); };
