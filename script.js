@@ -1,4 +1,4 @@
-// 1. FIREBASE SETUP
+// 1. FIREBASE SETUP & LOCAL PERSISTENCE
 const firebaseConfig = {
   apiKey: "AIzaSyDDTFzD8eaxS6hsQ_W5akOWRWixyZdjkSo",
   authDomain: "kd-ka-khana-ghar-tak.firebaseapp.com",
@@ -12,10 +12,15 @@ const firebaseConfig = {
 if (!firebase.apps.length) {
   firebase.initializeApp(firebaseConfig);
 }
+const auth = firebase.auth();
 const database = firebase.database();
 
+// Set Permanent Auth Persistence
+auth.setPersistence(firebase.auth.Auth.Persistence.LOCAL);
+
 // GLOBAL VARIABLES
-let currentUserPhone = null;
+let currentUser = null;
+let confirmationResultGlobal = null;
 let cart = [];
 let wishlist = [];
 let discount = 0;
@@ -184,6 +189,158 @@ let menu = [
   { id: 113, name: "Ice Cream", price: 70, cat: "Desserts", img: "https://images.unsplash.com/photo-1567206563064-6f60f4002b57?w=200" }
 ];
 
+// AUTH STATE OBSERVER (AUTO-LOGIN PERSISTENCE)
+auth.onAuthStateChanged((user) => {
+  if (user) {
+    currentUser = user;
+    document.getElementById('auth-section').style.display = 'none';
+    document.getElementById('user-details-section').style.display = 'block';
+    
+    let uid = user.uid;
+    let name = user.displayName || "";
+    let photo = user.photoURL || "https://cdn-icons-png.flaticon.com/512/3135/3135715.png";
+    let phone = user.phoneNumber || "";
+
+    if (document.getElementById('display-name')) document.getElementById('display-name').innerText = name || phone || "Logged User";
+    if (document.getElementById('user-avatar-img')) document.getElementById('user-avatar-img').src = photo;
+
+    // Load saved database details
+    database.ref('users/' + uid).once('value', (snap) => {
+      if(snap.val()) {
+        const u = snap.val();
+        if (document.getElementById('user-name-input')) document.getElementById('user-name-input').value = u.name || name;
+        if (document.getElementById('user-address-input')) document.getElementById('user-address-input').value = u.address || "";
+        if (document.getElementById('del-name')) document.getElementById('del-name').value = u.name || name;
+        if (document.getElementById('del-address')) document.getElementById('del-address').value = u.address || "";
+        if (u.photoUrl && document.getElementById('user-avatar-img')) document.getElementById('user-avatar-img').src = u.photoUrl;
+      }
+    });
+
+    renderOrders();
+  } else {
+    currentUser = null;
+    document.getElementById('auth-section').style.display = 'block';
+    document.getElementById('user-details-section').style.display = 'none';
+    if (document.getElementById('display-name')) document.getElementById('display-name').innerText = "Guest User";
+  }
+});
+
+// GOOGLE AUTH LOGIN
+function googleLogin() {
+  const provider = new firebase.auth.GoogleAuthProvider();
+  auth.signInWithPopup(provider)
+    .then((result) => {
+      alert("Google Sign-In Successful!");
+    })
+    .catch((error) => {
+      alert("Google Login Error: " + error.message);
+    });
+}
+
+// PHONE OTP AUTH LOGIN
+function setupRecaptcha() {
+  if (!window.recaptchaVerifier) {
+    window.recaptchaVerifier = new firebase.auth.RecaptchaVerifier('recaptcha-container', {
+      'size': 'invisible'
+    });
+  }
+}
+
+function sendOTP() {
+  const phone = document.getElementById('auth-phone').value;
+  if (!phone || phone.length < 10) return alert("Enter a valid 10-digit phone number!");
+
+  setupRecaptcha();
+  const phoneNumber = "+91" + phone;
+  const appVerifier = window.recaptchaVerifier;
+
+  auth.signInWithPhoneNumber(phoneNumber, appVerifier)
+    .then((confirmationResult) => {
+      confirmationResultGlobal = confirmationResult;
+      document.getElementById('otp-box').style.display = 'block';
+      alert("OTP SMS Sent to " + phoneNumber);
+    })
+    .catch((error) => {
+      alert("OTP Error: " + error.message);
+    });
+}
+
+function verifyOTP() {
+  const code = document.getElementById('otp-input').value;
+  if (!code || code.length < 6) return alert("Enter valid 6-digit OTP!");
+
+  if (confirmationResultGlobal) {
+    confirmationResultGlobal.confirm(code)
+      .then((result) => {
+        alert("Phone Verification Successful!");
+      })
+      .catch((error) => {
+        alert("Invalid OTP Code!");
+      });
+  }
+}
+
+// PROFILE CAMERA PHOTO UPLOAD
+function uploadProfileCameraPhoto(input) {
+  if (input.files && input.files[0]) {
+    const file = input.files[0];
+    const reader = new FileReader();
+
+    reader.onload = function(e) {
+      const base64Image = e.target.result;
+      document.getElementById('user-avatar-img').src = base64Image;
+
+      if (currentUser) {
+        database.ref('users/' + currentUser.uid).update({ photoUrl: base64Image })
+          .then(() => alert("Profile photo updated successfully!"));
+      }
+    };
+    reader.readAsDataURL(file);
+  }
+}
+
+function saveProfile() {
+  if(!currentUser) return alert("Please Login first!");
+  const name = document.getElementById('user-name-input').value;
+  const address = document.getElementById('user-address-input').value;
+  const photoUrl = document.getElementById('user-avatar-img').src;
+
+  database.ref('users/' + currentUser.uid).set({
+    name: name,
+    address: address,
+    photoUrl: photoUrl,
+    phone: currentUser.phoneNumber || ""
+  }).then(() => {
+    alert("Profile Saved Successfully!");
+    if (name) document.getElementById('display-name').innerText = name;
+  });
+}
+
+function customerLogout() {
+  auth.signOut().then(() => {
+    alert("Logged out successfully!");
+    location.reload();
+  });
+}
+
+function deleteAccount() {
+  if(!currentUser) return alert("Please login first!");
+  const reason = prompt("Enter reason for deleting account:");
+  if(reason) {
+    database.ref('deleted_accounts/' + currentUser.uid).set({
+      uid: currentUser.uid,
+      reason: reason,
+      date: new Date().toLocaleString()
+    }).then(() => {
+      database.ref('users/' + currentUser.uid).remove();
+      auth.currentUser.delete().then(() => {
+        alert("Account deleted.");
+        location.reload();
+      });
+    });
+  }
+}
+
 // NAVIGATION
 function showPage(pageId) {
   document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
@@ -311,80 +468,9 @@ function changeQty(id, delta) {
   renderCart();
 }
 
-// CUSTOMER AUTH & PROFILE PHOTO SYNC
-function customerLogin() {
-  const phoneInput = document.getElementById('auth-phone');
-  if (!phoneInput) return;
-  const phone = phoneInput.value;
-  if(phone.length >= 10) {
-    currentUserPhone = phone;
-    document.getElementById('auth-section').style.display = 'none';
-    document.getElementById('user-details-section').style.display = 'block';
-    document.getElementById('del-phone').value = phone; 
-    
-    database.ref('users/' + phone).once('value', (snap) => {
-      if(snap.val()) {
-        const u = snap.val();
-        if (document.getElementById('user-name-input')) document.getElementById('user-name-input').value = u.name || "";
-        if (document.getElementById('user-address-input')) document.getElementById('user-address-input').value = u.address || "";
-        if (document.getElementById('del-name')) document.getElementById('del-name').value = u.name || "";
-        if (document.getElementById('del-address')) document.getElementById('del-address').value = u.address || "";
-        if (document.getElementById('display-name')) document.getElementById('display-name').innerText = u.name || ("User: " + phone);
-        if (u.photoUrl && document.getElementById('user-avatar-img')) {
-          document.getElementById('user-avatar-img').src = u.photoUrl;
-          document.getElementById('user-photo-input').value = u.photoUrl;
-        }
-      } else {
-        document.getElementById('display-name').innerText = "User: " + phone;
-      }
-    });
-    alert("Logged In Successfully! Profile loaded.");
-    renderOrders();
-  } else {
-    alert("Enter a valid 10-digit phone number!");
-  }
-}
-
-function previewProfilePhoto() {
-  const photoUrl = document.getElementById('user-photo-input').value;
-  if (photoUrl) {
-    document.getElementById('user-avatar-img').src = photoUrl;
-  }
-}
-
-function saveProfile() {
-  if(!currentUserPhone) return alert("Please Login first!");
-  const name = document.getElementById('user-name-input').value;
-  const address = document.getElementById('user-address-input').value;
-  const photoUrl = document.getElementById('user-photo-input').value;
-
-  database.ref('users/' + currentUserPhone).set({ name, address, photoUrl })
-    .then(() => {
-      alert("Profile & Photo Saved Successfully!");
-      if (name) document.getElementById('display-name').innerText = name;
-      if (photoUrl) document.getElementById('user-avatar-img').src = photoUrl;
-    });
-}
-
-function deleteAccount() {
-  if(!currentUserPhone) return alert("Please login first!");
-  const reason = prompt("We are sad to see you go! Enter reason for account deletion:");
-  if(reason) {
-    database.ref('deleted_accounts/' + currentUserPhone).set({
-      phone: currentUserPhone,
-      reason: reason,
-      date: new Date().toLocaleString()
-    }).then(() => {
-      database.ref('users/' + currentUserPhone).remove();
-      alert("Account deleted.");
-      location.reload();
-    });
-  }
-}
-
-// PLACE ORDER & TIMELINE LIVE TRACKING
+// PLACE ORDER & TIMELINE TRACKING
 function placeOrder() {
-  if(!currentUserPhone) return alert("Please Login in Profile tab first!");
+  if(!currentUser) return alert("Please Login in Profile tab first!");
   
   const nameInp = document.getElementById('del-name');
   const addressInp = document.getElementById('del-address');
@@ -402,7 +488,7 @@ function placeOrder() {
   const orderId = "ORD" + Date.now().toString().slice(-5);
   const newOrder = {
     id: orderId,
-    phone: currentUserPhone,
+    uid: currentUser.uid,
     name: name,
     address: address,
     pay: pay,
@@ -424,14 +510,14 @@ function renderOrders() {
   const container = document.getElementById('my-orders-list');
   if(!container) return;
 
-  if(!currentUserPhone) {
+  if(!currentUser) {
     container.innerHTML = "<p>Please login in Profile tab to see order history & live tracking.</p>";
     return;
   }
   
   database.ref('orders').on('value', (snapshot) => {
     const data = snapshot.val();
-    let myOrders = data ? Object.values(data).filter(o => o.phone === currentUserPhone) : [];
+    let myOrders = data ? Object.values(data).filter(o => o.uid === currentUser.uid) : [];
     
     let totalCount = myOrders.length;
     let cancelByMe = myOrders.filter(o => o.status === 'CancelledByCustomer').length;
@@ -506,7 +592,7 @@ function reorder(id) {
   });
 }
 
-// ADMIN DASHBOARD & DYNAMIC DISH IMAGE EDITOR
+// ADMIN DASHBOARD
 function loginAdmin() {
   const passInp = document.getElementById('admin-pass');
   if (!passInp) return;
@@ -537,7 +623,7 @@ function renderAdmin() {
     if (container) {
       container.innerHTML = liveOrders.length === 0 ? "<p>No incoming orders.</p>" : liveOrders.map(o => `
         <div class="order-card">
-          <b>${o.id}</b> - ${o.name} <a href="tel:${o.phone}" style="color:gold;">📞 Call (${o.phone})</a><br>
+          <b>${o.id}</b> - ${o.name} <br>
           Address: ${o.address}<br>
           Items: ${(o.items || []).map(i => i.name + ' x' + i.qty).join(', ')}<br>
           Status: <b>${o.status}</b><br>
@@ -557,14 +643,13 @@ function renderAdmin() {
     if(container) {
       container.innerHTML = logs.length === 0 ? "<p>No deleted accounts.</p>" : logs.map(l => `
         <div style="font-size:0.85rem; padding:5px; border-bottom:1px solid #eee;">
-          <b>Phone:</b> ${l.phone} | <b>Date:</b> ${l.date}<br>
+          <b>UID:</b> ${l.uid} | <b>Date:</b> ${l.date}<br>
           <b>Reason:</b> ${l.reason}
         </div>
       `).join('');
     }
   });
 
-  // ADMIN MENU MANAGER WITH IMAGE URL EDITING
   const menuContainer = document.getElementById('admin-menu-list');
   if (menuContainer) {
     menuContainer.innerHTML = menu.map(m => `
