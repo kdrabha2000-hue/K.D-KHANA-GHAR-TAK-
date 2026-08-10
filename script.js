@@ -19,6 +19,7 @@ let selectedModalItem = null;
 let cart = JSON.parse(localStorage.getItem('kd_cart')) || [];
 let wishlist = JSON.parse(localStorage.getItem('kd_wishlist')) || [];
 let currentCat = "All";
+let isStoreOpen = true;
 let currentAdminUPI = "6000026478@okbizaxis";
 let isSearching = false;
 
@@ -39,7 +40,7 @@ let menu = [
   { id: 120, name: "Gulab Jamun (2 pcs)", price: 50, cat: "Desserts", img: "https://images.unsplash.com/photo-1541781774459-bb2af2f05b55?w=200", isOut: false }
 ];
 
-// POPUP MODAL LOGIC
+// MODAL POPUP LOGIC
 function openModal(id) {
   const item = menu.find(m => m.id === id);
   if (!item) return;
@@ -65,7 +66,7 @@ function buyNowFromModal() {
   showPage('cart');
 }
 
-// OWNER DASHBOARD & DELETE ORDER LOGIC
+// ADMIN DASHBOARD & FULL CONTROLS LOGIC
 function loginAdmin() {
   const passInp = document.getElementById('admin-pass');
   if (passInp && passInp.value.trim() === 'K.d@12345') {
@@ -78,13 +79,73 @@ function loginAdmin() {
   }
 }
 
+function toggleStoreStatus() {
+  isStoreOpen = !isStoreOpen;
+  const statusElem = document.getElementById('store-status-text');
+  if (statusElem) {
+    statusElem.innerText = isStoreOpen ? "OPEN" : "CLOSED";
+    statusElem.style.color = isStoreOpen ? "green" : "red";
+  }
+  alert("Store Status Changed to: " + (isStoreOpen ? "OPEN" : "CLOSED"));
+}
+
+function updateAdminUPI() {
+  const upi = document.getElementById('admin-upi-input').value;
+  if (upi) {
+    currentAdminUPI = upi;
+    alert("UPI ID Saved: " + upi);
+  }
+}
+
+function adminUpdateBanner() {
+  const txt = document.getElementById('new-banner-text').value;
+  if (txt) {
+    specialOffers.push("🔥 OFFER: " + txt);
+    alert("Banner Offer Added!");
+  }
+}
+
+function adminAssignVIP() {
+  const phone = document.getElementById('vip-user-phone').value;
+  if (phone) alert("Phone number " + phone + " is now VIP Member!");
+}
+
+function adminCreateCoupon() {
+  const code = document.getElementById('new-coupon-code').value;
+  const discount = document.getElementById('new-coupon-discount').value;
+  if (code && discount) alert("Promo Code " + code + " (₹" + discount + " OFF) Created!");
+}
+
+function adminAddItem() {
+  const name = document.getElementById('add-item-name').value;
+  const price = parseFloat(document.getElementById('add-item-price').value);
+  const cat = document.getElementById('add-item-cat').value;
+  const fileInput = document.getElementById('item-file-input');
+
+  if (!name || !price) return alert("Enter Item Name & Price!");
+
+  let imgUrl = "https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=200";
+  if (fileInput.files && fileInput.files[0]) {
+    const reader = new FileReader();
+    reader.onload = function(e) {
+      menu.push({ id: Date.now(), name, price, cat, img: e.target.result, isOut: false });
+      renderMenu();
+      alert("New Item Added To Menu!");
+    };
+    reader.readAsDataURL(fileInput.files[0]);
+  } else {
+    menu.push({ id: Date.now(), name, price, cat, img: imgUrl, isOut: false });
+    renderMenu();
+    alert("New Item Added To Menu!");
+  }
+}
+
 function renderAdminOrders() {
   database.ref('orders').on('value', (snap) => {
     const liveOrders = snap.val() ? Object.values(snap.val()) : [];
-    const pendingOrders = liveOrders.filter(o => o.status === 'Pending');
 
     if (document.getElementById('stat-total')) document.getElementById('stat-total').innerText = liveOrders.length;
-    if (document.getElementById('stat-pending')) document.getElementById('stat-pending').innerText = pendingOrders.length;
+    if (document.getElementById('stat-pending')) document.getElementById('stat-pending').innerText = liveOrders.filter(o => o.status === 'Pending').length;
     if (document.getElementById('stat-earning')) document.getElementById('stat-earning').innerText = liveOrders.filter(o => o.status === 'Delivered').reduce((s, o) => s + (o.total || 0), 0);
 
     const container = document.getElementById('admin-orders-list');
@@ -158,7 +219,7 @@ function startOfferBannerRotation() {
       bannerIdx = (bannerIdx + 1) % specialOffers.length;
       el.innerText = specialOffers[bannerIdx];
       el.style.opacity = 1;
-    }, 7000);
+    }, 500);
   }, 7000);
 }
 
@@ -365,6 +426,8 @@ function changeQty(id, delta) {
 }
 
 function proceedToPayment() {
+  if (!isStoreOpen) return alert("Restaurant is currently CLOSED!");
+
   const name = document.getElementById('del-name').value;
   const phone = document.getElementById('del-phone').value;
   const address = document.getElementById('del-address').value;
