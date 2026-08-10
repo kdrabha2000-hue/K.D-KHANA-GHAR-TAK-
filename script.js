@@ -374,3 +374,4 @@ window.onload = function() {
   startOfferBannerRotation();
   startMenuRotation();
 };
+
