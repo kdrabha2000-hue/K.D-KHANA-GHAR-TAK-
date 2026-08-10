@@ -1,47 +1,51 @@
-// FIREBASE SETUP
+// 1. FIREBASE SETUP (Your Real Firebase Credentials Connected)
 const firebaseConfig = {
   apiKey: "AIzaSyDDTFzD8eaxS6hsQ_W5akOWRWixyZdjkSo",
   authDomain: "kd-ka-khana-ghar-tak.firebaseapp.com",
+  databaseURL: "https://kd-ka-khana-ghar-tak-default-rtdb.asia-southeast1.firebasedatabase.app",
   projectId: "kd-ka-khana-ghar-tak",
   storageBucket: "kd-ka-khana-ghar-tak.firebasestorage.app",
   messagingSenderId: "69933070653",
   appId: "1:69933070653:web:f9b93ba827d794bb376d54"
 };
 
-firebase.initializeApp(firebaseConfig);
-const auth = firebase.auth();
-
-// GOOGLE 1-CLICK & OTP AUTH
-function googleLogin() {
-  const provider = new firebase.auth.GoogleAuthProvider();
-  auth.signInWithPopup(provider)
-    .then((result) => {
-      const user = result.user;
-      alert("Welcome " + (user.displayName || "User") + "!");
-      document.getElementById('user-name-input').value = user.displayName || "";
-      document.getElementById('user-email-input').value = user.email || "";
-      document.getElementById('vip-tag').innerHTML = "<span style='color:gold; font-weight:bold;'>👑 VIP MEMBER</span>";
-    })
-    .catch((error) => {
-      alert("Login Error: " + error.message);
-    });
+if (!firebase.apps.length) {
+  firebase.initializeApp(firebaseConfig);
 }
+const database = firebase.database();
 
-// LIVE AUTO SLIDING BANNERS
+// GLOBAL VARIABLES
+let currentUserPhone = null;
+let cart = [];
+let wishlist = [];
+let discount = 0;
+let currentCat = "All";
+
+// LIVE BANNER ROTATION
 let liveBanners = [
   "🔥 TODAY'S SPECIAL: Chicken Butter Masala @ ₹380",
+  "🎂 SPECIAL BIRTHDAY CAKES: Normal, Custom & Size Offers Available!",
   "🎉 FLAT 30% OFF - Use Promo Code: FIRST30",
   "⚡ FASTEST DELIVERY: 8:00 AM to 9:30 PM in Udalguri!"
 ];
 let currentBannerIdx = 0;
 
 setInterval(() => {
-  currentBannerIdx = (currentBannerIdx + 1) % liveBanners.length;
-  document.getElementById('home-banner').innerText = liveBanners[currentBannerIdx];
-}, 3000);
+  const bannerElem = document.getElementById('home-banner');
+  if (bannerElem) {
+    currentBannerIdx = (currentBannerIdx + 1) % liveBanners.length;
+    bannerElem.innerText = liveBanners[currentBannerIdx];
+  }
+}, 3500);
 
-// MENU DATA
+// MENU DATA (113 Food Items + Birthday Cakes Category)
 let menu = [
+  // Birthday Cakes
+  { id: 201, name: "Normal Cake (500gm)", price: 450, cat: "Birthday Cakes", img: "https://images.unsplash.com/photo-1558961363-fa8fdf82db35?w=200" },
+  { id: 202, name: "Customer Choice Cake (500gm)", price: 500, cat: "Birthday Cakes", img: "https://images.unsplash.com/photo-1578985545062-69928b1d9587?w=200" },
+  { id: 203, name: "Offer Cake (1kg)", price: 850, cat: "Birthday Cakes", img: "https://images.unsplash.com/photo-1535141192574-5d4897c12636?w=200" },
+  { id: 204, name: "Offer Cake (2kg)", price: 1600, cat: "Birthday Cakes", img: "https://images.unsplash.com/photo-1562777717-dc6984f65a63?w=200" },
+
   // Breads & Naan
   { id: 1, name: "Plain Tawa Roti", price: 10, cat: "Breads & Naan", img: "https://images.unsplash.com/photo-1626074353765-517a681e40be?w=200" },
   { id: 2, name: "Tawa Roti Butter", price: 15, cat: "Breads & Naan", img: "https://images.unsplash.com/photo-1626074353765-517a681e40be?w=200" },
@@ -180,35 +184,30 @@ let menu = [
   { id: 113, name: "Ice Cream", price: 70, cat: "Desserts", img: "https://images.unsplash.com/photo-1567206563064-6f60f4002b57?w=200" }
 ];
 
-let cart = [];
-let wishlist = [];
-let orders = [];
-let coupons = { 'FIRST30': 30 };
-let discount = 0;
-let currentCat = "All";
-
-// NAVIGATION LOGIC
+// NAVIGATION
 function showPage(pageId) {
   document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
-  document.getElementById(pageId).classList.add('active');
   document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+  document.getElementById(pageId).classList.add('active');
+  
   if(pageId === 'cart') renderCart();
-  if(pageId === 'wishlist') renderWishlist();
   if(pageId === 'orders') renderOrders();
 }
 
 function toggleNotifications() {
   const box = document.getElementById('notif-box');
-  box.style.display = box.style.display === 'block' ? 'none' : 'block';
+  if (box) box.style.display = box.style.display === 'block' ? 'none' : 'block';
 }
 
-// RENDER CATEGORIES
+// UI RENDERING
 function renderCategories() {
-  const categories = ["All", "Breads & Naan", "Dal & Gravy", "Main Course", "Pasta", "Breakfast & Snacks", "Tea & Coffee", "Chowmein & Rolls", "Fried Rice", "Momos", "Starters & Tandoor", "Juices & Drinks", "Desserts"];
+  const categories = ["All", "Birthday Cakes", "Breads & Naan", "Dal & Gravy", "Main Course", "Pasta", "Breakfast & Snacks", "Tea & Coffee", "Chowmein & Rolls", "Fried Rice", "Momos", "Starters & Tandoor", "Juices & Drinks", "Desserts"];
   const bar = document.getElementById('category-bar');
-  bar.innerHTML = categories.map(c => `
-    <div class="cat-chip ${c === currentCat ? 'active' : ''}" onclick="selectCategory('${c}')">${c}</div>
-  `).join('');
+  if (bar) {
+    bar.innerHTML = categories.map(c => `
+      <div class="cat-chip ${c === currentCat ? 'active' : ''}" onclick="selectCategory('${c}')">${c}</div>
+    `).join('');
+  }
 }
 
 function selectCategory(cat) {
@@ -217,30 +216,30 @@ function selectCategory(cat) {
   renderMenu();
 }
 
-// RENDER MENU
 function renderMenu() {
   const container = document.getElementById('menu-container');
-  let filtered = menu;
-  if(currentCat !== "All") filtered = menu.filter(m => m.cat === currentCat);
+  if (!container) return;
+  let filtered = currentCat === "All" ? menu : menu.filter(m => m.cat === currentCat);
   
   container.innerHTML = filtered.map(item => `
     <div class="food-card">
+      <span class="wishlist-icon" onclick="toggleWishlist(${item.id})">${wishlist.includes(item.id) ? '❤️' : '🤍'}</span>
       <img src="${item.img}" class="food-img">
       <div class="food-info">
         <div class="food-title">${item.name}</div>
         <div class="food-price">₹${item.price}</div>
-        <button class="btn-primary" style="margin-top:5px;" onclick="addToCart(${item.id})">ADD +</button>
+        <button class="btn-primary" onclick="addToCart(${item.id})">ADD +</button>
       </div>
-      <span onclick="toggleWishlist(${item.id})" style="cursor:pointer; font-size:1.2rem;">
-        ${wishlist.includes(item.id) ? '❤️' : '🤍'}
-      </span>
     </div>
   `).join('');
 }
 
 function filterMenu() {
-  const query = document.getElementById('search-input').value.toLowerCase();
+  const inputElem = document.getElementById('search-input');
+  if (!inputElem) return;
+  const query = inputElem.value.toLowerCase();
   const container = document.getElementById('menu-container');
+  if (!container) return;
   const filtered = menu.filter(m => m.name.toLowerCase().includes(query));
   container.innerHTML = filtered.map(item => `
     <div class="food-card">
@@ -248,252 +247,361 @@ function filterMenu() {
       <div class="food-info">
         <div class="food-title">${item.name}</div>
         <div class="food-price">₹${item.price}</div>
-        <button class="btn-primary" style="margin-top:5px;" onclick="addToCart(${item.id})">ADD +</button>
+        <button class="btn-primary" onclick="addToCart(${item.id})">ADD +</button>
       </div>
     </div>
   `).join('');
 }
 
-// CART & CHECKOUT
+// CART LOGIC
 function addToCart(id) {
   const item = menu.find(m => m.id === id);
+  if (!item) return;
   const exist = cart.find(c => c.id === id);
-  if(exist) exist.qty++;
-  else cart.push({...item, qty: 1});
+  if (exist) exist.qty++;
+  else cart.push({ ...item, qty: 1 });
   updateCartCount();
   alert(item.name + " added to cart!");
 }
 
 function updateCartCount() {
-  document.getElementById('cart-count').innerText = cart.reduce((s, i) => s + i.qty, 0);
+  const countElem = document.getElementById('cart-count');
+  if (countElem) {
+    countElem.innerText = cart.reduce((s, i) => s + i.qty, 0);
+  }
 }
 
 function renderCart() {
   const container = document.getElementById('cart-items');
-  if(cart.length === 0) {
+  const summary = document.getElementById('bill-summary');
+  if (!container) return;
+
+  if (cart.length === 0) {
     container.innerHTML = "<p>Your cart is empty.</p>";
-    document.getElementById('bill-summary').innerHTML = "";
+    if (summary) summary.innerHTML = "";
     return;
   }
   container.innerHTML = cart.map(i => `
-    <div class="food-card">
-      <div class="food-info">
-        <b>${i.name}</b><br>₹${i.price} x ${i.qty} = ₹${i.price * i.qty}
-      </div>
+    <div class="order-card" style="display:flex; justify-content:space-between; align-items:center;">
+      <div><b>${i.name}</b><br>₹${i.price} x ${i.qty} = ₹${i.price * i.qty}</div>
       <div>
-        <button onclick="changeQty(${i.id}, -1)">-</button>
-        <span style="margin:0 5px;">${i.qty}</span>
+        <button onclick="changeQty(${i.id}, -1)">-</button> 
+        <span style="margin:0 5px;">${i.qty}</span> 
         <button onclick="changeQty(${i.id}, 1)">+</button>
       </div>
     </div>
   `).join('');
   
   const subtotal = cart.reduce((s, i) => s + (i.price * i.qty), 0);
-  const finalTotal = Math.max(0, subtotal - discount);
-  document.getElementById('bill-summary').innerHTML = `
-    <div>Subtotal: ₹${subtotal}</div>
-    <div>Discount: -₹${discount}</div>
-    <div><b>Total Payable: ₹${finalTotal}</b></div>
-  `;
+  if (summary) {
+    summary.innerHTML = `
+      <div>Subtotal: ₹${subtotal}</div>
+      <div>Discount: -₹${discount}</div>
+      <div><b>Total Payable: ₹${Math.max(0, subtotal - discount)}</b></div>
+    `;
+  }
 }
 
 function changeQty(id, delta) {
   const item = cart.find(c => c.id === id);
-  if(!item) return;
+  if (!item) return;
   item.qty += delta;
-  if(item.qty <= 0) cart = cart.filter(c => c.id !== id);
+  if (item.qty <= 0) cart = cart.filter(c => c.id !== id);
   updateCartCount();
   renderCart();
 }
 
-function useSavedAddress() {
-  const val = document.getElementById('saved-address-dropdown').value;
-  if(val) document.getElementById('del-address').value = val;
-}
-
-function applyCoupon() {
-  const code = document.getElementById('coupon-code').value.toUpperCase();
-  if(coupons[code]) {
-    discount = coupons[code];
-    alert("Coupon Applied! ₹" + discount + " OFF");
+// CUSTOMER AUTH & DATA SYNC
+function customerLogin() {
+  const phoneInput = document.getElementById('auth-phone');
+  if (!phoneInput) return;
+  const phone = phoneInput.value;
+  if(phone.length >= 10) {
+    currentUserPhone = phone;
+    document.getElementById('auth-section').style.display = 'none';
+    document.getElementById('user-details-section').style.display = 'block';
+    document.getElementById('display-name').innerText = "User: " + phone;
+    document.getElementById('del-phone').value = phone; 
+    
+    database.ref('users/' + phone).once('value', (snap) => {
+      if(snap.val()) {
+        if (document.getElementById('user-name-input')) document.getElementById('user-name-input').value = snap.val().name || "";
+        if (document.getElementById('user-address-input')) document.getElementById('user-address-input').value = snap.val().address || "";
+        if (document.getElementById('del-name')) document.getElementById('del-name').value = snap.val().name || "";
+        if (document.getElementById('del-address')) document.getElementById('del-address').value = snap.val().address || "";
+      }
+    });
+    alert("Logged In Successfully! Your saved profile loaded.");
+    renderOrders();
   } else {
-    alert("Invalid Coupon Code!");
+    alert("Enter a valid 10-digit phone number!");
   }
-  renderCart();
 }
 
-function placeOrder() {
-  const name = document.getElementById('del-name').value;
-  const phone = document.getElementById('del-phone').value;
-  const address = document.getElementById('del-address').value;
-  const pay = document.getElementById('payment-mode').value;
-  
-  if(!name || !phone || !address) return alert("Please fill all delivery details!");
-  if(cart.length === 0) return alert("Cart is empty!");
+function saveProfile() {
+  if(!currentUserPhone) return alert("Please Login first!");
+  const name = document.getElementById('user-name-input').value;
+  const address = document.getElementById('user-address-input').value;
+  database.ref('users/' + currentUserPhone).set({ name, address })
+    .then(() => alert("Profile Saved Successfully!"));
+}
 
+function deleteAccount() {
+  if(!currentUserPhone) return alert("Please login first!");
+  const reason = prompt("We are sad to see you go! Please enter the reason for deleting your account:");
+  if(reason) {
+    database.ref('deleted_accounts/' + currentUserPhone).set({
+      phone: currentUserPhone,
+      reason: reason,
+      date: new Date().toLocaleString()
+    }).then(() => {
+      database.ref('users/' + currentUserPhone).remove();
+      alert("Account deleted successfully.");
+      location.reload();
+    });
+  }
+}
+
+// PLACE ORDER & HISTORY (With Status Lock)
+function placeOrder() {
+  if(!currentUserPhone) return alert("Please Login in Profile tab first!");
+  
+  const nameInp = document.getElementById('del-name');
+  const addressInp = document.getElementById('del-address');
+  const payInp = document.getElementById('payment-mode');
+
+  if (!nameInp || !addressInp) return;
+
+  const name = nameInp.value;
+  const address = addressInp.value;
+  const pay = payInp ? payInp.value : "COD";
+
+  if (!name || !address) return alert("Please fill all delivery details!");
+  if (cart.length === 0) return alert("Cart is empty!");
+
+  const orderId = "ORD" + Date.now().toString().slice(-5);
   const newOrder = {
-    id: "ORD" + Date.now().toString().slice(-5),
-    name, phone, address, pay,
-    items: [...cart],
+    id: orderId,
+    phone: currentUserPhone,
+    name: name,
+    address: address,
+    pay: pay,
+    items: cart,
     total: cart.reduce((s, i) => s + (i.price * i.qty), 0) - discount,
-    status: "Pending"
+    status: "Pending",
+    date: new Date().toLocaleString()
   };
 
-  orders.push(newOrder);
-  cart = [];
-  updateCartCount();
-  alert("Order Placed Successfully! Tracking ID: " + newOrder.id);
-  showPage('orders');
-}
-
-// WISHLIST & PROFILE
-function toggleWishlist(id) {
-  if(wishlist.includes(id)) wishlist = wishlist.filter(x => x !== id);
-  else wishlist.push(id);
-  renderMenu();
-}
-
-function renderWishlist() {
-  const container = document.getElementById('wishlist-container');
-  const items = menu.filter(m => wishlist.includes(m.id));
-  if(items.length === 0) return container.innerHTML = "<p>No items in wishlist.</p>";
-  container.innerHTML = items.map(i => `
-    <div class="food-card">
-      <img src="${i.img}" class="food-img">
-      <div class="food-info">
-        <b>${i.name}</b><br>₹${i.price}
-        <button class="btn-primary" onclick="addToCart(${i.id})">ADD +</button>
-      </div>
-    </div>
-  `).join('');
+  database.ref('orders/' + orderId).set(newOrder).then(() => {
+    cart = [];
+    updateCartCount();
+    alert("Order Placed Successfully! Tracking ID: " + orderId);
+    showPage('orders');
+  });
 }
 
 function renderOrders() {
   const container = document.getElementById('my-orders-list');
-  if(orders.length === 0) return container.innerHTML = "<p>No live orders.</p>";
-  container.innerHTML = orders.map(o => `
-    <div class="order-card">
-      <div><b>Order ID:</b> ${o.id}</div>
-      <div><b>Status:</b> <span style="color:var(--accent-red); font-weight:bold;">${o.status}</span></div>
-      <div><b>Total:</b> ₹${o.total} (${o.pay})</div>
-    </div>
-  `).join('');
+  if(!container) return;
+
+  if(!currentUserPhone) {
+    container.innerHTML = "<p>Please login in Profile tab to see your order history.</p>";
+    return;
+  }
+  
+  database.ref('orders').on('value', (snapshot) => {
+    const data = snapshot.val();
+    let myOrders = data ? Object.values(data).filter(o => o.phone === currentUserPhone) : [];
+    
+    let totalCount = myOrders.length;
+    let cancelByMe = myOrders.filter(o => o.status === 'CancelledByCustomer').length;
+    let cancelByAdmin = myOrders.filter(o => o.status === 'CancelledByAdmin').length;
+
+    container.innerHTML = `
+      <div class="bill-summary" style="margin-bottom:10px;">
+        <b>My Stats:</b> Total Orders: ${totalCount} | Cancelled by Me: ${cancelByMe} | Cancelled by KD: ${cancelByAdmin}
+      </div>
+      ${myOrders.length === 0 ? "<p>No orders yet.</p>" : myOrders.map(o => `
+        <div class="order-card">
+          <div><b>Order ID:</b> ${o.id} | <b>Date:</b> ${o.date}</div>
+          <div><b>Items:</b> ${(o.items || []).map(i => i.name + ' x' + i.qty).join(', ')}</div>
+          <div><b>Total:</b> ₹${o.total} (${o.pay})</div>
+          <div><b>Status:</b> <span style="color:var(--accent-red); font-weight:bold;">${o.status}</span></div>
+          
+          <!-- STATUS LOCK: Only Pending orders can be cancelled -->
+          ${o.status === 'Pending' ? 
+            `<button class="btn-sec" style="background:red; margin-top:5px;" onclick="cancelMyOrder('${o.id}')">Cancel Order</button>` 
+            : `<p style="color:orange; font-size:0.8rem; margin-top:5px;">🔒 Order Locked (Accepted / Cooking / Delivered)</p>`}
+          
+          <button class="btn-sec" style="background:#2196F3; margin-top:5px;" onclick="reorder('${o.id}')">1-Click Re-Order</button>
+        </div>
+      `).reverse().join('')}
+    `;
+  });
 }
 
-function saveProfile() {
-  alert("Profile Details Saved!");
+function cancelMyOrder(id) {
+  if(confirm("Are you sure you want to cancel this order?")) {
+    database.ref('orders/' + id).update({ status: 'CancelledByCustomer' });
+  }
 }
 
-// ADMIN AUTHENTICATION & CONTROLS
+function reorder(id) {
+  database.ref('orders/' + id).once('value', (snap) => {
+    if(snap.val() && snap.val().items) {
+      cart = [...snap.val().items];
+      updateCartCount();
+      alert("Items added to cart from past order!");
+      showPage('cart');
+    }
+  });
+}
+
+// ADMIN DASHBOARD (Protected by K.d@12345)
 function loginAdmin() {
-  const email = document.getElementById('admin-email').value;
-  const pass = document.getElementById('admin-pass').value;
-  if(email === 'kdrabha2000@gmail.com' && pass === 'admin123') {
+  const passInp = document.getElementById('admin-pass');
+  if (!passInp) return;
+  
+  if (passInp.value === 'K.d@12345') {
     document.getElementById('admin-panel').style.display = 'block';
     alert("Welcome Admin!");
     renderAdmin();
   } else {
-    alert("Access Denied!");
+    alert("Access Denied! Invalid Admin Password.");
   }
 }
 
 function renderAdmin() {
-  // Feature 9: Sales Overview
-  document.getElementById('stat-total').innerText = orders.length;
-  document.getElementById('stat-pending').innerText = orders.filter(o => o.status === 'Pending').length;
-  document.getElementById('stat-earning').innerText = orders.reduce((s, o) => s + o.total, 0);
+  database.ref('orders').on('value', (snap) => {
+    const ordersData = snap.val();
+    const liveOrders = ordersData ? Object.values(ordersData) : [];
 
-  // Feature 1, 2, 10: Live Order Control + Status Updater + Direct Call Action
-  const container = document.getElementById('admin-orders-list');
-  container.innerHTML = orders.length === 0 ? "<p>No incoming orders.</p>" : orders.map(o => `
-    <div class="order-card">
-      <b>${o.id}</b> - ${o.name} <a href="tel:${o.phone}" style="color:gold;">📞 Call Direct (${o.phone})</a><br>
-      Address: ${o.address}<br>
-      Items: ${o.items.map(i => i.name + ' x' + i.qty).join(', ')}<br>
-      Status: <b>${o.status}</b><br>
-      <button class="btn-sec" onclick="updateStatus('${o.id}', 'Accepted')">Accept Order</button>
-      <button class="btn-sec" onclick="updateStatus('${o.id}', 'Out for Delivery')">Out for Delivery</button>
-      <button class="btn-sec" onclick="updateStatus('${o.id}', 'Delivered')">Delivered</button>
-      <button class="btn-sec" style="background:red;" onclick="updateStatus('${o.id}', 'Rejected')">Reject Order</button>
-    </div>
-  `).join('');
+    const totalElem = document.getElementById('stat-total');
+    const pendingElem = document.getElementById('stat-pending');
+    const earningElem = document.getElementById('stat-earning');
 
-  // Feature 4 & 5: Item Delete & Price Manager
+    if (totalElem) totalElem.innerText = liveOrders.length;
+    if (pendingElem) pendingElem.innerText = liveOrders.filter(o => o.status === 'Pending').length;
+    if (earningElem) earningElem.innerText = liveOrders.filter(o => o.status === 'Delivered').reduce((s, o) => s + (o.total || 0), 0);
+
+    const container = document.getElementById('admin-orders-list');
+    if (container) {
+      container.innerHTML = liveOrders.length === 0 ? "<p>No incoming orders.</p>" : liveOrders.map(o => `
+        <div class="order-card">
+          <b>${o.id}</b> - ${o.name} <a href="tel:${o.phone}" style="color:gold;">📞 Call (${o.phone})</a><br>
+          Address: ${o.address}<br>
+          Items: ${(o.items || []).map(i => i.name + ' x' + i.qty).join(', ')}<br>
+          Status: <b>${o.status}</b><br>
+          <button class="btn-sec" onclick="updateStatus('${o.id}', 'Accepted')">Accept Order</button>
+          <button class="btn-sec" onclick="updateStatus('${o.id}', 'Out for Delivery')">Out for Delivery</button>
+          <button class="btn-sec" onclick="updateStatus('${o.id}', 'Delivered')">Delivered</button>
+          <button class="btn-sec" style="background:red;" onclick="updateStatus('${o.id}', 'CancelledByAdmin')">Reject Order</button>
+        </div>
+      `).reverse().join('');
+    }
+  });
+
+  // Account Deletion Reason Logs
+  database.ref('deleted_accounts').on('value', (snap) => {
+    const logsData = snap.val();
+    const logs = logsData ? Object.values(logsData) : [];
+    const container = document.getElementById('admin-delete-logs');
+    if(container) {
+      container.innerHTML = logs.length === 0 ? "<p>No deleted accounts.</p>" : logs.map(l => `
+        <div style="font-size:0.85rem; padding:5px; border-bottom:1px solid #eee;">
+          <b>Phone:</b> ${l.phone} | <b>Date:</b> ${l.date}<br>
+          <b>Reason:</b> ${l.reason}
+        </div>
+      `).join('');
+    }
+  });
+
+  // Admin Menu Manager
   const menuContainer = document.getElementById('admin-menu-list');
-  menuContainer.innerHTML = menu.map(m => `
-    <div class="admin-item-row">
-      <span>${m.name} (₹<input type="number" id="price-${m.id}" value="${m.price}" style="width:60px; padding:2px; display:inline;">)</span>
-      <div>
-        <button onclick="adminEditPrice(${m.id})" style="background:#2196F3; color:white; border:none; padding:4px 6px; border-radius:4px;">Save Price</button>
-        <button onclick="adminDeleteItem(${m.id})" style="background:red; color:white; border:none; padding:4px 6px; border-radius:4px;">🗑️ Delete</button>
+  if (menuContainer) {
+    menuContainer.innerHTML = menu.map(m => `
+      <div class="admin-item-row">
+        <span>${m.name} (₹<input type="number" id="price-${m.id}" value="${m.price}" style="width:60px; padding:2px; display:inline;">)</span>
+        <div>
+          <button onclick="adminEditPrice(${m.id})" style="background:#2196F3; color:white; border:none; padding:4px 6px; border-radius:4px;">Save Price</button>
+          <button onclick="adminDeleteItem(${m.id})" style="background:red; color:white; border:none; padding:4px 6px; border-radius:4px;">Delete</button>
+        </div>
       </div>
-    </div>
-  `).join('');
+    `).join('');
+  }
 }
 
 function updateStatus(id, st) {
-  const ord = orders.find(o => o.id === id);
-  if(ord) ord.status = st;
-  renderAdmin();
+  database.ref('orders/' + id).update({ status: st });
 }
 
-// Feature 3: Add Item
 function adminAddItem() {
-  const name = document.getElementById('add-item-name').value;
-  const price = Number(document.getElementById('add-item-price').value);
-  const cat = document.getElementById('add-item-cat').value;
-  if(!name || !price) return alert("Fill item details!");
-  
+  const nameInp = document.getElementById('add-item-name');
+  const priceInp = document.getElementById('add-item-price');
+  const catInp = document.getElementById('add-item-cat');
+
+  if (!nameInp || !priceInp || !catInp) return;
+
+  const name = nameInp.value;
+  const price = Number(priceInp.value);
+  const cat = catInp.value;
+
+  if (!name || !price) return alert("Fill item details!");
+
   menu.push({ id: Date.now(), name, price, cat, img: "https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=200" });
   alert("Item added to live menu!");
   renderMenu();
   renderAdmin();
 }
 
-// Feature 4: Delete Item
 function adminDeleteItem(id) {
   menu = menu.filter(m => m.id !== id);
-  alert("Item deleted from live menu!");
+  alert("Item deleted!");
   renderMenu();
   renderAdmin();
 }
 
-// Feature 5: Edit Price
 function adminEditPrice(id) {
-  const newPrice = Number(document.getElementById(`price-${id}`).value);
+  const priceInp = document.getElementById(`price-${id}`);
+  if (!priceInp) return;
+  const newPrice = Number(priceInp.value);
   const item = menu.find(m => m.id === id);
-  if(item && newPrice) {
+  if (item && newPrice) {
     item.price = newPrice;
     alert("Price updated for " + item.name + "!");
     renderMenu();
   }
 }
 
-// Feature 6: VIP Manager
-function adminAssignVIP() {
-  const phone = document.getElementById('vip-user-phone').value;
-  if(!phone) return alert("Enter phone number!");
-  alert("Customer (" + phone + ") is now a 👑 VIP Member!");
+function toggleWishlist(id) {
+  if (wishlist.includes(id)) wishlist = wishlist.filter(x => x !== id);
+  else wishlist.push(id);
+  renderMenu();
 }
 
-// Feature 7: Coupon Generator
-function adminCreateCoupon() {
-  const code = document.getElementById('new-coupon-code').value.toUpperCase();
-  const disc = Number(document.getElementById('new-coupon-discount').value);
-  if(!code || !disc) return alert("Enter valid code and discount!");
-  coupons[code] = disc;
-  alert("Coupon " + code + " created for ₹" + disc + " OFF!");
+function applyCoupon() {
+  const codeInp = document.getElementById('coupon-code');
+  if (!codeInp) return;
+  const code = codeInp.value.toUpperCase();
+  if (code === 'FIRST30') {
+    discount = 30;
+    alert("Coupon Applied! ₹30 OFF");
+  } else {
+    alert("Invalid Coupon Code!");
+  }
+  renderCart();
 }
 
-// Feature 8: Banner Manager
-function adminUpdateBanner() {
-  const text = document.getElementById('new-banner-text').value;
-  if(!text) return alert("Enter banner text!");
-  liveBanners.push("🔥 " + text);
-  document.getElementById('home-banner').innerText = "🔥 " + text;
-  alert("New Offer Banner added to slideshow!");
+function useSavedAddress() {
+  const dropdown = document.getElementById('saved-address-dropdown');
+  const addressBox = document.getElementById('del-address');
+  if (dropdown && addressBox && dropdown.value) {
+    addressBox.value = dropdown.value;
+  }
 }
 
 // INITIAL LOAD
-renderCategories();
-renderMenu();
+window.onload = function() {
+  renderCategories();
+  renderMenu();
+};
