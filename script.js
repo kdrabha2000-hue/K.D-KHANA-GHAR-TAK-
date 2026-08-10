@@ -1,4 +1,4 @@
-// 1. FIREBASE SETUP (Your Real Firebase Credentials Connected)
+// 1. FIREBASE SETUP
 const firebaseConfig = {
   apiKey: "AIzaSyDDTFzD8eaxS6hsQ_W5akOWRWixyZdjkSo",
   authDomain: "kd-ka-khana-ghar-tak.firebaseapp.com",
@@ -38,7 +38,7 @@ setInterval(() => {
   }
 }, 3500);
 
-// MENU DATA (113 Food Items + Birthday Cakes Category)
+// MENU DATA (113 Food Items + Birthday Cakes)
 let menu = [
   // Birthday Cakes
   { id: 201, name: "Normal Cake (500gm)", price: 450, cat: "Birthday Cakes", img: "https://images.unsplash.com/photo-1558961363-fa8fdf82db35?w=200" },
@@ -331,7 +331,7 @@ function customerLogin() {
         if (document.getElementById('del-address')) document.getElementById('del-address').value = snap.val().address || "";
       }
     });
-    alert("Logged In Successfully! Your saved profile loaded.");
+    alert("Logged In Successfully! Saved profile loaded.");
     renderOrders();
   } else {
     alert("Enter a valid 10-digit phone number!");
@@ -362,7 +362,7 @@ function deleteAccount() {
   }
 }
 
-// PLACE ORDER & HISTORY (With Status Lock)
+// PLACE ORDER & HISTORY (WITH TIMELINE LIVE TRACKING)
 function placeOrder() {
   if(!currentUserPhone) return alert("Please Login in Profile tab first!");
   
@@ -405,7 +405,7 @@ function renderOrders() {
   if(!container) return;
 
   if(!currentUserPhone) {
-    container.innerHTML = "<p>Please login in Profile tab to see your order history.</p>";
+    container.innerHTML = "<p>Please login in Profile tab to see your order history and tracking.</p>";
     return;
   }
   
@@ -418,24 +418,56 @@ function renderOrders() {
     let cancelByAdmin = myOrders.filter(o => o.status === 'CancelledByAdmin').length;
 
     container.innerHTML = `
-      <div class="bill-summary" style="margin-bottom:10px;">
+      <div class="bill-summary" style="margin-bottom:15px;">
         <b>My Stats:</b> Total Orders: ${totalCount} | Cancelled by Me: ${cancelByMe} | Cancelled by KD: ${cancelByAdmin}
       </div>
-      ${myOrders.length === 0 ? "<p>No orders yet.</p>" : myOrders.map(o => `
-        <div class="order-card">
+      ${myOrders.length === 0 ? "<p>No orders placed yet.</p>" : myOrders.map(o => {
+        
+        // Status Order Logic for Timeline
+        const statuses = ["Pending", "Accepted", "Out for Delivery", "Delivered"];
+        const currentIdx = statuses.indexOf(o.status);
+
+        return `
+        <div class="order-card" style="margin-bottom:20px;">
           <div><b>Order ID:</b> ${o.id} | <b>Date:</b> ${o.date}</div>
           <div><b>Items:</b> ${(o.items || []).map(i => i.name + ' x' + i.qty).join(', ')}</div>
-          <div><b>Total:</b> ₹${o.total} (${o.pay})</div>
-          <div><b>Status:</b> <span style="color:var(--accent-red); font-weight:bold;">${o.status}</span></div>
+          <div><b>Total Amount:</b> ₹${o.total} (${o.pay})</div>
           
-          <!-- STATUS LOCK: Only Pending orders can be cancelled -->
+          <!-- VISUAL TRACKING TIMELINE -->
+          <div style="margin-top:15px; font-weight:bold; font-size:0.9rem;">Order Status Timeline:</div>
+          <div class="timeline">
+            
+            <div class="timeline-step ${currentIdx >= 0 ? 'completed' : ''}">
+              <div class="timeline-title">Order Placed</div>
+              <div class="timeline-time">${o.date}</div>
+              <div class="timeline-desc">Your order has been received by K.D Kitchen.</div>
+            </div>
+
+            <div class="timeline-step ${currentIdx >= 1 ? 'completed' : (currentIdx === 0 ? 'active' : '')}">
+              <div class="timeline-title">Order Confirmed / Cooking</div>
+              <div class="timeline-desc">Restaurant accepted your order and started cooking.</div>
+            </div>
+
+            <div class="timeline-step ${currentIdx >= 2 ? 'completed' : (currentIdx === 1 ? 'active' : '')}">
+              <div class="timeline-title">Out For Delivery</div>
+              <div class="timeline-desc">Delivery partner picked up your food.</div>
+            </div>
+
+            <div class="timeline-step ${currentIdx >= 3 ? 'completed' : (currentIdx === 2 ? 'active' : '')}">
+              <div class="timeline-title">Delivered</div>
+              <div class="timeline-desc">Food delivered to your address. Enjoy your meal!</div>
+            </div>
+
+          </div>
+
+          <!-- LOCK LOGIC: Only Pending orders can be cancelled -->
           ${o.status === 'Pending' ? 
             `<button class="btn-sec" style="background:red; margin-top:5px;" onclick="cancelMyOrder('${o.id}')">Cancel Order</button>` 
-            : `<p style="color:orange; font-size:0.8rem; margin-top:5px;">🔒 Order Locked (Accepted / Cooking / Delivered)</p>`}
+            : `<p style="color:orange; font-size:0.8rem; margin-top:5px;">🔒 Order Locked (Accepted / Cooking in progress)</p>`}
           
           <button class="btn-sec" style="background:#2196F3; margin-top:5px;" onclick="reorder('${o.id}')">1-Click Re-Order</button>
         </div>
-      `).reverse().join('')}
+      `}).reverse().join('')}
     `;
   });
 }
@@ -457,7 +489,7 @@ function reorder(id) {
   });
 }
 
-// ADMIN DASHBOARD (Protected by K.d@12345)
+// ADMIN DASHBOARD (Protected by Password: K.d@12345)
 function loginAdmin() {
   const passInp = document.getElementById('admin-pass');
   if (!passInp) return;
@@ -571,6 +603,40 @@ function adminEditPrice(id) {
     alert("Price updated for " + item.name + "!");
     renderMenu();
   }
+}
+
+function adminUpdateBanner() {
+  const textInp = document.getElementById('new-banner-text');
+  if (!textInp || !textInp.value) return alert("Enter banner text!");
+  liveBanners.push("🔥 " + textInp.value);
+  const bannerElem = document.getElementById('home-banner');
+  if (bannerElem) bannerElem.innerText = "🔥 " + textInp.value;
+  alert("New Banner Added to Slideshow!");
+  textInp.value = "";
+}
+
+function adminAssignVIP() {
+  const phoneInp = document.getElementById('vip-user-phone');
+  if (!phoneInp || !phoneInp.value) return alert("Enter customer phone number!");
+  database.ref('users/' + phoneInp.value).update({ isVIP: true })
+    .then(() => alert("Customer " + phoneInp.value + " is now a 👑 VIP Member!"));
+  phoneInp.value = "";
+}
+
+function adminCreateCoupon() {
+  const codeInp = document.getElementById('new-coupon-code');
+  const discInp = document.getElementById('new-coupon-discount');
+  if (!codeInp || !discInp) return;
+
+  const code = codeInp.value.toUpperCase();
+  const disc = Number(discInp.value);
+  if (!code || !disc) return alert("Enter valid code and discount!");
+  
+  database.ref('coupons/' + code).set({ discount: disc })
+    .then(() => alert("Coupon " + code + " created for ₹" + disc + " OFF!"));
+  
+  codeInp.value = "";
+  discInp.value = "";
 }
 
 function toggleWishlist(id) {
