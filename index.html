@@ -32,7 +32,7 @@
   <div class="notif-box" id="notif-box">
     <h4>Notifications</h4>
     <p>🚀 Welcome to K.D Restaurant!</p>
-    <p>🎂 New Birthday Cakes & Food Items available now!</p>
+    <p>🎂 Birthday Cakes & Food Special Offers available!</p>
   </div>
 
   <!-- MAIN CONTAINER -->
@@ -91,7 +91,7 @@
       </div>
     </div>
 
-    <!-- ORDERS PAGE (WITH TIMELINE TRACKING) -->
+    <!-- ORDERS PAGE (WITH LIVE TIMELINE TRACKING) -->
     <div id="orders" class="page">
       <h2>📦 My Orders & Live Tracking</h2>
       <div id="my-orders-list">
@@ -99,11 +99,13 @@
       </div>
     </div>
 
-    <!-- PROFILE PAGE (WITH CUSTOMER PHOTO UPLOAD) -->
+    <!-- PROFILE PAGE -->
     <div id="profile" class="page">
       <div class="profile-header" style="display:flex; align-items:center; gap:15px; margin-bottom:15px; background:white; padding:15px; border-radius:8px;">
         <div class="avatar-container" style="position:relative;">
           <img id="user-avatar-img" src="https://cdn-icons-png.flaticon.com/512/3135/3135715.png" style="width:70px; height:70px; border-radius:50%; object-fit:cover; border:2px solid var(--accent-red);">
+          <label for="camera-file-input" style="position:absolute; bottom:0; right:0; background:var(--accent-red); color:white; padding:4px 7px; border-radius:50%; font-size:0.7rem; cursor:pointer;"><i class="fas fa-camera"></i></label>
+          <input type="file" id="camera-file-input" accept="image/*" capture="user" style="display:none;" onchange="uploadProfileCameraPhoto(this)">
         </div>
         <div>
           <h2 id="display-name">Guest User</h2>
@@ -114,21 +116,31 @@
       <!-- LOGIN / SIGNUP SECTION -->
       <div class="checkout-form" id="auth-section">
         <h3>Login / Sign Up</h3>
-        <input type="number" id="auth-phone" placeholder="Enter Mobile Number">
-        <button class="btn-sec" onclick="customerLogin()">Login securely</button>
+        
+        <!-- Google Login Button -->
+        <button class="btn-primary" style="background:#ea4335; margin-bottom:15px;" onclick="googleLogin()"><i class="fab fa-google"></i> Sign in with Google</button>
+        <div style="text-align:center; color:#777; margin-bottom:15px;">--- OR LOGIN WITH PHONE ---</div>
+        
+        <!-- Phone + OTP Login -->
+        <input type="number" id="auth-phone" placeholder="Enter 10-Digit Phone Number">
+        <div id="recaptcha-container"></div>
+        <button class="btn-sec" id="send-otp-btn" onclick="sendOTP()">Send OTP SMS</button>
+
+        <div id="otp-box" style="display:none; margin-top:10px;">
+          <input type="number" id="otp-input" placeholder="Enter 6-Digit OTP">
+          <button class="btn-sec" style="background:#2ed573;" onclick="verifyOTP()">Verify OTP & Login</button>
+        </div>
       </div>
 
-      <!-- USER DETAILS & PHOTO UPLOAD -->
+      <!-- USER DETAILS -->
       <div class="checkout-form" id="user-details-section" style="display:none;">
-        <h3>My Details & Profile Photo</h3>
-        <label style="font-size:0.85rem; color:#555;">Profile Picture Link (URL):</label>
-        <input type="text" id="user-photo-input" placeholder="Paste Image Link / URL here" onchange="previewProfilePhoto()">
-        
+        <h3>My Saved Details</h3>
         <input type="text" id="user-name-input" placeholder="Your Full Name">
         <input type="text" id="user-address-input" placeholder="Save Delivery Address">
         
-        <button class="btn-sec" style="background:#2ed573;" onclick="saveProfile()">Save Profile & Photo</button>
-        <button class="btn-sec" style="background:#ff4757; margin-top:10px;" onclick="deleteAccount()">Delete Account</button>
+        <button class="btn-sec" style="background:#2ed573;" onclick="saveProfile()">Save Details</button>
+        <button class="btn-sec" style="background:#00a8ff; margin-top:8px;" onclick="customerLogout()">Logout Account</button>
+        <button class="btn-sec" style="background:#ff4757; margin-top:8px;" onclick="deleteAccount()">Delete Account</button>
       </div>
 
       <div class="checkout-form">
@@ -143,7 +155,7 @@
         <button class="btn-sec" onclick="loginAdmin()">Login Admin</button>
       </div>
 
-      <!-- COMPLETE ADMIN PANEL (15 FEATURES) -->
+      <!-- COMPLETE ADMIN PANEL -->
       <div id="admin-panel" style="display:none; margin-top:20px; border-top:2px solid #ccc; padding-top:15px;">
         <h3 style="color:var(--accent-red);">👑 Admin Dashboard</h3>
         
@@ -166,11 +178,10 @@
         <input type="number" id="new-coupon-discount" placeholder="Discount Amount (₹)">
         <button class="btn-sec" onclick="adminCreateCoupon()">Create Coupon</button>
 
-        <!-- ADD ITEM WITH CUSTOM PHOTO LINK -->
-        <h4 style="margin-top:10px;">➕ Add Item / Birthday Cake (With Custom Photo)</h4>
+        <h4 style="margin-top:10px;">➕ Add Item / Birthday Cake (Custom Photo Link)</h4>
         <input type="text" id="add-item-name" placeholder="Item / Cake Name">
         <input type="number" id="add-item-price" placeholder="Price (₹)">
-        <input type="text" id="add-item-img" placeholder="Paste Image URL / Link from Web/Gallery">
+        <input type="text" id="add-item-img" placeholder="Paste Image URL / Link">
         <select id="add-item-cat">
           <option value="Birthday Cakes">Birthday Cakes</option>
           <option value="Breads & Naan">Breads & Naan</option>
@@ -191,8 +202,7 @@
         <h4 style="margin-top:15px;">📦 Incoming Live Orders</h4>
         <div id="admin-orders-list"></div>
 
-        <!-- MENU MANAGER WITH DYNAMIC IMAGE EDITING -->
-        <h4 style="margin-top:15px;">📋 Menu Manager (Edit Prices, Photos & Delete)</h4>
+        <h4 style="margin-top:15px;">📋 Menu Manager (Edit Prices & Photo Links)</h4>
         <div id="admin-menu-list"></div>
 
         <h4 style="margin-top:15px;">🗑️ Deleted Accounts Reasons Log</h4>
@@ -227,6 +237,7 @@
 
   <!-- FIREBASE LIBRARIES -->
   <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-auth-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-database-compat.js"></script>
   <script src="script.js"></script>
 </body>
