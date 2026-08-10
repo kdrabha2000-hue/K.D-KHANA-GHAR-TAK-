@@ -38,7 +38,56 @@ let menu = [
   { id: 120, name: "Gulab Jamun (2 pcs)", price: 50, cat: "Desserts", img: "https://images.unsplash.com/photo-1541781774459-bb2af2f05b55?w=200", isOut: false }
 ];
 
-// DATA CLOUD & LOCAL STORAGE SYNC
+// ADMIN TOGGLE BOX (FIXED)
+function toggleAdminPassBox() {
+  const box = document.getElementById('admin-pass-box');
+  if (box) {
+    box.style.display = (box.style.display === 'block' || box.style.display === '') ? 'none' : 'block';
+  }
+}
+
+// ADMIN LOGIN FUNCTION (FIXED)
+function loginAdmin() {
+  const passInp = document.getElementById('admin-pass');
+  if (passInp && passInp.value === 'K.d@12345') {
+    document.getElementById('admin-panel').style.display = 'block';
+    alert("Welcome Admin!");
+    renderAdminOrders();
+  } else {
+    alert("Invalid Admin Password!");
+  }
+}
+
+function renderAdminOrders() {
+  database.ref('orders').on('value', (snap) => {
+    const liveOrders = snap.val() ? Object.values(snap.val()) : [];
+    const pendingOrders = liveOrders.filter(o => o.status === 'Pending');
+
+    if (document.getElementById('stat-total')) document.getElementById('stat-total').innerText = liveOrders.length;
+    if (document.getElementById('stat-pending')) document.getElementById('stat-pending').innerText = pendingOrders.length;
+    if (document.getElementById('stat-earning')) document.getElementById('stat-earning').innerText = liveOrders.filter(o => o.status === 'Delivered').reduce((s, o) => s + (o.total || 0), 0);
+
+    const container = document.getElementById('admin-orders-list');
+    if (container) {
+      container.innerHTML = liveOrders.map(o => `
+        <div class="order-card">
+          <b>ID: ${o.id}</b> | <b>User:</b> ${o.name} | <b>Phone:</b> ${o.phone}<br>
+          <b>Address:</b> ${o.address}<br>
+          <b>Total:</b> ₹${o.total} (${o.pay}) | Status: <b>${o.status}</b><br><br>
+          <button class="btn-sec" style="background:#2ed573;" onclick="updateStatus('${o.id}', 'Accepted')">Accept</button>
+          <button class="btn-sec" style="background:#00a8ff;" onclick="updateStatus('${o.id}', 'Out for Delivery')">Out for Delivery</button>
+          <button class="btn-sec" style="background:#20bf6b;" onclick="updateStatus('${o.id}', 'Delivered')">Delivered</button>
+          <button class="btn-sec" style="background:#ff4757;" onclick="updateStatus('${o.id}', 'CancelledByAdmin')">Reject</button>
+        </div>
+      `).reverse().join('');
+    }
+  });
+}
+
+function updateStatus(id, st) {
+  database.ref('orders/' + id).update({ status: st });
+}
+
 function syncStorage() {
   localStorage.setItem('kd_cart', JSON.stringify(cart));
   localStorage.setItem('kd_wishlist', JSON.stringify(wishlist));
@@ -47,15 +96,13 @@ function syncStorage() {
   }
 }
 
-// 1. TOP NOTICE ROTATION (5-7 SEC)
+// ROTATING NOTICES AND BANNERS
 const topNotices = [
   "🚀 Welcome to K.D Restaurant! <br> 🥤 Get refreshing Cold Drinks with your meals!",
   "⚡ Superfast Express Delivery in Udalguri area!",
-  "🎉 Order Fresh Birthday Cakes at Special Discount Prices!",
-  "🍕 Delicious Food Delivered Straight to Your Doorstep!"
+  "🎉 Order Fresh Birthday Cakes at Special Discount Prices!"
 ];
 let noticeIdx = 0;
-
 function startTopNoticeRotation() {
   setInterval(() => {
     const el = document.getElementById('top-announcement');
@@ -69,15 +116,12 @@ function startTopNoticeRotation() {
   }, 6000);
 }
 
-// 2. ORANGE BANNER ROTATION (6-7 SEC)
 const specialOffers = [
   "🔥 TODAY'S SPECIAL: Chicken Butter Masala @ ₹380",
   "🍗 SPECIAL OFFER: Chicken Pokora (Half) @ ₹120",
-  "🎂 FRESH CAKE OFFER: Normal Cake (500gm) @ ₹450",
-  "🥤 CHILL DEAL: Cold Coffee / Sprite @ ₹40"
+  "🎂 FRESH CAKE OFFER: Normal Cake (500gm) @ ₹450"
 ];
 let bannerIdx = 0;
-
 function startOfferBannerRotation() {
   setInterval(() => {
     const el = document.getElementById('home-banner');
@@ -91,16 +135,12 @@ function startOfferBannerRotation() {
   }, 7000);
 }
 
-// 3. MENU SHUFFLE ROTATION (7-8 SEC)
 function startMenuRotation() {
   setInterval(() => {
-    if (!isSearching) {
-      renderMenu();
-    }
+    if (!isSearching) renderMenu();
   }, 8000);
 }
 
-// SEARCH FUNCTIONALITY
 function filterMenu() {
   const query = document.getElementById('search-input').value.toLowerCase().trim();
   if (query.length > 0) {
@@ -129,10 +169,6 @@ function loadUserSession(uid, phone, name, photo, address, dbWish) {
   if (document.getElementById('user-address-input')) document.getElementById('user-address-input').value = address || "";
   if (document.getElementById('saved-addr-text')) document.getElementById('saved-addr-text').innerText = address || "No Address Saved";
   if (photo && document.getElementById('user-avatar-img')) document.getElementById('user-avatar-img').src = photo;
-
-  if (document.getElementById('del-name')) document.getElementById('del-name').value = name || "";
-  if (document.getElementById('del-address')) document.getElementById('del-address').value = address || "";
-  if (document.getElementById('del-phone')) document.getElementById('del-phone').value = phone || "";
 
   renderOrders(); renderMenu(); renderWishlist();
 }
@@ -189,7 +225,6 @@ function toggleWishlist(id) {
   renderWishlist();
 }
 
-// RENDER WISHLIST WITH PHOTO
 function renderWishlist() {
   const container = document.getElementById('wishlist-container');
   if (!container) return;
@@ -213,7 +248,6 @@ function renderWishlist() {
   `).join('');
 }
 
-// RENDER MENU GRID WITH AUTOMATIC SHUFFLE
 function renderMenu(customList = null) {
   const container = document.getElementById('menu-container');
   if (!container) return;
