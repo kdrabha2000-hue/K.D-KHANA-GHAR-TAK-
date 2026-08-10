@@ -62,3 +62,4 @@ body { background-color: var(--primary-bg); color: var(--text-dark); padding-bot
 .nav-item { text-align: center; color: #777; cursor: pointer; font-size: 0.75rem; }
 .nav-item i { font-size: 1.2rem; margin-bottom: 3px; display: block; }
 .nav-item.active { color: var(--accent-red); }
+
