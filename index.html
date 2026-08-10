@@ -62,12 +62,11 @@
       <div id="wishlist-container" class="menu-grid"></div>
     </div>
 
-    <!-- CART PAGE (SHOPSY / FLIPKART STYLE) -->
+    <!-- CART PAGE -->
     <div id="cart" class="page">
       <h2>🛒 My Cart</h2>
       <div id="cart-items"></div>
 
-      <!-- COLD DRINK AUTO-SUGGESTION IN CART -->
       <div id="cart-drink-suggestion" class="suggestion-box">
         <h4>🥤 Recommended Drink with Meal</h4>
         <div class="drink-card">
@@ -100,7 +99,7 @@
       </div>
     </div>
 
-    <!-- ORDERS PAGE (WITH LIVE TRACKING) -->
+    <!-- ORDERS PAGE -->
     <div id="orders" class="page">
       <h2>📦 My Orders & Live Tracking</h2>
       <div id="my-orders-list">
@@ -108,7 +107,7 @@
       </div>
     </div>
 
-    <!-- PROFILE PAGE (UNIFIED SINGLE LOGIN) -->
+    <!-- PROFILE PAGE -->
     <div id="profile" class="page">
       <div class="profile-header" style="display:flex; align-items:center; gap:15px; margin-bottom:15px; background:white; padding:15px; border-radius:8px;">
         <div class="avatar-container" style="position:relative;">
@@ -122,7 +121,7 @@
         </div>
       </div>
 
-      <!-- SINGLE UNIFIED LOGIN SCREEN -->
+      <!-- SINGLE LOGIN SCREEN -->
       <div class="checkout-form" id="auth-section">
         <h3>Login / Sign Up</h3>
         <button class="btn-primary" style="background:#ea4335; margin-bottom:15px;" onclick="googleLogin()"><i class="fab fa-google"></i> Sign in with Google</button>
@@ -137,7 +136,6 @@
           <button class="btn-sec" style="background:#2ed573;" onclick="verifyOTP()">Verify OTP & Login</button>
         </div>
 
-        <!-- SECRET ADMIN ACCESS LINK -->
         <div style="text-align:center; margin-top:20px; border-top:1px dashed #ccc; padding-top:10px;">
           <span style="font-size:0.8rem; color:#888; cursor:pointer;" onclick="toggleAdminPassBox()">🔒 Restaurant Owner Portal</span>
           <div id="admin-pass-box" style="display:none; margin-top:10px;">
@@ -147,7 +145,6 @@
         </div>
       </div>
 
-      <!-- USER DETAILS -->
       <div class="checkout-form" id="user-details-section" style="display:none;">
         <h3>My Saved Details</h3>
         <input type="text" id="user-name-input" placeholder="Your Full Name">
@@ -160,11 +157,11 @@
 
       <div class="checkout-form">
         <h3>Help Center</h3>
-        <a href="https://wa.me/91XXXXXXXXXX" class="btn-sec" style="background:#25D366; text-decoration:none; display:block; text-align:center;">WhatsApp Support</a>
-        <a href="tel:+91XXXXXXXXXX" class="btn-sec" style="background:#00a8ff; text-decoration:none; display:block; text-align:center; margin-top:10px;">Call Restaurant</a>
+        <a href="https://wa.me/916000026478" class="btn-sec" style="background:#25D366; text-decoration:none; display:block; text-align:center;">WhatsApp Support</a>
+        <a href="tel:+916000026478" class="btn-sec" style="background:#00a8ff; text-decoration:none; display:block; text-align:center; margin-top:10px;">Call Restaurant</a>
       </div>
 
-      <!-- COMPLETE SELLER / ADMIN DASHBOARD -->
+      <!-- ADMIN DASHBOARD -->
       <div id="admin-panel" style="display:none; margin-top:20px; border-top:2px solid #ccc; padding-top:15px;">
         <h3 style="color:var(--accent-red);">👑 Admin Dashboard</h3>
         
@@ -174,14 +171,12 @@
           <div class="stat-box">Earning: ₹<span id="stat-earning">0</span></div>
         </div>
 
-        <!-- STORE STATUS TOGGLE -->
         <div style="background:#e3f2fd; padding:10px; border-radius:6px; margin-bottom:15px; display:flex; justify-content:space-between; align-items:center;">
           <b>Store Status: <span id="store-status-text" style="color:green;">OPEN</span></b>
           <button class="btn-sec" style="background:#0288d1;" onclick="toggleStoreStatus()">Toggle Open/Close</button>
         </div>
 
-        <!-- DYNAMIC UPI ID EDITOR -->
-        <h4 style="margin-top:10px;">💳 Store UPI Payment ID Configuration</h4>
+        <h4>💳 Store UPI Payment ID Configuration</h4>
         <input type="text" id="admin-upi-input" value="6000026478@okbizaxis" placeholder="Enter Your Bank UPI ID">
         <button class="btn-sec" onclick="updateAdminUPI()">Save UPI ID</button>
 
@@ -224,7 +219,7 @@
         <h4 style="margin-top:15px;">📦 Incoming Live Orders</h4>
         <div id="admin-orders-list"></div>
 
-        <h4 style="margin-top:15px;">📋 Menu Manager (Out-of-Stock / Prices)</h4>
+        <h4 style="margin-top:15px;">📋 Menu Manager (Modify / Edit Photo & Price)</h4>
         <div id="admin-menu-list"></div>
 
         <h4 style="margin-top:15px;">⭐ Customer Reviews & Ratings</h4>
@@ -236,7 +231,40 @@
     </div>
   </main>
 
-  <!-- PRODUCT DETAIL POPUP MODAL (SHOPSY / FLIPKART STYLE) -->
+  <!-- ITEM EDIT MODAL FOR ADMIN -->
+  <div id="edit-item-modal" class="modal">
+    <div class="modal-content">
+      <span class="close-btn" onclick="closeEditModal()">&times;</span>
+      <h3>✏️ Modify Menu Item</h3>
+      <input type="hidden" id="edit-item-id">
+      <label>Item Name:</label>
+      <input type="text" id="edit-item-name">
+      <label>Price (₹):</label>
+      <input type="number" id="edit-item-price">
+      <label>Category:</label>
+      <select id="edit-item-cat">
+        <option value="Birthday Cakes">Birthday Cakes</option>
+        <option value="Cold Drinks & Beverages">Cold Drinks & Beverages</option>
+        <option value="Breads & Naan">Breads & Naan</option>
+        <option value="Dal & Gravy">Dal & Gravy</option>
+        <option value="Main Course">Main Course</option>
+        <option value="Pasta">Pasta</option>
+        <option value="Breakfast & Snacks">Breakfast & Snacks</option>
+        <option value="Tea & Coffee">Tea & Coffee</option>
+        <option value="Chowmein & Rolls">Chowmein & Rolls</option>
+        <option value="Fried Rice">Fried Rice</option>
+        <option value="Momos">Momos</option>
+        <option value="Starters & Tandoor">Starters & Tandoor</option>
+        <option value="Juices & Drinks">Juices & Drinks</option>
+        <option value="Desserts">Desserts</option>
+      </select>
+      <label>Change Photo (Camera / Gallery):</label>
+      <input type="file" id="edit-item-file" accept="image/*" style="margin:5px 0;">
+      <button class="btn-primary" style="background:#2ed573; margin-top:10px;" onclick="saveItemModification()">Save Changes</button>
+    </div>
+  </div>
+
+  <!-- PRODUCT DETAIL POPUP MODAL -->
   <div id="product-modal" class="modal">
     <div class="modal-content">
       <span class="close-btn" onclick="closeModal()">&times;</span>
@@ -248,7 +276,6 @@
         Hamare K.D Restaurant mein yeh khas dish bilkul taaza aur uchh-gunwatta ke masalon ke sath taiyaar ki jaati hai. Safai aur hygiene ka poora dhyan rakha jata hai taaki aapko swasth aur swadisht bhojan mile. Ek baar zaroor try karein!
       </p>
 
-      <!-- CROSS SELLING DRINKS SECTION -->
       <div style="margin:15px 0; border-top:1px dashed #ccc; padding-top:10px;">
         <h4 style="color:#555;">🥤 Pairs Great With Cold Drinks:</h4>
         <div class="drink-card" style="margin-top:5px;">
@@ -261,21 +288,12 @@
         <button class="btn-sec" style="flex:1; background:#ff9f00;" onclick="addToCartFromModal()">ADD TO CART</button>
         <button class="btn-primary" style="flex:1; background:#fb641b;" onclick="buyNowFromModal()">BUY NOW</button>
       </div>
-
-      <!-- CUSTOMER REVIEWS FOR THIS PRODUCT -->
-      <div style="margin-top:20px; border-top:1px solid #eee; padding-top:10px;">
-        <h4>Customer Reviews & Ratings</h4>
-        <div id="modal-reviews-list">
-          <p style="font-size:0.8rem; color:#888;">No reviews yet. Be the first to review!</p>
-        </div>
-      </div>
     </div>
   </div>
 
-  <!-- AUDIO ALERT FOR ADMIN -->
   <audio id="order-sound" src="https://assets.mixkit.co/active_storage/sfx/2869/2869-preview.mp3" preload="auto"></audio>
 
-  <!-- BOTTOM NAVIGATION -->
+  <!-- BOTTOM NAV -->
   <nav class="bottom-nav">
     <div class="nav-item active" onclick="showPage('home')">
       <i class="fas fa-home"></i>
@@ -299,7 +317,6 @@
     </div>
   </nav>
 
-  <!-- FIREBASE LIBRARIES -->
   <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-auth-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-database-compat.js"></script>
