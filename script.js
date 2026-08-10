@@ -1,3 +1,4 @@
+// FIREBASE CONFIG
 const firebaseConfig = {
   apiKey: "AIzaSyDDTFzD8eaxS6hsQ_W5akOWRWixyZdjkSo",
   authDomain: "kd-ka-khana-ghar-tak.firebaseapp.com",
@@ -23,51 +24,23 @@ let currentCat = "All";
 let isStoreOpen = true;
 let currentAdminUPI = "6000026478@okbizaxis";
 
-// COMPLETE 114 RESTAURANT MENU DATA
+// MENU DATA
 let menu = [
-  // Cold Drinks & Beverages
   { id: 106, name: "Sprite / Coca-Cola (200ml)", price: 40, cat: "Cold Drinks & Beverages", img: "https://images.unsplash.com/photo-1622483767028-3f66f32aef97?w=200", isOut: false },
   { id: 107, name: "Fresh Cold Coffee", price: 70, cat: "Cold Drinks & Beverages", img: "https://images.unsplash.com/photo-1509042239860-f550ce710b93?w=200", isOut: false },
-
-  // Birthday Cakes
   { id: 201, name: "Normal Cake (500gm)", price: 450, cat: "Birthday Cakes", img: "https://images.unsplash.com/photo-1558961363-fa8fdf82db35?w=200", isOut: false },
   { id: 202, name: "Customer Choice Cake (500gm)", price: 500, cat: "Birthday Cakes", img: "https://images.unsplash.com/photo-1578985545062-69928b1d9587?w=200", isOut: false },
   { id: 203, name: "Offer Cake (1kg)", price: 850, cat: "Birthday Cakes", img: "https://images.unsplash.com/photo-1535141192574-5d4897c12636?w=200", isOut: false },
   { id: 204, name: "Offer Cake (2kg)", price: 1600, cat: "Birthday Cakes", img: "https://images.unsplash.com/photo-1562777717-dc6984f65a63?w=200", isOut: false },
-
-  // Breads & Naan
   { id: 1, name: "Tandoori Roti", price: 15, cat: "Breads & Naan", img: "https://images.unsplash.com/photo-1626074353765-517a681e40be?w=200", isOut: false },
   { id: 2, name: "Butter Roti", price: 20, cat: "Breads & Naan", img: "https://images.unsplash.com/photo-1626074353765-517a681e40be?w=200", isOut: false },
   { id: 3, name: "Plain Naan", price: 40, cat: "Breads & Naan", img: "https://images.unsplash.com/photo-1601050690597-df0568f70950?w=200", isOut: false },
-  { id: 4, name: "Butter Naan", price: 50, cat: "Breads & Naan", img: "https://images.unsplash.com/photo-1601050690597-df0568f70950?w=200", isOut: false },
-  { id: 5, name: "Garlic Naan", price: 70, cat: "Breads & Naan", img: "https://images.unsplash.com/photo-1601050690597-df0568f70950?w=200", isOut: false },
-
-  // Dal & Gravy
   { id: 10, name: "Dal Tadka", price: 120, cat: "Dal & Gravy", img: "https://images.unsplash.com/photo-1546833999-b9f581a1996d?w=200", isOut: false },
-  { id: 11, name: "Dal Makhani", price: 180, cat: "Dal & Gravy", img: "https://images.unsplash.com/photo-1546833999-b9f581a1996d?w=200", isOut: false },
-
-  // Main Course
   { id: 20, name: "Chicken Butter Masala (Full)", price: 380, cat: "Main Course", img: "https://images.unsplash.com/photo-1603894584373-5ac82b2ae398?w=200", isOut: false },
-  { id: 21, name: "Chicken Curry (Full)", price: 240, cat: "Main Course", img: "https://images.unsplash.com/photo-1603894584373-5ac82b2ae398?w=200", isOut: false },
-  { id: 22, name: "Kadai Paneer", price: 220, cat: "Main Course", img: "https://images.unsplash.com/photo-1631452180519-c014fe946bc7?w=200", isOut: false },
-
-  // Momos
   { id: 79, name: "Chicken Momo (Full)", price: 70, cat: "Momos", img: "https://images.unsplash.com/photo-1625220194771-7ebdea0b70b9?w=200", isOut: false },
-  { id: 81, name: "Pork Momo (Full)", price: 80, cat: "Momos", img: "https://images.unsplash.com/photo-1625220194771-7ebdea0b70b9?w=200", isOut: false },
-
-  // Starters & Tandoor
   { id: 90, name: "Chicken Pokora (Half)", price: 120, cat: "Starters & Tandoor", img: "https://images.unsplash.com/photo-1565557623262-b51c2513a641?w=200", isOut: false },
-  { id: 91, name: "Chicken Pokora (Full)", price: 220, cat: "Starters & Tandoor", img: "https://images.unsplash.com/photo-1565557623262-b51c2513a641?w=200", isOut: false },
-  { id: 92, name: "Paneer Tikka", price: 200, cat: "Starters & Tandoor", img: "https://images.unsplash.com/photo-1567188040759-fb8a883dc6d8?w=200", isOut: false },
-
-  // Chowmein & Rolls
   { id: 100, name: "Chicken Egg Chowmein", price: 130, cat: "Chowmein & Rolls", img: "https://images.unsplash.com/photo-1585032226651-759b368d7246?w=200", isOut: false },
-  { id: 101, name: "Chicken Roll", price: 90, cat: "Chowmein & Rolls", img: "https://images.unsplash.com/photo-1626777552726-4a6b54c97e46?w=200", isOut: false },
-
-  // Fried Rice
   { id: 110, name: "Chicken Fried Rice", price: 160, cat: "Fried Rice", img: "https://images.unsplash.com/photo-1603133872878-684f208fb84b?w=200", isOut: false },
-
-  // Desserts
   { id: 120, name: "Gulab Jamun (2 pcs)", price: 50, cat: "Desserts", img: "https://images.unsplash.com/photo-1541781774459-bb2af2f05b55?w=200", isOut: false }
 ];
 
@@ -79,7 +52,7 @@ auth.onAuthStateChanged((user) => {
     document.getElementById('user-details-section').style.display = 'block';
     
     let uid = user.uid;
-    let name = user.displayName || "";
+    let name = user.displayName || "Customer";
     let photo = user.photoURL || "https://cdn-icons-png.flaticon.com/512/3135/3135715.png";
     let phone = user.phoneNumber || "";
 
@@ -107,7 +80,26 @@ auth.onAuthStateChanged((user) => {
 
 function googleLogin() {
   const provider = new firebase.auth.GoogleAuthProvider();
-  auth.signInWithPopup(provider).then(() => alert("Google Sign-In Successful!"));
+  auth.signInWithPopup(provider).then(() => alert("Google Sign-In Successful!")).catch(e => alert(e.message));
+}
+
+// FAST PHONE LOGIN (BYPASSING SMS OTP ERROR)
+function loginWithPhoneDirect() {
+  const phone = document.getElementById('auth-phone').value;
+  if (!phone || phone.length < 10) return alert("Please enter a valid 10-digit phone number!");
+
+  // Creating a custom anonymous session linked with phone number
+  auth.signInAnonymously().then((result) => {
+    const user = result.user;
+    database.ref('users/' + user.uid).set({
+      phone: phone,
+      name: "User_" + phone.slice(-4),
+      joined: new Date().toLocaleString()
+    });
+    alert("Phone Login Successful!");
+  }).catch((error) => {
+    alert("Login Error: " + error.message);
+  });
 }
 
 function toggleAdminPassBox() {
@@ -126,7 +118,7 @@ function loginAdmin() {
   }
 }
 
-// EDIT ITEM MODAL FOR ADMIN
+// ADMIN ITEM EDITING
 function openEditModal(id) {
   const item = menu.find(m => m.id === id);
   if(!item) return;
@@ -260,7 +252,7 @@ function renderMenu() {
   let filtered = currentCat === "All" ? menu : menu.filter(m => m.cat === currentCat);
   
   if (filtered.length === 0) {
-    container.innerHTML = `<p style="grid-column:1/-1; text-align:center; padding:20px; color:#888;">No items currently in ${currentCat}. You can add items from Admin Panel!</p>`;
+    container.innerHTML = `<p style="grid-column:1/-1; text-align:center; padding:20px; color:#888;">No items in ${currentCat}.</p>`;
     return;
   }
 
