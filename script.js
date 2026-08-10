@@ -40,13 +40,13 @@ let menu = [
   { id: 120, name: "Gulab Jamun (2 pcs)", price: 50, cat: "Desserts", img: "https://images.unsplash.com/photo-1541781774459-bb2af2f05b55?w=200", isOut: false }
 ];
 
-// MODAL POPUP LOGIC
+// MODAL POPUP
 function openModal(id) {
   const item = menu.find(m => m.id === id);
   if (!item) return;
   selectedModalItem = item;
   document.getElementById('modal-img').src = item.img;
-  document.getElementById('modal-title').innerText = item.name;
+  document.getElementById('modal-title').innerText = item.name + (item.isOut ? " (Out of Stock)" : "");
   document.getElementById('modal-price').innerText = "₹" + item.price;
   document.getElementById('product-modal').style.display = 'flex';
 }
@@ -66,7 +66,7 @@ function buyNowFromModal() {
   showPage('cart');
 }
 
-// ADMIN DASHBOARD & FULL CONTROLS LOGIC
+// ADMIN FUNCTIONS
 function loginAdmin() {
   const passInp = document.getElementById('admin-pass');
   if (passInp && passInp.value.trim() === 'K.d@12345') {
@@ -74,6 +74,7 @@ function loginAdmin() {
     document.getElementById('admin-panel').style.display = 'block';
     alert("Welcome Restaurant Owner!");
     renderAdminOrders();
+    renderAdminMenuEditor();
   } else {
     alert("Galat Password!");
   }
@@ -87,33 +88,6 @@ function toggleStoreStatus() {
     statusElem.style.color = isStoreOpen ? "green" : "red";
   }
   alert("Store Status Changed to: " + (isStoreOpen ? "OPEN" : "CLOSED"));
-}
-
-function updateAdminUPI() {
-  const upi = document.getElementById('admin-upi-input').value;
-  if (upi) {
-    currentAdminUPI = upi;
-    alert("UPI ID Saved: " + upi);
-  }
-}
-
-function adminUpdateBanner() {
-  const txt = document.getElementById('new-banner-text').value;
-  if (txt) {
-    specialOffers.push("🔥 OFFER: " + txt);
-    alert("Banner Offer Added!");
-  }
-}
-
-function adminAssignVIP() {
-  const phone = document.getElementById('vip-user-phone').value;
-  if (phone) alert("Phone number " + phone + " is now VIP Member!");
-}
-
-function adminCreateCoupon() {
-  const code = document.getElementById('new-coupon-code').value;
-  const discount = document.getElementById('new-coupon-discount').value;
-  if (code && discount) alert("Promo Code " + code + " (₹" + discount + " OFF) Created!");
 }
 
 function adminAddItem() {
@@ -130,16 +104,100 @@ function adminAddItem() {
     reader.onload = function(e) {
       menu.push({ id: Date.now(), name, price, cat, img: e.target.result, isOut: false });
       renderMenu();
+      renderAdminMenuEditor();
       alert("New Item Added To Menu!");
     };
     reader.readAsDataURL(fileInput.files[0]);
   } else {
     menu.push({ id: Date.now(), name, price, cat, img: imgUrl, isOut: false });
     renderMenu();
+    renderAdminMenuEditor();
     alert("New Item Added To Menu!");
   }
 }
 
+// RENDER & EDIT MENU ITEMS
+function renderAdminMenuEditor() {
+  const container = document.getElementById('admin-menu-edit-list');
+  if (!container) return;
+
+  container.innerHTML = menu.map(item => `
+    <div class="admin-menu-row">
+      <img src="${item.img}" style="width:40px; height:40px; object-fit:cover; border-radius:4px;">
+      <div style="flex:1;">
+        <b>${item.name}</b> - ₹${item.price}<br>
+        <small style="color:${item.isOut ? 'red' : 'green'};">${item.isOut ? 'Out of Stock' : 'In Stock'}</small>
+      </div>
+      <button class="btn-sec" style="background:#007bff;" onclick="openEditItemModal(${item.id})">✏️ Edit</button>
+      <button class="btn-sec" style="background:${item.isOut ? '#28a745' : '#ffc107'}; color:#333;" onclick="toggleItemStock(${item.id})">
+        ${item.isOut ? 'Make Available' : 'Mark Out'}
+      </button>
+      <button class="btn-sec" style="background:#dc3545;" onclick="deleteMenuItem(${item.id})">🗑️</button>
+    </div>
+  `).join('');
+}
+
+function openEditItemModal(id) {
+  const item = menu.find(m => m.id === id);
+  if (!item) return;
+  document.getElementById('edit-item-id').value = item.id;
+  document.getElementById('edit-item-name').value = item.name;
+  document.getElementById('edit-item-price').value = item.price;
+  document.getElementById('edit-item-modal').style.display = 'flex';
+}
+
+function closeEditModal() {
+  document.getElementById('edit-item-modal').style.display = 'none';
+}
+
+function saveItemEdits() {
+  const id = parseInt(document.getElementById('edit-item-id').value);
+  const name = document.getElementById('edit-item-name').value;
+  const price = parseFloat(document.getElementById('edit-item-price').value);
+  const fileInput = document.getElementById('edit-item-file');
+
+  const item = menu.find(m => m.id === id);
+  if (!item) return;
+
+  if (name) item.name = name;
+  if (price) item.price = price;
+
+  if (fileInput.files && fileInput.files[0]) {
+    const reader = new FileReader();
+    reader.onload = function(e) {
+      item.img = e.target.result;
+      renderMenu();
+      renderAdminMenuEditor();
+      closeEditModal();
+      alert("Item Details & Photo Updated!");
+    };
+    reader.readAsDataURL(fileInput.files[0]);
+  } else {
+    renderMenu();
+    renderAdminMenuEditor();
+    closeEditModal();
+    alert("Item Details Updated!");
+  }
+}
+
+function toggleItemStock(id) {
+  const item = menu.find(m => m.id === id);
+  if (item) {
+    item.isOut = !item.isOut;
+    renderMenu();
+    renderAdminMenuEditor();
+  }
+}
+
+function deleteMenuItem(id) {
+  if (confirm("Delete this dish from Live Menu?")) {
+    menu = menu.filter(m => m.id !== id);
+    renderMenu();
+    renderAdminMenuEditor();
+  }
+}
+
+// ORDER MANAGEMENT
 function renderAdminOrders() {
   database.ref('orders').on('value', (snap) => {
     const liveOrders = snap.val() ? Object.values(snap.val()) : [];
@@ -169,6 +227,13 @@ function renderAdminOrders() {
 function deleteOrderPermanent(orderId) {
   if (confirm("Delete this order record permanently?")) {
     database.ref('orders/' + orderId).remove();
+  }
+}
+
+function clearAllOrders() {
+  if (confirm("ARE YOU SURE? This will permanently delete ALL orders from database!")) {
+    database.ref('orders').remove();
+    alert("All orders cleared!");
   }
 }
 
@@ -223,7 +288,6 @@ function startOfferBannerRotation() {
   }, 7000);
 }
 
-// SLOW MENU SLIDING (2-3 MINUTES GAP)
 function startMenuRotation() {
   setInterval(() => {
     if (!isSearching) renderMenu();
@@ -257,7 +321,6 @@ function loadUserSession(uid, phone, name, photo, address, dbWish) {
   if (document.getElementById('user-name-input')) document.getElementById('user-name-input').value = name || "";
   if (document.getElementById('user-address-input')) document.getElementById('user-address-input').value = address || "";
   if (document.getElementById('saved-addr-text')) document.getElementById('saved-addr-text').innerText = address || "No Address Saved";
-  if (photo && document.getElementById('user-avatar-img')) document.getElementById('user-avatar-img').src = photo;
 
   renderOrders(); renderMenu(); renderWishlist();
 }
@@ -325,13 +388,13 @@ function renderWishlist() {
   }
 
   container.innerHTML = wishlistItems.map(item => `
-    <div class="food-card" onclick="openModal(${item.id})">
+    <div class="food-card ${item.isOut ? 'out-of-stock' : ''}" onclick="openModal(${item.id})">
       <span class="wishlist-icon" onclick="event.stopPropagation(); toggleWishlist(${item.id})">❤️</span>
       <img src="${item.img}" class="food-img">
       <div class="food-info">
         <div class="food-title">${item.name}</div>
         <div class="food-price">₹${item.price}</div>
-        <button class="btn-add" onclick="event.stopPropagation(); addToCart(${item.id})">ADD</button>
+        <button class="btn-add" onclick="event.stopPropagation(); addToCart(${item.id})">${item.isOut ? 'OUT' : 'ADD'}</button>
       </div>
     </div>
   `).join('');
@@ -348,13 +411,13 @@ function renderMenu(customList = null) {
   }
 
   container.innerHTML = displayList.map(item => `
-    <div class="food-card" onclick="openModal(${item.id})">
+    <div class="food-card ${item.isOut ? 'out-of-stock' : ''}" onclick="openModal(${item.id})">
       <span class="wishlist-icon" onclick="event.stopPropagation(); toggleWishlist(${item.id})">${wishlist.includes(item.id) ? '❤️' : '🤍'}</span>
       <img src="${item.img}" class="food-img">
       <div class="food-info">
         <div class="food-title">${item.name}</div>
         <div class="food-price">₹${item.price}</div>
-        <button class="btn-add" onclick="event.stopPropagation(); addToCart(${item.id})">Add</button>
+        <button class="btn-add" onclick="event.stopPropagation(); addToCart(${item.id})">${item.isOut ? 'OUT' : 'Add'}</button>
       </div>
     </div>
   `).join('');
@@ -378,7 +441,8 @@ function selectCategory(cat) {
 
 function addToCart(id) {
   const item = menu.find(m => m.id === id);
-  if (!item || item.isOut) return;
+  if (!item) return;
+  if (item.isOut) return alert("Item currently Out of Stock!");
   const exist = cart.find(c => c.id === id);
   if (exist) exist.qty++;
   else cart.push({ ...item, qty: 1 });
