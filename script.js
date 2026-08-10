@@ -1,4 +1,3 @@
-// FIREBASE CONFIG
 const firebaseConfig = {
   apiKey: "AIzaSyDDTFzD8eaxS6hsQ_W5akOWRWixyZdjkSo",
   authDomain: "kd-ka-khana-ghar-tak.firebaseapp.com",
@@ -24,7 +23,6 @@ let currentCat = "All";
 let isStoreOpen = true;
 let currentAdminUPI = "6000026478@okbizaxis";
 
-// MENU DATA
 let menu = [
   { id: 106, name: "Sprite / Coca-Cola (200ml)", price: 40, cat: "Cold Drinks & Beverages", img: "https://images.unsplash.com/photo-1622483767028-3f66f32aef97?w=200", isOut: false },
   { id: 107, name: "Fresh Cold Coffee", price: 70, cat: "Cold Drinks & Beverages", img: "https://images.unsplash.com/photo-1509042239860-f550ce710b93?w=200", isOut: false },
@@ -44,7 +42,6 @@ let menu = [
   { id: 120, name: "Gulab Jamun (2 pcs)", price: 50, cat: "Desserts", img: "https://images.unsplash.com/photo-1541781774459-bb2af2f05b55?w=200", isOut: false }
 ];
 
-// AUTH OBSERVER
 auth.onAuthStateChanged((user) => {
   if (user) {
     currentUser = user;
@@ -54,18 +51,19 @@ auth.onAuthStateChanged((user) => {
     let uid = user.uid;
     let name = user.displayName || "Customer";
     let photo = user.photoURL || "https://cdn-icons-png.flaticon.com/512/3135/3135715.png";
-    let phone = user.phoneNumber || "";
 
-    if (document.getElementById('display-name')) document.getElementById('display-name').innerText = name || phone || "Logged User";
+    if (document.getElementById('display-name')) document.getElementById('display-name').innerText = name;
     if (document.getElementById('user-avatar-img')) document.getElementById('user-avatar-img').src = photo;
 
     database.ref('users/' + uid).once('value', (snap) => {
       if(snap.val()) {
         const u = snap.val();
+        if (document.getElementById('user-phone-input')) document.getElementById('user-phone-input').value = u.phone || "";
         if (document.getElementById('user-name-input')) document.getElementById('user-name-input').value = u.name || name;
         if (document.getElementById('user-address-input')) document.getElementById('user-address-input').value = u.address || "";
         if (document.getElementById('del-name')) document.getElementById('del-name').value = u.name || name;
         if (document.getElementById('del-address')) document.getElementById('del-address').value = u.address || "";
+        if (document.getElementById('del-phone')) document.getElementById('del-phone').value = u.phone || "";
       }
     });
 
@@ -80,20 +78,26 @@ auth.onAuthStateChanged((user) => {
 
 function googleLogin() {
   const provider = new firebase.auth.GoogleAuthProvider();
-  auth.signInWithPopup(provider).then(() => alert("Google Sign-In Successful!")).catch(e => alert(e.message));
+  auth.signInWithPopup(provider).then((result) => {
+    const user = result.user;
+    database.ref('users/' + user.uid).update({
+      name: user.displayName,
+      email: user.email,
+      phone: user.phoneNumber || "9876543210"
+    });
+    alert("Google Sign-In Successful!");
+  }).catch(e => alert(e.message));
 }
 
-// FAST PHONE LOGIN (BYPASSING SMS OTP ERROR)
 function loginWithPhoneDirect() {
   const phone = document.getElementById('auth-phone').value;
   if (!phone || phone.length < 10) return alert("Please enter a valid 10-digit phone number!");
 
-  // Creating a custom anonymous session linked with phone number
   auth.signInAnonymously().then((result) => {
     const user = result.user;
     database.ref('users/' + user.uid).set({
       phone: phone,
-      name: "User_" + phone.slice(-4),
+      name: "Customer " + phone.slice(-4),
       joined: new Date().toLocaleString()
     });
     alert("Phone Login Successful!");
@@ -118,7 +122,38 @@ function loginAdmin() {
   }
 }
 
-// ADMIN ITEM EDITING
+// SAVE PROFILE WITH MANDATORY PHONE NUMBER CHECK (CANNOT BE BLANK / DELETED)
+function saveProfile() {
+  if(!currentUser) return alert("Please Login first!");
+  const name = document.getElementById('user-name-input').value;
+  const address = document.getElementById('user-address-input').value;
+  const phone = document.getElementById('user-phone-input').value;
+
+  if (!phone || phone.length < 10) {
+    return alert("Phone number cannot be left blank or deleted! Please enter a valid 10-digit number.");
+  }
+
+  database.ref('users/' + currentUser.uid).update({ name, address, phone })
+    .then(() => alert("Profile Saved Successfully!"));
+}
+
+function customerLogout() {
+  auth.signOut().then(() => location.reload());
+}
+
+function deleteAccount() {
+  if(!currentUser) return alert("Please login first!");
+  const reason = prompt("Enter reason for deleting account:");
+  if(reason) {
+    database.ref('deleted_accounts/' + currentUser.uid).set({ uid: currentUser.uid, reason, date: new Date().toLocaleString() })
+      .then(() => {
+        database.ref('users/' + currentUser.uid).remove();
+        auth.currentUser.delete().then(() => location.reload());
+      });
+  }
+}
+
+// ADMIN EDIT ITEM MODAL
 function openEditModal(id) {
   const item = menu.find(m => m.id === id);
   if(!item) return;
