@@ -9,7 +9,6 @@
 </head>
 <body>
 
-  <!-- HEADER -->
   <header class="header">
     <div class="header-info">
       <h1>K.D KA KHANA GHAR TAK</h1>
@@ -28,22 +27,19 @@
     </div>
   </header>
 
-  <!-- NOTIFICATION BOX -->
   <div class="notif-box" id="notif-box">
     <h4>Notifications</h4>
     <p>🚀 Welcome to K.D Restaurant!</p>
-    <p>🎂 Birthday Cakes & Food Special Offers available!</p>
+    <p>🎂 Birthday Cakes & Food Offers Live!</p>
   </div>
 
-  <!-- MAIN CONTAINER -->
   <main class="main-container">
 
-    <!-- HOME PAGE -->
     <div id="home" class="page active">
       <div class="search-bar-container">
         <div class="search-box">
           <i class="fas fa-search"></i>
-          <input type="text" id="search-input" placeholder="Search dishes (Biryani, Naan, Cake...)" onkeyup="filterMenu()">
+          <input type="text" id="search-input" placeholder="Search dishes (Biryani, Cake...)" onkeyup="filterMenu()">
         </div>
       </div>
 
@@ -55,13 +51,11 @@
       <div class="menu-grid" id="menu-container"></div>
     </div>
 
-    <!-- WISHLIST PAGE -->
     <div id="wishlist" class="page">
       <h2>❤️ My Wishlist</h2>
       <div id="wishlist-container" class="menu-grid"></div>
     </div>
 
-    <!-- CART PAGE -->
     <div id="cart" class="page">
       <h2>🛒 My Cart</h2>
       <div id="cart-items"></div>
@@ -75,11 +69,8 @@
 
       <div class="checkout-form">
         <h3>Delivery Details</h3>
-        <select id="saved-address-dropdown" onchange="useSavedAddress()">
-          <option value="">Select Saved Address</option>
-        </select>
         <input type="text" id="del-name" placeholder="Full Name">
-        <input type="number" id="del-phone" placeholder="Phone Number (10 digits)">
+        <input type="number" id="del-phone" placeholder="Phone Number">
         <textarea id="del-address" placeholder="Complete Delivery Address"></textarea>
         
         <select id="payment-mode">
@@ -91,15 +82,13 @@
       </div>
     </div>
 
-    <!-- ORDERS PAGE (WITH LIVE TIMELINE TRACKING) -->
     <div id="orders" class="page">
       <h2>📦 My Orders & Live Tracking</h2>
       <div id="my-orders-list">
-        <p>Please login in Profile tab to see your order history & live tracking.</p>
+        <p>Please login in Profile tab to see order history & live tracking.</p>
       </div>
     </div>
 
-    <!-- PROFILE PAGE -->
     <div id="profile" class="page">
       <div class="profile-header" style="display:flex; align-items:center; gap:15px; margin-bottom:15px; background:white; padding:15px; border-radius:8px;">
         <div class="avatar-container" style="position:relative;">
@@ -113,15 +102,11 @@
         </div>
       </div>
 
-      <!-- LOGIN / SIGNUP SECTION -->
       <div class="checkout-form" id="auth-section">
         <h3>Login / Sign Up</h3>
-        
-        <!-- Google Login Button -->
         <button class="btn-primary" style="background:#ea4335; margin-bottom:15px;" onclick="googleLogin()"><i class="fab fa-google"></i> Sign in with Google</button>
         <div style="text-align:center; color:#777; margin-bottom:15px;">--- OR LOGIN WITH PHONE ---</div>
         
-        <!-- Phone + OTP Login -->
         <input type="number" id="auth-phone" placeholder="Enter 10-Digit Phone Number">
         <div id="recaptcha-container"></div>
         <button class="btn-sec" id="send-otp-btn" onclick="sendOTP()">Send OTP SMS</button>
@@ -132,7 +117,6 @@
         </div>
       </div>
 
-      <!-- USER DETAILS -->
       <div class="checkout-form" id="user-details-section" style="display:none;">
         <h3>My Saved Details</h3>
         <input type="text" id="user-name-input" placeholder="Your Full Name">
@@ -155,7 +139,6 @@
         <button class="btn-sec" onclick="loginAdmin()">Login Admin</button>
       </div>
 
-      <!-- COMPLETE ADMIN PANEL -->
       <div id="admin-panel" style="display:none; margin-top:20px; border-top:2px solid #ccc; padding-top:15px;">
         <h3 style="color:var(--accent-red);">👑 Admin Dashboard</h3>
         
@@ -178,7 +161,7 @@
         <input type="number" id="new-coupon-discount" placeholder="Discount Amount (₹)">
         <button class="btn-sec" onclick="adminCreateCoupon()">Create Coupon</button>
 
-        <h4 style="margin-top:10px;">➕ Add Item / Birthday Cake (Custom Photo Link)</h4>
+        <h4 style="margin-top:10px;">➕ Add Item / Birthday Cake</h4>
         <input type="text" id="add-item-name" placeholder="Item / Cake Name">
         <input type="number" id="add-item-price" placeholder="Price (₹)">
         <input type="text" id="add-item-img" placeholder="Paste Image URL / Link">
@@ -202,16 +185,30 @@
         <h4 style="margin-top:15px;">📦 Incoming Live Orders</h4>
         <div id="admin-orders-list"></div>
 
-        <h4 style="margin-top:15px;">📋 Menu Manager (Edit Prices & Photo Links)</h4>
+        <h4 style="margin-top:15px;">📋 Menu Manager</h4>
         <div id="admin-menu-list"></div>
 
-        <h4 style="margin-top:15px;">🗑️ Deleted Accounts Reasons Log</h4>
+        <h4 style="margin-top:15px;">🗑️ Deleted Accounts Log</h4>
         <div id="admin-delete-logs"></div>
       </div>
     </div>
   </main>
 
-  <!-- BOTTOM NAVIGATION -->
+  <div id="product-modal" class="modal">
+    <div class="modal-content">
+      <span class="close-btn" onclick="closeModal()">&times;</span>
+      <img id="modal-img" src="" class="modal-img">
+      <h2 id="modal-title" style="margin-top:10px;"></h2>
+      <div id="modal-price" style="font-size:1.3rem; font-weight:bold; color:var(--accent-red); margin:8px 0;"></div>
+      <p id="modal-desc" style="color:#666; font-size:0.85rem; margin-bottom:15px;">Delicious and fresh dish prepared specially at K.D Kitchen with high-quality ingredients.</p>
+      
+      <div style="display:flex; gap:10px;">
+        <button class="btn-sec" style="flex:1; background:#ff9f00;" onclick="addToCartFromModal()">ADD TO CART</button>
+        <button class="btn-primary" style="flex:1; background:#fb641b;" onclick="buyNowFromModal()">BUY NOW</button>
+      </div>
+    </div>
+  </div>
+
   <nav class="bottom-nav">
     <div class="nav-item active" onclick="showPage('home')">
       <i class="fas fa-home"></i>
@@ -235,7 +232,6 @@
     </div>
   </nav>
 
-  <!-- FIREBASE LIBRARIES -->
   <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-auth-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-database-compat.js"></script>
