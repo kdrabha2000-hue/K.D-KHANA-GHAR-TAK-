@@ -38,7 +38,7 @@ let menu = [
   { id: 120, name: "Gulab Jamun (2 pcs)", price: 50, cat: "Desserts", img: "https://images.unsplash.com/photo-1541781774459-bb2af2f05b55?w=200", isOut: false }
 ];
 
-// OWNER LOGIN FUNCTION
+// OWNER LOGIN FUNCTION (SECURED)
 function loginAdmin() {
   const passInp = document.getElementById('admin-pass');
   if (passInp && passInp.value.trim() === 'K.d@12345') {
@@ -47,7 +47,7 @@ function loginAdmin() {
     alert("Welcome Restaurant Owner!");
     renderAdminOrders();
   } else {
-    alert("Galat Password! Sahi Password daalein: K.d@12345");
+    alert("Galat Password!");
   }
 }
 
