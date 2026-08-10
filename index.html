@@ -32,7 +32,7 @@
   <div class="notif-box" id="notif-box">
     <h4>Notifications</h4>
     <p>🚀 Welcome to K.D Restaurant!</p>
-    <p>🎂 New 1KG Birthday Cakes available now!</p>
+    <p>🎂 New 1KG & 2KG Birthday Cakes available now!</p>
   </div>
 
   <!-- MAIN CONTAINER -->
@@ -96,11 +96,11 @@
       </div>
     </div>
 
-    <!-- ORDERS PAGE -->
+    <!-- ORDERS PAGE (WITH TIMELINE TRACKING) -->
     <div id="orders" class="page">
-      <h2>📦 My Orders</h2>
+      <h2>📦 My Orders & Live Tracking</h2>
       <div id="my-orders-list">
-        <p>Please login to see your orders.</p>
+        <p>Please login in Profile tab to see your order history & live tracking.</p>
       </div>
     </div>
 
@@ -121,13 +121,13 @@
         <button class="btn-sec" onclick="customerLogin()">Login securely</button>
       </div>
 
-      <!-- USER DETAILS (Hidden until login) -->
+      <!-- USER DETAILS -->
       <div class="checkout-form" id="user-details-section" style="display:none;">
         <h3>My Details</h3>
         <input type="text" id="user-name-input" placeholder="Your Name">
         <input type="text" id="user-address-input" placeholder="Save Delivery Address">
         <button class="btn-sec" onclick="saveProfile()">Save Details</button>
-        <button class="btn-sec" style="background:#ff4757;" onclick="deleteAccount()">Delete Account</button>
+        <button class="btn-sec" style="background:#ff4757; margin-top:10px;" onclick="deleteAccount()">Delete Account</button>
       </div>
 
       <div class="checkout-form">
@@ -136,39 +136,70 @@
         <a href="tel:+91XXXXXXXXXX" class="btn-sec" style="background:#00a8ff; text-decoration:none; display:block; text-align:center; margin-top:10px;">Call Restaurant</a>
       </div>
 
-      <div class="admin-login-box">
+      <div class="admin-login-box" style="background:#fff; padding:15px; border-radius:8px; margin-top:15px;">
         <h4>Admin Access Only</h4>
-        <input type="password" id="admin-pass" placeholder="Enter Admin Password">
+        <input type="password" id="admin-pass" placeholder="Enter Admin Password" style="width:100%; padding:8px; margin:8px 0; border:1px solid #ccc; border-radius:4px;">
         <button class="btn-sec" onclick="loginAdmin()">Login Admin</button>
       </div>
 
-      <!-- ADMIN PANEL (Hidden by Default) -->
+      <!-- COMPLETE ADMIN PANEL (13 FEATURES) -->
       <div id="admin-panel" style="display:none; margin-top:20px; border-top:2px solid #ccc; padding-top:15px;">
         <h3 style="color:var(--accent-red);">👑 Admin Dashboard</h3>
         
+        <!-- 1. Sales Analytics -->
         <div class="admin-stats">
           <div class="stat-box">Total Orders: <span id="stat-total">0</span></div>
           <div class="stat-box">Pending: <span id="stat-pending">0</span></div>
           <div class="stat-box">Earning: ₹<span id="stat-earning">0</span></div>
         </div>
 
-        <h4>Live Orders Stream</h4>
-        <div id="admin-orders-list"></div>
+        <!-- 2. Live Offer Banner Manager -->
+        <h4>📢 Update Offer Banner</h4>
+        <input type="text" id="new-banner-text" placeholder="Enter new banner offer text">
+        <button class="btn-sec" onclick="adminUpdateBanner()">Add Banner Offer</button>
 
-        <h4>Add New Item / Cake</h4>
-        <input type="text" id="add-item-name" placeholder="Item Name">
-        <input type="number" id="add-item-price" placeholder="Price">
+        <!-- 3. VIP Member Manager -->
+        <h4 style="margin-top:10px;">👑 Assign VIP Member</h4>
+        <input type="number" id="vip-user-phone" placeholder="Customer Phone Number">
+        <button class="btn-sec" onclick="adminAssignVIP()">Make VIP</button>
+
+        <!-- 4. Coupon Code Creator -->
+        <h4 style="margin-top:10px;">🎟️ Create Promo Coupon</h4>
+        <input type="text" id="new-coupon-code" placeholder="Coupon Code (e.g. FIRST30)">
+        <input type="number" id="new-coupon-discount" placeholder="Discount Amount (₹)">
+        <button class="btn-sec" onclick="adminCreateCoupon()">Create Coupon</button>
+
+        <!-- 5. Add New Item / Birthday Cake -->
+        <h4 style="margin-top:10px;">➕ Add New Item / Birthday Cake</h4>
+        <input type="text" id="add-item-name" placeholder="Item / Cake Name">
+        <input type="number" id="add-item-price" placeholder="Price (₹)">
         <select id="add-item-cat">
           <option value="Birthday Cakes">Birthday Cakes</option>
+          <option value="Breads & Naan">Breads & Naan</option>
+          <option value="Dal & Gravy">Dal & Gravy</option>
           <option value="Main Course">Main Course</option>
+          <option value="Pasta">Pasta</option>
+          <option value="Breakfast & Snacks">Breakfast & Snacks</option>
+          <option value="Tea & Coffee">Tea & Coffee</option>
+          <option value="Chowmein & Rolls">Chowmein & Rolls</option>
+          <option value="Fried Rice">Fried Rice</option>
+          <option value="Momos">Momos</option>
           <option value="Starters & Tandoor">Starters & Tandoor</option>
+          <option value="Juices & Drinks">Juices & Drinks</option>
+          <option value="Desserts">Desserts</option>
         </select>
-        <button class="btn-sec" onclick="adminAddItem()">Add Item</button>
+        <button class="btn-sec" onclick="adminAddItem()">Add to Menu</button>
 
-        <h4>Menu Manager</h4>
+        <!-- 6. Realtime Live Orders Stream -->
+        <h4 style="margin-top:15px;">📦 Incoming Live Orders</h4>
+        <div id="admin-orders-list"></div>
+
+        <!-- 7. Menu Manager & Inline Price Editor -->
+        <h4 style="margin-top:15px;">📋 Menu Manager (Edit Prices / Delete)</h4>
         <div id="admin-menu-list"></div>
 
-        <h4>Deleted Accounts Log</h4>
+        <!-- 8. Deleted Accounts Reasons Log -->
+        <h4 style="margin-top:15px;">🗑️ Deleted Accounts Reasons Log</h4>
         <div id="admin-delete-logs"></div>
       </div>
     </div>
