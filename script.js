@@ -38,23 +38,16 @@ let menu = [
   { id: 120, name: "Gulab Jamun (2 pcs)", price: 50, cat: "Desserts", img: "https://images.unsplash.com/photo-1541781774459-bb2af2f05b55?w=200", isOut: false }
 ];
 
-// ADMIN TOGGLE BOX (FIXED)
-function toggleAdminPassBox() {
-  const box = document.getElementById('admin-pass-box');
-  if (box) {
-    box.style.display = (box.style.display === 'block' || box.style.display === '') ? 'none' : 'block';
-  }
-}
-
-// ADMIN LOGIN FUNCTION (FIXED)
+// OWNER LOGIN FUNCTION
 function loginAdmin() {
   const passInp = document.getElementById('admin-pass');
-  if (passInp && passInp.value === 'K.d@12345') {
+  if (passInp && passInp.value.trim() === 'K.d@12345') {
+    document.getElementById('auth-section').style.display = 'none';
     document.getElementById('admin-panel').style.display = 'block';
-    alert("Welcome Admin!");
+    alert("Welcome Restaurant Owner!");
     renderAdminOrders();
   } else {
-    alert("Invalid Admin Password!");
+    alert("Galat Password! Sahi Password daalein: K.d@12345");
   }
 }
 
@@ -96,7 +89,6 @@ function syncStorage() {
   }
 }
 
-// ROTATING NOTICES AND BANNERS
 const topNotices = [
   "🚀 Welcome to K.D Restaurant! <br> 🥤 Get refreshing Cold Drinks with your meals!",
   "⚡ Superfast Express Delivery in Udalguri area!",
