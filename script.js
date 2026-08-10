@@ -311,7 +311,7 @@ function changeQty(id, delta) {
   renderCart();
 }
 
-// CUSTOMER AUTH & DATA SYNC
+// CUSTOMER AUTH & PROFILE PHOTO SYNC
 function customerLogin() {
   const phoneInput = document.getElementById('auth-phone');
   if (!phoneInput) return;
@@ -320,21 +320,35 @@ function customerLogin() {
     currentUserPhone = phone;
     document.getElementById('auth-section').style.display = 'none';
     document.getElementById('user-details-section').style.display = 'block';
-    document.getElementById('display-name').innerText = "User: " + phone;
     document.getElementById('del-phone').value = phone; 
     
     database.ref('users/' + phone).once('value', (snap) => {
       if(snap.val()) {
-        if (document.getElementById('user-name-input')) document.getElementById('user-name-input').value = snap.val().name || "";
-        if (document.getElementById('user-address-input')) document.getElementById('user-address-input').value = snap.val().address || "";
-        if (document.getElementById('del-name')) document.getElementById('del-name').value = snap.val().name || "";
-        if (document.getElementById('del-address')) document.getElementById('del-address').value = snap.val().address || "";
+        const u = snap.val();
+        if (document.getElementById('user-name-input')) document.getElementById('user-name-input').value = u.name || "";
+        if (document.getElementById('user-address-input')) document.getElementById('user-address-input').value = u.address || "";
+        if (document.getElementById('del-name')) document.getElementById('del-name').value = u.name || "";
+        if (document.getElementById('del-address')) document.getElementById('del-address').value = u.address || "";
+        if (document.getElementById('display-name')) document.getElementById('display-name').innerText = u.name || ("User: " + phone);
+        if (u.photoUrl && document.getElementById('user-avatar-img')) {
+          document.getElementById('user-avatar-img').src = u.photoUrl;
+          document.getElementById('user-photo-input').value = u.photoUrl;
+        }
+      } else {
+        document.getElementById('display-name').innerText = "User: " + phone;
       }
     });
-    alert("Logged In Successfully! Saved profile loaded.");
+    alert("Logged In Successfully! Profile loaded.");
     renderOrders();
   } else {
     alert("Enter a valid 10-digit phone number!");
+  }
+}
+
+function previewProfilePhoto() {
+  const photoUrl = document.getElementById('user-photo-input').value;
+  if (photoUrl) {
+    document.getElementById('user-avatar-img').src = photoUrl;
   }
 }
 
@@ -342,13 +356,19 @@ function saveProfile() {
   if(!currentUserPhone) return alert("Please Login first!");
   const name = document.getElementById('user-name-input').value;
   const address = document.getElementById('user-address-input').value;
-  database.ref('users/' + currentUserPhone).set({ name, address })
-    .then(() => alert("Profile Saved Successfully!"));
+  const photoUrl = document.getElementById('user-photo-input').value;
+
+  database.ref('users/' + currentUserPhone).set({ name, address, photoUrl })
+    .then(() => {
+      alert("Profile & Photo Saved Successfully!");
+      if (name) document.getElementById('display-name').innerText = name;
+      if (photoUrl) document.getElementById('user-avatar-img').src = photoUrl;
+    });
 }
 
 function deleteAccount() {
   if(!currentUserPhone) return alert("Please login first!");
-  const reason = prompt("We are sad to see you go! Please enter the reason for deleting your account:");
+  const reason = prompt("We are sad to see you go! Enter reason for account deletion:");
   if(reason) {
     database.ref('deleted_accounts/' + currentUserPhone).set({
       phone: currentUserPhone,
@@ -356,13 +376,13 @@ function deleteAccount() {
       date: new Date().toLocaleString()
     }).then(() => {
       database.ref('users/' + currentUserPhone).remove();
-      alert("Account deleted successfully.");
+      alert("Account deleted.");
       location.reload();
     });
   }
 }
 
-// PLACE ORDER & HISTORY (WITH TIMELINE LIVE TRACKING)
+// PLACE ORDER & TIMELINE LIVE TRACKING
 function placeOrder() {
   if(!currentUserPhone) return alert("Please Login in Profile tab first!");
   
@@ -405,7 +425,7 @@ function renderOrders() {
   if(!container) return;
 
   if(!currentUserPhone) {
-    container.innerHTML = "<p>Please login in Profile tab to see your order history and tracking.</p>";
+    container.innerHTML = "<p>Please login in Profile tab to see order history & live tracking.</p>";
     return;
   }
   
@@ -423,7 +443,6 @@ function renderOrders() {
       </div>
       ${myOrders.length === 0 ? "<p>No orders placed yet.</p>" : myOrders.map(o => {
         
-        // Status Order Logic for Timeline
         const statuses = ["Pending", "Accepted", "Out for Delivery", "Delivered"];
         const currentIdx = statuses.indexOf(o.status);
 
@@ -433,7 +452,6 @@ function renderOrders() {
           <div><b>Items:</b> ${(o.items || []).map(i => i.name + ' x' + i.qty).join(', ')}</div>
           <div><b>Total Amount:</b> ₹${o.total} (${o.pay})</div>
           
-          <!-- VISUAL TRACKING TIMELINE -->
           <div style="margin-top:15px; font-weight:bold; font-size:0.9rem;">Order Status Timeline:</div>
           <div class="timeline">
             
@@ -460,7 +478,6 @@ function renderOrders() {
 
           </div>
 
-          <!-- LOCK LOGIC: Only Pending orders can be cancelled -->
           ${o.status === 'Pending' ? 
             `<button class="btn-sec" style="background:red; margin-top:5px;" onclick="cancelMyOrder('${o.id}')">Cancel Order</button>` 
             : `<p style="color:orange; font-size:0.8rem; margin-top:5px;">🔒 Order Locked (Accepted / Cooking in progress)</p>`}
@@ -489,7 +506,7 @@ function reorder(id) {
   });
 }
 
-// ADMIN DASHBOARD (Protected by Password: K.d@12345)
+// ADMIN DASHBOARD & DYNAMIC DISH IMAGE EDITOR
 function loginAdmin() {
   const passInp = document.getElementById('admin-pass');
   if (!passInp) return;
@@ -533,7 +550,6 @@ function renderAdmin() {
     }
   });
 
-  // Account Deletion Reason Logs
   database.ref('deleted_accounts').on('value', (snap) => {
     const logsData = snap.val();
     const logs = logsData ? Object.values(logsData) : [];
@@ -548,15 +564,20 @@ function renderAdmin() {
     }
   });
 
-  // Admin Menu Manager
+  // ADMIN MENU MANAGER WITH IMAGE URL EDITING
   const menuContainer = document.getElementById('admin-menu-list');
   if (menuContainer) {
     menuContainer.innerHTML = menu.map(m => `
       <div class="admin-item-row">
-        <span>${m.name} (₹<input type="number" id="price-${m.id}" value="${m.price}" style="width:60px; padding:2px; display:inline;">)</span>
-        <div>
-          <button onclick="adminEditPrice(${m.id})" style="background:#2196F3; color:white; border:none; padding:4px 6px; border-radius:4px;">Save Price</button>
-          <button onclick="adminDeleteItem(${m.id})" style="background:red; color:white; border:none; padding:4px 6px; border-radius:4px;">Delete</button>
+        <div style="display:flex; align-items:center; gap:10px; margin-bottom:5px;">
+          <img src="${m.img}" style="width:40px; height:40px; border-radius:4px; object-fit:cover;">
+          <b>${m.name}</b>
+        </div>
+        Price (₹): <input type="number" id="price-${m.id}" value="${m.price}" style="width:60px; padding:2px; margin-bottom:5px;"><br>
+        Image Link: <input type="text" id="img-${m.id}" value="${m.img}" style="width:100%; padding:2px; margin:3px 0;"><br>
+        <div style="margin-top:5px;">
+          <button onclick="adminEditItem(${m.id})" style="background:#2196F3; color:white; border:none; padding:4px 8px; border-radius:4px;">Save Changes</button>
+          <button onclick="adminDeleteItem(${m.id})" style="background:red; color:white; border:none; padding:4px 8px; border-radius:4px;">Delete Item</button>
         </div>
       </div>
     `).join('');
@@ -571,19 +592,22 @@ function adminAddItem() {
   const nameInp = document.getElementById('add-item-name');
   const priceInp = document.getElementById('add-item-price');
   const catInp = document.getElementById('add-item-cat');
+  const imgInp = document.getElementById('add-item-img');
 
   if (!nameInp || !priceInp || !catInp) return;
 
   const name = nameInp.value;
   const price = Number(priceInp.value);
   const cat = catInp.value;
+  const img = (imgInp && imgInp.value) ? imgInp.value : "https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=200";
 
-  if (!name || !price) return alert("Fill item details!");
+  if (!name || !price) return alert("Fill item name & price!");
 
-  menu.push({ id: Date.now(), name, price, cat, img: "https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=200" });
-  alert("Item added to live menu!");
+  menu.push({ id: Date.now(), name, price, cat, img });
+  alert("New item added to live menu!");
   renderMenu();
   renderAdmin();
+  nameInp.value = ""; priceInp.value = ""; if(imgInp) imgInp.value = "";
 }
 
 function adminDeleteItem(id) {
@@ -593,15 +617,17 @@ function adminDeleteItem(id) {
   renderAdmin();
 }
 
-function adminEditPrice(id) {
+function adminEditItem(id) {
   const priceInp = document.getElementById(`price-${id}`);
-  if (!priceInp) return;
-  const newPrice = Number(priceInp.value);
+  const imgInp = document.getElementById(`img-${id}`);
   const item = menu.find(m => m.id === id);
-  if (item && newPrice) {
-    item.price = newPrice;
-    alert("Price updated for " + item.name + "!");
+
+  if (item && priceInp) {
+    item.price = Number(priceInp.value);
+    if(imgInp && imgInp.value) item.img = imgInp.value;
+    alert("Price and Image updated for " + item.name + "!");
     renderMenu();
+    renderAdmin();
   }
 }
 
