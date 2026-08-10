@@ -28,12 +28,6 @@
     </div>
   </header>
 
-  <div class="notif-box" id="notif-box">
-    <h4>Notifications</h4>
-    <p>🚀 Welcome to K.D Restaurant!</p>
-    <p>🥤 Get refreshing Cold Drinks with your meals!</p>
-  </div>
-
   <main class="main-container">
 
     <!-- HOME PAGE -->
@@ -98,9 +92,6 @@
       <!-- LOGIN SCREEN -->
       <div class="checkout-form" id="auth-section">
         <h3>Login / Sign Up</h3>
-        <button class="btn-primary" style="background:#ea4335; margin-bottom:15px;" onclick="googleLogin()"><i class="fab fa-google"></i> Sign in with Google</button>
-        <div style="text-align:center; color:#777; margin-bottom:15px;">--- OR LOGIN WITH PHONE ---</div>
-        
         <input type="number" id="auth-phone" placeholder="Enter 10-Digit Phone Number">
         <button class="btn-sec" style="background:#2ed573; width:100%; margin-top:5px; font-weight:bold; padding:10px;" onclick="loginWithPhoneDirect()">Login with Phone Number 🚀</button>
 
@@ -118,24 +109,12 @@
         <div class="fk-profile-card">
           <div class="avatar-container" style="position:relative;">
             <img id="user-avatar-img" src="https://cdn-icons-png.flaticon.com/512/3135/3135715.png" class="fk-avatar">
-            <label for="camera-file-input" class="camera-btn"><i class="fas fa-camera"></i></label>
-            <input type="file" id="camera-file-input" accept="image/*" style="display:none;" onchange="uploadProfileCameraPhoto(this)">
           </div>
           <div style="flex:1;">
-            <div style="display:flex; justify-content:space-between; align-items:center;">
-              <h2 id="display-name" style="font-size:1.2rem; font-weight:bold;">Hi Customer</h2>
-              <div class="fk-coins">🪙 <span id="coins-count">14</span></div>
-            </div>
+            <h2 id="display-name" style="font-size:1.2rem; font-weight:bold;">Hi Customer</h2>
             <div id="display-phone" style="font-size:0.85rem; color:#666; margin-top:2px;">+91-XXXXXXXXXX</div>
             <div id="display-address" style="font-size:0.8rem; color:#888; margin-top:4px;"><i class="fas fa-map-marker-alt" style="color:var(--accent-red);"></i> <span id="saved-addr-text">No Address Saved</span></div>
           </div>
-        </div>
-
-        <div class="fk-grid">
-          <div class="fk-grid-card" onclick="showPage('orders')"><i class="fas fa-box fk-icon" style="color:#fb641b;"></i><span>Orders</span></div>
-          <div class="fk-grid-card" onclick="showPage('wishlist')"><i class="fas fa-heart fk-icon" style="color:var(--accent-red);"></i><span>Saved Items</span></div>
-          <div class="fk-grid-card" onclick="alert('Language: English / Hindi')"><i class="fas fa-language fk-icon" style="color:#2ed573;"></i><span>Language</span></div>
-          <div class="fk-grid-card" onclick="window.location.href='https://wa.me/916000026478'"><i class="fas fa-headset fk-icon" style="color:#00a8ff;"></i><span>Contact Us</span></div>
         </div>
 
         <div class="checkout-form" style="margin-top:15px;">
@@ -149,9 +128,9 @@
         </div>
       </div>
 
-      <!-- OWNER DASHBOARD PANEL (FULL CONTROLS RESTORED) -->
+      <!-- OWNER DASHBOARD PANEL -->
       <div id="admin-panel" style="display:none; margin-top:20px; border-top:2px solid #ccc; padding-top:15px;">
-        <h3 style="color:var(--accent-red); margin-bottom:10px;">👑 Admin Dashboard</h3>
+        <h3 style="color:var(--accent-red); margin-bottom:10px;">👑 Restaurant Owner Dashboard</h3>
         
         <div class="admin-stats">
           <div class="stat-box">Total Orders: <span id="stat-total">0</span></div>
@@ -164,46 +143,58 @@
           <button class="btn-sec" style="background:#0288d1;" onclick="toggleStoreStatus()">Toggle Open/Close</button>
         </div>
 
-        <h4>💳 Store UPI Payment ID Configuration</h4>
-        <input type="text" id="admin-upi-input" value="6000026478@okbizaxis" placeholder="Enter Your Bank UPI ID">
-        <button class="btn-sec" style="margin-bottom:12px;" onclick="updateAdminUPI()">Save UPI ID</button>
+        <!-- ADD ITEM FORM WITH CAMERA & GALLERY OPTION -->
+        <div class="checkout-form" style="background:#f9f9f9; border:1px dashed #28a745;">
+          <h4 style="color:#28a745;">➕ Add New Item / Cake (Camera / Gallery)</h4>
+          <input type="text" id="add-item-name" placeholder="Item Name">
+          <input type="number" id="add-item-price" placeholder="Price (₹)">
+          <label style="font-size:0.8rem; color:#666;">📸 Upload Photo (Camera/Gallery):</label>
+          <input type="file" id="item-file-input" accept="image/*" style="margin:5px 0;">
+          <select id="add-item-cat">
+            <option value="Birthday Cakes">Birthday Cakes</option>
+            <option value="Cold Drinks & Beverages">Cold Drinks & Beverages</option>
+            <option value="Breads & Naan">Breads & Naan</option>
+            <option value="Dal & Gravy">Dal & Gravy</option>
+            <option value="Main Course">Main Course</option>
+            <option value="Momos">Momos</option>
+            <option value="Starters & Tandoor">Starters & Tandoor</option>
+            <option value="Desserts">Desserts</option>
+          </select>
+          <button class="btn-sec" style="background:#28a745; width:100%; font-weight:bold; padding:10px; margin-top:5px;" onclick="adminAddItem()">Add Dish To Menu 🚀</button>
+        </div>
 
-        <h4>📢 Update Banner (Camera / Gallery Upload)</h4>
-        <input type="text" id="new-banner-text" placeholder="Offer Banner Text">
-        <input type="file" id="banner-file-input" accept="image/*" style="margin:5px 0;">
-        <button class="btn-sec" style="margin-bottom:12px;" onclick="adminUpdateBanner()">Add Banner Offer</button>
+        <!-- EDIT EXISTING MENU ITEMS & STOCK TOGGLE -->
+        <div class="checkout-form" style="margin-top:15px;">
+          <h4>✏️ Manage & Edit All Menu Items</h4>
+          <div id="admin-menu-edit-list"></div>
+        </div>
 
-        <h4>👑 Assign VIP Member</h4>
-        <input type="number" id="vip-user-phone" placeholder="Customer Phone Number">
-        <button class="btn-sec" style="margin-bottom:12px;" onclick="adminAssignVIP()">Make VIP</button>
-
-        <h4>🎟️ Create Promo Coupon</h4>
-        <input type="text" id="new-coupon-code" placeholder="Coupon Code (e.g. FIRST30)">
-        <input type="number" id="new-coupon-discount" placeholder="Discount Amount (₹)">
-        <button class="btn-sec" style="margin-bottom:12px;" onclick="adminCreateCoupon()">Create Coupon</button>
-
-        <h4>➕ Add Item / Birthday Cake (Camera / Gallery Photo)</h4>
-        <input type="text" id="add-item-name" placeholder="Item / Cake Name">
-        <input type="number" id="add-item-price" placeholder="Price (₹)">
-        <input type="file" id="item-file-input" accept="image/*" style="margin:5px 0;">
-        <select id="add-item-cat">
-          <option value="Birthday Cakes">Birthday Cakes</option>
-          <option value="Cold Drinks & Beverages">Cold Drinks & Beverages</option>
-          <option value="Breads & Naan">Breads & Naan</option>
-          <option value="Dal & Gravy">Dal & Gravy</option>
-          <option value="Main Course">Main Course</option>
-          <option value="Momos">Momos</option>
-          <option value="Starters & Tandoor">Starters & Tandoor</option>
-          <option value="Desserts">Desserts</option>
-        </select>
-        <button class="btn-sec" style="margin-top:5px; margin-bottom:15px;" onclick="adminAddItem()">Add to Live Menu</button>
-
-        <h4>📦 Incoming Live Orders</h4>
+        <!-- ORDERS MANAGEMENT -->
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-top:15px; margin-bottom:10px;">
+          <h4>📦 Incoming Live Orders</h4>
+          <button class="btn-sec" style="background:#dc3545;" onclick="clearAllOrders()">🗑️ Clear All Orders</button>
+        </div>
         <div id="admin-orders-list"></div>
       </div>
 
     </div>
   </main>
+
+  <!-- ADMIN EDIT ITEM MODAL -->
+  <div id="edit-item-modal" class="modal">
+    <div class="modal-content">
+      <span class="close-btn" onclick="closeEditModal()">&times;</span>
+      <h3>✏️ Edit Item Details</h3>
+      <input type="hidden" id="edit-item-id">
+      <label style="font-size:0.8rem; color:#666; margin-top:8px; display:block;">Dish Name:</label>
+      <input type="text" id="edit-item-name" placeholder="Item Name">
+      <label style="font-size:0.8rem; color:#666; margin-top:8px; display:block;">Price (₹):</label>
+      <input type="number" id="edit-item-price" placeholder="Price">
+      <label style="font-size:0.8rem; color:#666; margin-top:8px; display:block;">Change Photo (Camera/Gallery):</label>
+      <input type="file" id="edit-item-file" accept="image/*" style="margin:5px 0;">
+      <button class="btn-primary" style="background:#28a745; margin-top:12px;" onclick="saveItemEdits()">Save Edits 💾</button>
+    </div>
+  </div>
 
   <!-- POPUP MODAL FOR DISH DETAILS -->
   <div id="product-modal" class="modal">
