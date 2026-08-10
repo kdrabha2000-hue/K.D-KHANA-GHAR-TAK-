@@ -9,6 +9,7 @@
 </head>
 <body>
 
+  <!-- HEADER -->
   <header class="header">
     <div class="header-info">
       <h1>K.D KA KHANA GHAR TAK</h1>
@@ -27,19 +28,23 @@
     </div>
   </header>
 
+  <!-- NOTIFICATION BOX -->
   <div class="notif-box" id="notif-box">
     <h4>Notifications</h4>
     <p>🚀 Welcome to K.D Restaurant!</p>
-    <p>🎂 Birthday Cakes & Food Offers Live!</p>
+    <p>🥤 Get refreshing Cold Drinks with your meals!</p>
   </div>
 
+  <!-- MAIN CONTAINER -->
   <main class="main-container">
 
+    <!-- HOME PAGE -->
     <div id="home" class="page active">
       <div class="search-bar-container">
         <div class="search-box">
           <i class="fas fa-search"></i>
-          <input type="text" id="search-input" placeholder="Search dishes (Biryani, Cake...)" onkeyup="filterMenu()">
+          <input type="text" id="search-input" placeholder="Search dishes (Biryani, Naan, Cake...)" onkeyup="filterMenu()">
+          <i class="fas fa-microphone mic-icon" onclick="startVoiceSearch()" title="Voice Search"></i>
         </div>
       </div>
 
@@ -51,14 +56,25 @@
       <div class="menu-grid" id="menu-container"></div>
     </div>
 
+    <!-- WISHLIST PAGE -->
     <div id="wishlist" class="page">
       <h2>❤️ My Wishlist</h2>
       <div id="wishlist-container" class="menu-grid"></div>
     </div>
 
+    <!-- CART PAGE (SHOPSY / FLIPKART STYLE) -->
     <div id="cart" class="page">
       <h2>🛒 My Cart</h2>
       <div id="cart-items"></div>
+
+      <!-- COLD DRINK AUTO-SUGGESTION IN CART -->
+      <div id="cart-drink-suggestion" class="suggestion-box">
+        <h4>🥤 Recommended Drink with Meal</h4>
+        <div class="drink-card">
+          <span>Cold Coffee / Sprite (200ml) - ₹40</span>
+          <button class="btn-sec" style="background:#28a745; padding:4px 10px;" onclick="addSuggestedDrink(106)">+ Add</button>
+        </div>
+      </div>
 
       <div class="coupon-section">
         <input type="text" id="coupon-code" placeholder="Enter Promo Code (e.g., FIRST30)">
@@ -72,16 +88,19 @@
         <input type="text" id="del-name" placeholder="Full Name">
         <input type="number" id="del-phone" placeholder="Phone Number">
         <textarea id="del-address" placeholder="Complete Delivery Address"></textarea>
+        <input type="text" id="del-instruction" placeholder="Order Instructions (e.g., Don't ring doorbell)">
         
-        <select id="payment-mode">
-          <option value="COD">Cash on Delivery (COD)</option>
-          <option value="UPI">Pay via UPI / GPay</option>
-        </select>
+        <h3>Select Payment Method</h3>
+        <div class="payment-options">
+          <label><input type="radio" name="pay-option" value="UPI" checked> 📱 UPI (Google Pay, PhonePe, Paytm)</label><br>
+          <label><input type="radio" name="pay-option" value="COD"> 💵 Cash on Delivery (COD)</label>
+        </div>
         
-        <button class="btn-primary" style="width:100%; margin-top:15px;" onclick="placeOrder()">Place Order 🚀</button>
+        <button class="btn-primary" style="width:100%; margin-top:15px; background:#fb641b;" onclick="proceedToPayment()">Proceed to Payment / Place Order 🚀</button>
       </div>
     </div>
 
+    <!-- ORDERS PAGE (WITH LIVE TRACKING) -->
     <div id="orders" class="page">
       <h2>📦 My Orders & Live Tracking</h2>
       <div id="my-orders-list">
@@ -89,6 +108,7 @@
       </div>
     </div>
 
+    <!-- PROFILE PAGE (UNIFIED SINGLE LOGIN) -->
     <div id="profile" class="page">
       <div class="profile-header" style="display:flex; align-items:center; gap:15px; margin-bottom:15px; background:white; padding:15px; border-radius:8px;">
         <div class="avatar-container" style="position:relative;">
@@ -98,10 +118,11 @@
         </div>
         <div>
           <h2 id="display-name">Guest User</h2>
-          <div id="vip-tag"></div>
+          <div id="user-coins" style="font-size:0.85rem; color:#f39c12;">🪙 SuperCoins Balance: <span id="coins-count">0</span></div>
         </div>
       </div>
 
+      <!-- SINGLE UNIFIED LOGIN SCREEN -->
       <div class="checkout-form" id="auth-section">
         <h3>Login / Sign Up</h3>
         <button class="btn-primary" style="background:#ea4335; margin-bottom:15px;" onclick="googleLogin()"><i class="fab fa-google"></i> Sign in with Google</button>
@@ -115,8 +136,18 @@
           <input type="number" id="otp-input" placeholder="Enter 6-Digit OTP">
           <button class="btn-sec" style="background:#2ed573;" onclick="verifyOTP()">Verify OTP & Login</button>
         </div>
+
+        <!-- SECRET ADMIN ACCESS LINK -->
+        <div style="text-align:center; margin-top:20px; border-top:1px dashed #ccc; padding-top:10px;">
+          <span style="font-size:0.8rem; color:#888; cursor:pointer;" onclick="toggleAdminPassBox()">🔒 Restaurant Owner Portal</span>
+          <div id="admin-pass-box" style="display:none; margin-top:10px;">
+            <input type="password" id="admin-pass" placeholder="Enter Admin Secret Password">
+            <button class="btn-sec" style="background:#333;" onclick="loginAdmin()">Login as Admin</button>
+          </div>
+        </div>
       </div>
 
+      <!-- USER DETAILS -->
       <div class="checkout-form" id="user-details-section" style="display:none;">
         <h3>My Saved Details</h3>
         <input type="text" id="user-name-input" placeholder="Your Full Name">
@@ -133,12 +164,7 @@
         <a href="tel:+91XXXXXXXXXX" class="btn-sec" style="background:#00a8ff; text-decoration:none; display:block; text-align:center; margin-top:10px;">Call Restaurant</a>
       </div>
 
-      <div class="admin-login-box" style="background:#fff; padding:15px; border-radius:8px; margin-top:15px;">
-        <h4>Admin Access Only</h4>
-        <input type="password" id="admin-pass" placeholder="Enter Admin Password" style="width:100%; padding:8px; margin:8px 0; border:1px solid #ccc; border-radius:4px;">
-        <button class="btn-sec" onclick="loginAdmin()">Login Admin</button>
-      </div>
-
+      <!-- COMPLETE SELLER / ADMIN DASHBOARD -->
       <div id="admin-panel" style="display:none; margin-top:20px; border-top:2px solid #ccc; padding-top:15px;">
         <h3 style="color:var(--accent-red);">👑 Admin Dashboard</h3>
         
@@ -148,8 +174,20 @@
           <div class="stat-box">Earning: ₹<span id="stat-earning">0</span></div>
         </div>
 
-        <h4>📢 Update Offer Banner</h4>
-        <input type="text" id="new-banner-text" placeholder="Enter new banner offer text">
+        <!-- STORE STATUS TOGGLE -->
+        <div style="background:#e3f2fd; padding:10px; border-radius:6px; margin-bottom:15px; display:flex; justify-content:space-between; align-items:center;">
+          <b>Store Status: <span id="store-status-text" style="color:green;">OPEN</span></b>
+          <button class="btn-sec" style="background:#0288d1;" onclick="toggleStoreStatus()">Toggle Open/Close</button>
+        </div>
+
+        <!-- DYNAMIC UPI ID EDITOR -->
+        <h4 style="margin-top:10px;">💳 Store UPI Payment ID Configuration</h4>
+        <input type="text" id="admin-upi-input" value="6000026478@okbizaxis" placeholder="Enter Your Bank UPI ID">
+        <button class="btn-sec" onclick="updateAdminUPI()">Save UPI ID</button>
+
+        <h4 style="margin-top:15px;">📢 Update Banner (Camera / Gallery Upload)</h4>
+        <input type="text" id="new-banner-text" placeholder="Offer Banner Text">
+        <input type="file" id="banner-file-input" accept="image/*" style="margin:5px 0;">
         <button class="btn-sec" onclick="adminUpdateBanner()">Add Banner Offer</button>
 
         <h4 style="margin-top:10px;">👑 Assign VIP Member</h4>
@@ -161,12 +199,13 @@
         <input type="number" id="new-coupon-discount" placeholder="Discount Amount (₹)">
         <button class="btn-sec" onclick="adminCreateCoupon()">Create Coupon</button>
 
-        <h4 style="margin-top:10px;">➕ Add Item / Birthday Cake</h4>
+        <h4 style="margin-top:10px;">➕ Add Item / Birthday Cake (Camera / Gallery Photo)</h4>
         <input type="text" id="add-item-name" placeholder="Item / Cake Name">
         <input type="number" id="add-item-price" placeholder="Price (₹)">
-        <input type="text" id="add-item-img" placeholder="Paste Image URL / Link">
+        <input type="file" id="item-file-input" accept="image/*" style="margin:5px 0;">
         <select id="add-item-cat">
           <option value="Birthday Cakes">Birthday Cakes</option>
+          <option value="Cold Drinks & Beverages">Cold Drinks & Beverages</option>
           <option value="Breads & Naan">Breads & Naan</option>
           <option value="Dal & Gravy">Dal & Gravy</option>
           <option value="Main Course">Main Course</option>
@@ -185,8 +224,11 @@
         <h4 style="margin-top:15px;">📦 Incoming Live Orders</h4>
         <div id="admin-orders-list"></div>
 
-        <h4 style="margin-top:15px;">📋 Menu Manager</h4>
+        <h4 style="margin-top:15px;">📋 Menu Manager (Out-of-Stock / Prices)</h4>
         <div id="admin-menu-list"></div>
+
+        <h4 style="margin-top:15px;">⭐ Customer Reviews & Ratings</h4>
+        <div id="admin-reviews-list"></div>
 
         <h4 style="margin-top:15px;">🗑️ Deleted Accounts Log</h4>
         <div id="admin-delete-logs"></div>
@@ -194,21 +236,46 @@
     </div>
   </main>
 
+  <!-- PRODUCT DETAIL POPUP MODAL (SHOPSY / FLIPKART STYLE) -->
   <div id="product-modal" class="modal">
     <div class="modal-content">
       <span class="close-btn" onclick="closeModal()">&times;</span>
       <img id="modal-img" src="" class="modal-img">
       <h2 id="modal-title" style="margin-top:10px;"></h2>
       <div id="modal-price" style="font-size:1.3rem; font-weight:bold; color:var(--accent-red); margin:8px 0;"></div>
-      <p id="modal-desc" style="color:#666; font-size:0.85rem; margin-bottom:15px;">Delicious and fresh dish prepared specially at K.D Kitchen with high-quality ingredients.</p>
+      
+      <p id="modal-desc" class="food-description">
+        Hamare K.D Restaurant mein yeh khas dish bilkul taaza aur uchh-gunwatta ke masalon ke sath taiyaar ki jaati hai. Safai aur hygiene ka poora dhyan rakha jata hai taaki aapko swasth aur swadisht bhojan mile. Ek baar zaroor try karein!
+      </p>
+
+      <!-- CROSS SELLING DRINKS SECTION -->
+      <div style="margin:15px 0; border-top:1px dashed #ccc; padding-top:10px;">
+        <h4 style="color:#555;">🥤 Pairs Great With Cold Drinks:</h4>
+        <div class="drink-card" style="margin-top:5px;">
+          <span>Sprite / Coke (200ml) - ₹40</span>
+          <button class="btn-sec" style="background:#28a745; padding:3px 8px; font-size:0.8rem;" onclick="addSuggestedDrink(106)">+ Add Drink</button>
+        </div>
+      </div>
       
       <div style="display:flex; gap:10px;">
         <button class="btn-sec" style="flex:1; background:#ff9f00;" onclick="addToCartFromModal()">ADD TO CART</button>
         <button class="btn-primary" style="flex:1; background:#fb641b;" onclick="buyNowFromModal()">BUY NOW</button>
       </div>
+
+      <!-- CUSTOMER REVIEWS FOR THIS PRODUCT -->
+      <div style="margin-top:20px; border-top:1px solid #eee; padding-top:10px;">
+        <h4>Customer Reviews & Ratings</h4>
+        <div id="modal-reviews-list">
+          <p style="font-size:0.8rem; color:#888;">No reviews yet. Be the first to review!</p>
+        </div>
+      </div>
     </div>
   </div>
 
+  <!-- AUDIO ALERT FOR ADMIN -->
+  <audio id="order-sound" src="https://assets.mixkit.co/active_storage/sfx/2869/2869-preview.mp3" preload="auto"></audio>
+
+  <!-- BOTTOM NAVIGATION -->
   <nav class="bottom-nav">
     <div class="nav-item active" onclick="showPage('home')">
       <i class="fas fa-home"></i>
@@ -232,6 +299,7 @@
     </div>
   </nav>
 
+  <!-- FIREBASE LIBRARIES -->
   <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-auth-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-database-compat.js"></script>
