@@ -1,197 +1,206 @@
 <!DOCTYPE html>
-<html lang="hi">
+<html lang="en">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <title>K.D KA KHANA GHAR TAK</title>
   <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 </head>
 <body>
 
   <!-- HEADER -->
   <header class="header">
-    <div>
-      <div class="brand-title">K.D KA KHANA GHAR TAK</div>
-      <div class="brand-sub">S&A Family Restaurant</div>
-      <div class="header-info">📍 U.T. Road, Udalguri | 🕒 8:00 AM - 9:30 PM</div>
+    <div class="header-info">
+      <h1>K.D KA KHANA GHAR TAK</h1>
+      <p class="subtitle">S&A Family Restaurant</p>
+      <div class="location-bar">
+        <i class="fas fa-map-marker-alt" style="color:var(--accent-red);"></i> U.T. Road, Udalguri | <i class="far fa-clock"></i> 8:00 AM - 9:30 PM
+      </div>
     </div>
-    <div class="header-actions">
-      <span onclick="toggleNotifications()" class="icon-btn">🔔</span>
-      <span onclick="showPage('wishlist')" class="icon-btn">❤️</span>
-      <span onclick="showPage('cart')" class="icon-btn">🛒 <b id="cart-count">0</b></span>
+    <div class="header-icons">
+      <i class="fas fa-bell icon-btn" onclick="toggleNotifications()"></i>
+      <i class="fas fa-heart icon-btn" onclick="showPage('wishlist')" style="color:var(--accent-red);"></i>
+      <div class="cart-icon" onclick="showPage('cart')">
+        <i class="fas fa-shopping-cart"></i>
+        <span class="cart-count" id="cart-count">0</span>
+      </div>
     </div>
   </header>
 
-  <!-- NOTIFICATION POPUP -->
-  <div id="notif-box" class="notif-popup">
-    🎉 Welcome to K.D KA KHANA GHAR TAK! Use code <b>FIRST30</b> for ₹30 OFF.
+  <!-- NOTIFICATION BOX -->
+  <div class="notif-box" id="notif-box">
+    <h4>Notifications</h4>
+    <p>🚀 Welcome to K.D Restaurant!</p>
+    <p>🎂 New 1KG Birthday Cakes available now!</p>
   </div>
 
-  <!-- SEARCH BAR -->
-  <div class="search-container">
-    <input type="text" id="search-input" placeholder="🔍 Search dishes (Biryani, Naan, Momo...)" onkeyup="filterMenu()">
-  </div>
+  <!-- MAIN CONTAINER -->
+  <main class="main-container">
 
-  <!-- HOME / MENU PAGE -->
-  <div id="home" class="page active container">
-    <!-- AUTO SLIDING LIVE BANNER -->
-    <div class="banner-slider">
-      <div class="banner" id="home-banner">🔥 TODAY'S SPECIAL: Chicken Butter Masala @ ₹380</div>
-    </div>
-
-    <!-- CATEGORY FILTERS -->
-    <div class="category-scroll" id="category-bar"></div>
-
-    <!-- MENU ITEMS -->
-    <div id="menu-container"></div>
-  </div>
-
-  <!-- WISHLIST PAGE -->
-  <div id="wishlist" class="page container">
-    <h3>❤️ My Wishlist</h3>
-    <div id="wishlist-container"></div>
-  </div>
-
-  <!-- CART & CHECKOUT PAGE -->
-  <div id="cart" class="page container">
-    <h3>🛒 My Cart</h3>
-    <div id="cart-items"></div>
-    
-    <div class="coupon-box" style="margin-top:10px;">
-      <input type="text" id="coupon-code" placeholder="Apply Coupon (e.g. FIRST30)">
-      <button class="btn-sec" onclick="applyCoupon()">Apply Promo Code</button>
-    </div>
-    <div id="bill-summary" class="bill-summary"></div>
-    
-    <h4>📍 Saved Delivery Addresses</h4>
-    <select id="saved-address-dropdown" onchange="useSavedAddress()">
-      <option value="">Choose Saved Address (Optional)</option>
-      <option value="Home: Near Petrol Pump, U.T. Road, Udalguri">Home: Near Petrol Pump, Udalguri</option>
-      <option value="Work: Main Market Shop #12, Udalguri">Work: Main Market Shop #12</option>
-    </select>
-
-    <input type="text" id="del-name" placeholder="Full Name">
-    <input type="text" id="del-phone" placeholder="Phone Number">
-    <textarea id="del-address" placeholder="Complete Delivery Address"></textarea>
-    
-    <h4>💳 Payment Method</h4>
-    <select id="payment-mode">
-      <option value="UPI">UPI / GPay / PhonePe (6000026478@okbizaxis)</option>
-      <option value="COD">Cash on Delivery (COD)</option>
-    </select>
-    <button class="btn-primary" onclick="placeOrder()">Place Order 🚀</button>
-  </div>
-
-  <!-- LIVE ORDERS & TRACKING PAGE -->
-  <div id="orders" class="page container">
-    <h3>📦 Live Order Tracking</h3>
-    <div id="my-orders-list"></div>
-  </div>
-
-  <!-- PROFILE & HELP PAGE -->
-  <div id="profile" class="page container">
-    <h3>👤 My Account</h3>
-    <div id="user-info">
-      <button class="btn-primary" style="background:#4285F4; margin-bottom:10px;" onclick="googleLogin()">Login with Google</button>
-      <input type="text" id="user-name-input" placeholder="Your Name">
-      <input type="text" id="user-phone-input" placeholder="Phone Number">
-      <input type="email" id="user-email-input" placeholder="Your Email ID">
-      <button class="btn-sec" onclick="saveProfile()">Save Profile</button>
-      <div id="vip-tag" style="margin-top:10px;"></div>
-    </div>
-
-    <!-- MY COUPONS SECTION -->
-    <div class="help-section" style="margin-top:15px; background:#181818; padding:10px; border-radius:6px;">
-      <h4>🏷️ Available Coupons</h4>
-      <p style="font-size:0.8rem; color:#aaa;">Use <b>FIRST30</b> for ₹30 OFF on your order.</p>
-    </div>
-
-    <!-- HELP CENTRE -->
-    <div class="help-section" style="margin-top:15px;">
-      <h4>💬 Help Centre & Support</h4>
-      <a href="https://wa.me/918453270362" target="_blank" class="btn-whatsapp">Chat on WhatsApp (+91 8453270362)</a>
-      <a href="tel:+918453270362" class="btn-sec" style="display:block; text-align:center; margin-top:8px;">Call Support Direct</a>
-    </div>
-
-    <!-- SECRET ADMIN LOGIN -->
-    <div class="admin-login-box" style="margin-top:30px; border-top:1px solid #333; padding-top:15px;">
-      <small style="color:#aaa;">Admin Login (KD Only):</small>
-      <input type="email" id="admin-email" placeholder="Admin Email">
-      <input type="password" id="admin-pass" placeholder="Password">
-      <button class="btn-sec" onclick="loginAdmin()">Login Admin</button>
-    </div>
-
-    <!-- ADMIN PANEL (FULL 10 FEATURES) -->
-    <div id="admin-panel">
-      <h2>👑 KD ADMIN PANEL</h2>
-      
-      <!-- 1. LIVE SALES ANALYTICS -->
-      <div class="admin-stats">
-        <div>Total Orders: <b id="stat-total">0</b></div>
-        <div>Pending: <b id="stat-pending">0</b></div>
-        <div>Earnings: <b>₹<span id="stat-earning">0</span></b></div>
+    <!-- HOME PAGE -->
+    <div id="home" class="page active">
+      <!-- SEARCH BAR -->
+      <div class="search-bar-container">
+        <div class="search-box">
+          <i class="fas fa-search"></i>
+          <input type="text" id="search-input" placeholder="Search dishes (Biryani, Naan, Cake...)" onkeyup="filterMenu()">
+        </div>
       </div>
 
-      <!-- 2 & 10. LIVE ORDERS CONTROL & DIRECT CALL ACTION -->
-      <h4>📦 Live Customer Orders</h4>
-      <div id="admin-orders-list"></div>
+      <!-- LIVE BANNER -->
+      <div class="live-banner" id="home-banner">
+        🔥 TODAY'S SPECIAL: Chicken Butter Masala @ ₹380
+      </div>
 
-      <!-- 3. ADD NEW MENU ITEM -->
-      <h4 style="margin-top:15px;">➕ Add New Menu Item</h4>
-      <input type="text" id="add-item-name" placeholder="Item Name">
-      <input type="number" id="add-item-price" placeholder="Price (₹)">
-      <select id="add-item-cat">
-        <option value="Breads & Naan">Breads & Naan</option>
-        <option value="Dal & Gravy">Dal & Gravy</option>
-        <option value="Main Course">Main Course</option>
-        <option value="Pasta">Pasta</option>
-        <option value="Breakfast & Snacks">Breakfast & Snacks</option>
-        <option value="Tea & Coffee">Tea & Coffee</option>
-        <option value="Chowmein & Rolls">Chowmein & Rolls</option>
-        <option value="Fried Rice">Fried Rice</option>
-        <option value="Momos">Momos</option>
-        <option value="Starters & Tandoor">Starters & Tandoor</option>
-        <option value="Juices & Drinks">Juices & Drinks</option>
-        <option value="Desserts">Desserts</option>
-      </select>
-      <button class="btn-primary" onclick="adminAddItem()">Add to Live Menu</button>
+      <!-- CATEGORY BAR -->
+      <div class="category-scroll" id="category-bar"></div>
 
-      <!-- 4 & 5. DELETE & PRICE EDIT MANAGER -->
-      <h4 style="margin-top:15px;">🗑️ Delete & Edit Active Menu</h4>
-      <div id="admin-menu-list"></div>
-
-      <!-- 6. VIP USER MANAGER -->
-      <h4 style="margin-top:15px;">👑 VIP Customer Manager</h4>
-      <input type="text" id="vip-user-phone" placeholder="Enter Customer Phone">
-      <button class="btn-sec" onclick="adminAssignVIP()">Assign VIP Tag</button>
-
-      <!-- 7. COUPON GENERATOR -->
-      <h4 style="margin-top:15px;">🏷️ Coupon Generator</h4>
-      <input type="text" id="new-coupon-code" placeholder="Coupon Code (e.g. KDFOOD20)">
-      <input type="number" id="new-coupon-discount" placeholder="Discount Amount (₹)">
-      <button class="btn-sec" onclick="adminCreateCoupon()">Save Promo Code</button>
-
-      <!-- 8. OFFER BANNER MANAGER -->
-      <h4 style="margin-top:15px;">📢 Update Home Offer Banners</h4>
-      <input type="text" id="new-banner-text" placeholder="Enter New Live Offer Banner">
-      <button class="btn-sec" onclick="adminUpdateBanner()">Update Banner Live</button>
+      <!-- MENU GRID -->
+      <div class="menu-grid" id="menu-container"></div>
     </div>
-  </div>
+
+    <!-- WISHLIST PAGE -->
+    <div id="wishlist" class="page">
+      <h2>❤️ My Wishlist</h2>
+      <div id="wishlist-container" class="menu-grid"></div>
+    </div>
+
+    <!-- CART PAGE -->
+    <div id="cart" class="page">
+      <h2>🛒 My Cart</h2>
+      <div id="cart-items"></div>
+
+      <div class="coupon-section">
+        <input type="text" id="coupon-code" placeholder="Enter Promo Code (e.g., FIRST30)">
+        <button class="btn-sec" onclick="applyCoupon()">Apply</button>
+      </div>
+      
+      <div id="bill-summary" class="bill-summary"></div>
+
+      <div class="checkout-form">
+        <h3>Delivery Details</h3>
+        <select id="saved-address-dropdown" onchange="useSavedAddress()">
+          <option value="">Select Saved Address</option>
+        </select>
+        <input type="text" id="del-name" placeholder="Full Name">
+        <input type="number" id="del-phone" placeholder="Phone Number (10 digits)">
+        <textarea id="del-address" placeholder="Complete Delivery Address"></textarea>
+        
+        <select id="payment-mode">
+          <option value="COD">Cash on Delivery (COD)</option>
+          <option value="UPI">Pay via UPI / GPay</option>
+        </select>
+        
+        <button class="btn-primary" style="width:100%; margin-top:15px;" onclick="placeOrder()">Place Order 🚀</button>
+      </div>
+    </div>
+
+    <!-- ORDERS PAGE -->
+    <div id="orders" class="page">
+      <h2>📦 My Orders</h2>
+      <div id="my-orders-list">
+        <p>Please login to see your orders.</p>
+      </div>
+    </div>
+
+    <!-- PROFILE PAGE -->
+    <div id="profile" class="page">
+      <div class="profile-header">
+        <div class="avatar">👤</div>
+        <div>
+          <h2 id="display-name">Guest User</h2>
+          <div id="vip-tag"></div>
+        </div>
+      </div>
+
+      <!-- LOGIN / SIGNUP SECTION -->
+      <div class="checkout-form" id="auth-section">
+        <h3>Login / Sign Up</h3>
+        <input type="number" id="auth-phone" placeholder="Enter Mobile Number">
+        <button class="btn-sec" onclick="customerLogin()">Login securely</button>
+      </div>
+
+      <!-- USER DETAILS (Hidden until login) -->
+      <div class="checkout-form" id="user-details-section" style="display:none;">
+        <h3>My Details</h3>
+        <input type="text" id="user-name-input" placeholder="Your Name">
+        <input type="text" id="user-address-input" placeholder="Save Delivery Address">
+        <button class="btn-sec" onclick="saveProfile()">Save Details</button>
+        <button class="btn-sec" style="background:#ff4757;" onclick="deleteAccount()">Delete Account</button>
+      </div>
+
+      <div class="checkout-form">
+        <h3>Help Center</h3>
+        <a href="https://wa.me/91XXXXXXXXXX" class="btn-sec" style="background:#25D366; text-decoration:none; display:block; text-align:center;">WhatsApp Support</a>
+        <a href="tel:+91XXXXXXXXXX" class="btn-sec" style="background:#00a8ff; text-decoration:none; display:block; text-align:center; margin-top:10px;">Call Restaurant</a>
+      </div>
+
+      <div class="admin-login-box">
+        <h4>Admin Access Only</h4>
+        <input type="password" id="admin-pass" placeholder="Enter Admin Password">
+        <button class="btn-sec" onclick="loginAdmin()">Login Admin</button>
+      </div>
+
+      <!-- ADMIN PANEL (Hidden by Default) -->
+      <div id="admin-panel" style="display:none; margin-top:20px; border-top:2px solid #ccc; padding-top:15px;">
+        <h3 style="color:var(--accent-red);">👑 Admin Dashboard</h3>
+        
+        <div class="admin-stats">
+          <div class="stat-box">Total Orders: <span id="stat-total">0</span></div>
+          <div class="stat-box">Pending: <span id="stat-pending">0</span></div>
+          <div class="stat-box">Earning: ₹<span id="stat-earning">0</span></div>
+        </div>
+
+        <h4>Live Orders Stream</h4>
+        <div id="admin-orders-list"></div>
+
+        <h4>Add New Item / Cake</h4>
+        <input type="text" id="add-item-name" placeholder="Item Name">
+        <input type="number" id="add-item-price" placeholder="Price">
+        <select id="add-item-cat">
+          <option value="Birthday Cakes">Birthday Cakes</option>
+          <option value="Main Course">Main Course</option>
+          <option value="Starters & Tandoor">Starters & Tandoor</option>
+        </select>
+        <button class="btn-sec" onclick="adminAddItem()">Add Item</button>
+
+        <h4>Menu Manager</h4>
+        <div id="admin-menu-list"></div>
+
+        <h4>Deleted Accounts Log</h4>
+        <div id="admin-delete-logs"></div>
+      </div>
+    </div>
+  </main>
 
   <!-- BOTTOM NAVIGATION -->
-  <nav class="nav">
-    <div class="nav-item active" onclick="showPage('home')">🏠<br>Home</div>
-    <div class="nav-item" onclick="showPage('wishlist')">❤️<br>Wishlist</div>
-    <div class="nav-item" onclick="showPage('cart')">🛒<br>Cart</div>
-    <div class="nav-item" onclick="showPage('orders')">📦<br>Orders</div>
-    <div class="nav-item" onclick="showPage('profile')">👤<br>Profile</div>
+  <nav class="bottom-nav">
+    <div class="nav-item active" onclick="showPage('home')">
+      <i class="fas fa-home"></i>
+      <span>Home</span>
+    </div>
+    <div class="nav-item" onclick="showPage('wishlist')">
+      <i class="fas fa-heart"></i>
+      <span>Wishlist</span>
+    </div>
+    <div class="nav-item" onclick="showPage('cart')">
+      <i class="fas fa-shopping-bag"></i>
+      <span>Cart</span>
+    </div>
+    <div class="nav-item" onclick="showPage('orders')">
+      <i class="fas fa-box"></i>
+      <span>Orders</span>
+    </div>
+    <div class="nav-item" onclick="showPage('profile')">
+      <i class="fas fa-user"></i>
+      <span>Profile</span>
+    </div>
   </nav>
 
   <!-- FIREBASE LIBRARIES -->
   <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-auth-compat.js"></script>
-
-  <!-- SCRIPT -->
+  <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-database-compat.js"></script>
   <script src="script.js"></script>
 </body>
 </html>
