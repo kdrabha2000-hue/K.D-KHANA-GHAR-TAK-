@@ -42,37 +42,46 @@ let menu = [
   { id: 120, name: "Gulab Jamun (2 pcs)", price: 50, cat: "Desserts", img: "https://images.unsplash.com/photo-1541781774459-bb2af2f05b55?w=200", isOut: false }
 ];
 
+// USER SESSION LOAD (FIXED REALTIME UPDATE)
+function loadUserSession(uid, phone, name, photo, address) {
+  currentUser = { uid, phone, name };
+  localStorage.setItem('kd_user_phone', phone);
+  localStorage.setItem('kd_user_uid', uid);
+
+  document.getElementById('auth-section').style.display = 'none';
+  document.getElementById('user-details-section').style.display = 'block';
+
+  document.getElementById('display-name').innerText = name || "Hi Customer";
+  document.getElementById('display-phone').innerText = "+91-" + phone;
+  document.getElementById('user-phone-input').value = phone;
+  document.getElementById('user-name-input').value = name || "";
+  document.getElementById('user-address-input').value = address || "";
+  document.getElementById('saved-addr-text').innerText = address || "No Address Saved";
+  if (photo) document.getElementById('user-avatar-img').src = photo;
+
+  document.getElementById('del-name').value = name || "";
+  document.getElementById('del-address').value = address || "";
+  document.getElementById('del-phone').value = phone || "";
+
+  renderOrders();
+}
+
 auth.onAuthStateChanged((user) => {
   if (user) {
-    currentUser = user;
-    document.getElementById('auth-section').style.display = 'none';
-    document.getElementById('user-details-section').style.display = 'block';
-    
     let uid = user.uid;
-    let name = user.displayName || "Customer";
-    let photo = user.photoURL || "https://cdn-icons-png.flaticon.com/512/3135/3135715.png";
-
-    if (document.getElementById('display-name')) document.getElementById('display-name').innerText = name;
-    if (document.getElementById('user-avatar-img')) document.getElementById('user-avatar-img').src = photo;
-
     database.ref('users/' + uid).once('value', (snap) => {
-      if(snap.val()) {
-        const u = snap.val();
-        if (document.getElementById('user-phone-input')) document.getElementById('user-phone-input').value = u.phone || "";
-        if (document.getElementById('user-name-input')) document.getElementById('user-name-input').value = u.name || name;
-        if (document.getElementById('user-address-input')) document.getElementById('user-address-input').value = u.address || "";
-        if (document.getElementById('del-name')) document.getElementById('del-name').value = u.name || name;
-        if (document.getElementById('del-address')) document.getElementById('del-address').value = u.address || "";
-        if (document.getElementById('del-phone')) document.getElementById('del-phone').value = u.phone || "";
-      }
+      const u = snap.val() || {};
+      loadUserSession(uid, u.phone || user.phoneNumber || "8453270362", u.name || user.displayName || "Hi Customer", u.photo || user.photoURL, u.address || "");
     });
-
-    renderOrders();
   } else {
-    currentUser = null;
-    document.getElementById('auth-section').style.display = 'block';
-    document.getElementById('user-details-section').style.display = 'none';
-    if (document.getElementById('display-name')) document.getElementById('display-name').innerText = "Guest User";
+    const savedPhone = localStorage.getItem('kd_user_phone');
+    const savedUid = localStorage.getItem('kd_user_uid');
+    if (savedPhone && savedUid) {
+      database.ref('users/' + savedUid).once('value', (snap) => {
+        const u = snap.val() || {};
+        loadUserSession(savedUid, u.phone || savedPhone, u.name || "Customer " + savedPhone.slice(-4), u.photo, u.address || "");
+      });
+    }
   }
 });
 
@@ -83,9 +92,8 @@ function googleLogin() {
     database.ref('users/' + user.uid).update({
       name: user.displayName,
       email: user.email,
-      phone: user.phoneNumber || "9876543210"
+      phone: "8453270362"
     });
-    alert("Google Sign-In Successful!");
   }).catch(e => alert(e.message));
 }
 
@@ -93,36 +101,30 @@ function loginWithPhoneDirect() {
   const phone = document.getElementById('auth-phone').value;
   if (!phone || phone.length < 10) return alert("Please enter a valid 10-digit phone number!");
 
-  auth.signInAnonymously().then((result) => {
-    const user = result.user;
-    database.ref('users/' + user.uid).set({
-      phone: phone,
-      name: "Customer " + phone.slice(-4),
-      joined: new Date().toLocaleString()
-    });
+  const customUid = "user_" + phone;
+  database.ref('users/' + customUid).update({
+    phone: phone,
+    name: "Customer " + phone.slice(-4),
+    joined: new Date().toLocaleString()
+  }).then(() => {
+    loadUserSession(customUid, phone, "Customer " + phone.slice(-4), null, "");
     alert("Phone Login Successful!");
-  }).catch((error) => {
-    alert("Login Error: " + error.message);
   });
 }
 
-function toggleAdminPassBox() {
-  const box = document.getElementById('admin-pass-box');
-  box.style.display = box.style.display === 'block' ? 'none' : 'block';
-}
-
-function loginAdmin() {
-  const passInp = document.getElementById('admin-pass');
-  if (passInp && passInp.value === 'K.d@12345') {
-    document.getElementById('admin-panel').style.display = 'block';
-    alert("Welcome Admin!");
-    renderAdmin();
-  } else {
-    alert("Invalid Admin Password!");
+function uploadProfileCameraPhoto(input) {
+  if (input.files && input.files[0]) {
+    const reader = new FileReader();
+    reader.onload = function(e) {
+      document.getElementById('user-avatar-img').src = e.target.result;
+      if (currentUser) {
+        database.ref('users/' + currentUser.uid).update({ photo: e.target.result });
+      }
+    };
+    reader.readAsDataURL(input.files[0]);
   }
 }
 
-// SAVE PROFILE WITH MANDATORY PHONE NUMBER CHECK (CANNOT BE BLANK / DELETED)
 function saveProfile() {
   if(!currentUser) return alert("Please Login first!");
   const name = document.getElementById('user-name-input').value;
@@ -130,14 +132,18 @@ function saveProfile() {
   const phone = document.getElementById('user-phone-input').value;
 
   if (!phone || phone.length < 10) {
-    return alert("Phone number cannot be left blank or deleted! Please enter a valid 10-digit number.");
+    return alert("Phone number cannot be left blank! Please enter a valid 10-digit number.");
   }
 
   database.ref('users/' + currentUser.uid).update({ name, address, phone })
-    .then(() => alert("Profile Saved Successfully!"));
+    .then(() => {
+      loadUserSession(currentUser.uid, phone, name, document.getElementById('user-avatar-img').src, address);
+      alert("Profile Saved Successfully!");
+    });
 }
 
 function customerLogout() {
+  localStorage.clear();
   auth.signOut().then(() => location.reload());
 }
 
@@ -148,112 +154,89 @@ function deleteAccount() {
     database.ref('deleted_accounts/' + currentUser.uid).set({ uid: currentUser.uid, reason, date: new Date().toLocaleString() })
       .then(() => {
         database.ref('users/' + currentUser.uid).remove();
-        auth.currentUser.delete().then(() => location.reload());
+        customerLogout();
       });
   }
 }
 
-// ADMIN EDIT ITEM MODAL
-function openEditModal(id) {
-  const item = menu.find(m => m.id === id);
-  if(!item) return;
-  document.getElementById('edit-item-id').value = item.id;
-  document.getElementById('edit-item-name').value = item.name;
-  document.getElementById('edit-item-price').value = item.price;
-  document.getElementById('edit-item-cat').value = item.cat;
-  document.getElementById('edit-item-modal').style.display = 'flex';
-}
-
-function closeEditModal() {
-  document.getElementById('edit-item-modal').style.display = 'none';
-}
-
-function saveItemModification() {
-  const id = parseInt(document.getElementById('edit-item-id').value);
-  const name = document.getElementById('edit-item-name').value;
-  const price = parseFloat(document.getElementById('edit-item-price').value);
-  const cat = document.getElementById('edit-item-cat').value;
-  const fileInput = document.getElementById('edit-item-file');
-
-  const item = menu.find(m => m.id === id);
-  if(item) {
-    item.name = name;
-    item.price = price;
-    item.cat = cat;
-
-    if (fileInput.files && fileInput.files[0]) {
-      const reader = new FileReader();
-      reader.onload = function(e) {
-        item.img = e.target.result;
-        finishItemSave();
-      };
-      reader.readAsDataURL(fileInput.files[0]);
-    } else {
-      finishItemSave();
-    }
+// WISHLIST FUNCTIONALITY (FIXED)
+function toggleWishlist(id) {
+  if (wishlist.includes(id)) {
+    wishlist = wishlist.filter(x => x !== id);
+  } else {
+    wishlist.push(id);
   }
-}
-
-function finishItemSave() {
-  alert("Item updated successfully!");
-  closeEditModal();
   renderMenu();
-  renderAdmin();
+  renderWishlist();
 }
 
-function deleteOrderItem(orderId) {
-  if(confirm("Are you sure you want to delete this order record?")) {
-    database.ref('orders/' + orderId).remove().then(() => alert("Order Deleted!"));
-  }
-}
+function renderWishlist() {
+  const container = document.getElementById('wishlist-container');
+  if (!container) return;
+  const wishlistItems = menu.filter(m => wishlist.includes(m.id));
 
-// PAYMENT ENGINE
-function proceedToPayment() {
-  if(!currentUser) return alert("Please Login first!");
-  if (!isStoreOpen) return alert("Restaurant is currently CLOSED!");
-
-  const name = document.getElementById('del-name').value;
-  const address = document.getElementById('del-address').value;
-  const payOption = document.querySelector('input[name="pay-option"]:checked').value;
-  const instructions = document.getElementById('del-instruction').value;
-
-  if (!name || !address) return alert("Please fill delivery details!");
-  if (cart.length === 0) return alert("Cart is empty!");
-
-  const subtotal = cart.reduce((s, i) => s + (i.price * i.qty), 0);
-  const deliveryFee = subtotal >= 200 ? 0 : 30;
-  const totalAmount = Math.max(0, subtotal + deliveryFee - discount);
-
-  if (payOption === "UPI") {
-    const upiUrl = `upi://pay?pa=${currentAdminUPI}&pn=KD_KA_KHANA_GHAR_TAK&am=${totalAmount}&cu=INR`;
-    window.location.href = upiUrl;
+  if (wishlistItems.length === 0) {
+    container.innerHTML = `<p style="grid-column:1/-1; text-align:center; padding:20px; color:#888;">Your Wishlist is empty. Tap ❤️ on items to add them here!</p>`;
+    return;
   }
 
-  placeOrderData(name, address, payOption, instructions, totalAmount);
+  container.innerHTML = wishlistItems.map(item => `
+    <div class="food-card" onclick="openModal(${item.id})">
+      <span class="wishlist-icon" onclick="event.stopPropagation(); toggleWishlist(${item.id})">❤️</span>
+      <img src="${item.img}" class="food-img">
+      <div class="food-info">
+        <div class="food-title">${item.name}</div>
+        <div class="food-price">₹${item.price}</div>
+        <button class="btn-primary" onclick="event.stopPropagation(); addToCart(${item.id})">ADD +</button>
+      </div>
+    </div>
+  `).join('');
 }
 
-function placeOrderData(name, address, payOption, instructions, totalAmount) {
-  const orderId = "ORD" + Date.now().toString().slice(-5);
-  const newOrder = {
-    id: orderId,
-    uid: currentUser.uid,
-    name: name,
-    address: address,
-    phone: document.getElementById('del-phone').value || "N/A",
-    instructions: instructions,
-    pay: payOption,
-    items: cart,
-    total: totalAmount,
-    status: "Pending",
-    date: new Date().toLocaleString()
-  };
+// ORDERS TRACKING REALTIME (FIXED)
+function renderOrders() {
+  const container = document.getElementById('my-orders-list');
+  if(!container) return;
 
-  database.ref('orders/' + orderId).set(newOrder).then(() => {
-    cart = [];
-    updateCartCount();
-    alert("Order Placed Successfully! Order ID: " + orderId);
-    showPage('orders');
+  if(!currentUser) {
+    container.innerHTML = "<p style='text-align:center; padding:20px; color:#888;'>Please login in Account tab to see order history & live tracking.</p>";
+    return;
+  }
+  
+  database.ref('orders').on('value', (snapshot) => {
+    const data = snapshot.val();
+    let myOrders = data ? Object.values(data).filter(o => o.uid === currentUser.uid || o.phone === currentUser.phone) : [];
+
+    if (myOrders.length === 0) {
+      container.innerHTML = "<p style='text-align:center; padding:20px; color:#888;'>No orders placed yet.</p>";
+      return;
+    }
+
+    container.innerHTML = myOrders.map(o => {
+      const statuses = ["Pending", "Accepted", "Out for Delivery", "Delivered"];
+      const currentIdx = statuses.indexOf(o.status);
+
+      return `
+      <div class="order-card">
+        <div><b>Order ID:</b> ${o.id} | <b>Date:</b> ${o.date}</div>
+        <div><b>Items:</b> ${(o.items || []).map(i => i.name + ' x' + i.qty).join(', ')}</div>
+        <div><b>Total:</b> ₹${o.total} (${o.pay})</div>
+        
+        <div class="timeline">
+          <div class="timeline-step ${currentIdx >= 0 ? 'completed' : ''}"><div class="timeline-title">Order Placed</div></div>
+          <div class="timeline-step ${currentIdx >= 1 ? 'completed' : ''}"><div class="timeline-title">Accepted / Cooking</div></div>
+          <div class="timeline-step ${currentIdx >= 2 ? 'completed' : ''}"><div class="timeline-title">Out for Delivery</div></div>
+          <div class="timeline-step ${currentIdx >= 3 ? 'completed' : ''}"><div class="timeline-title">Delivered</div></div>
+        </div>
+
+        ${o.status === 'Pending' ? `<button class="btn-sec" style="background:red;" onclick="cancelMyOrder('${o.id}')">Cancel Order</button>` : '🔒 Order Status Locked'}
+      </div>
+    `}).reverse().join('');
   });
+}
+
+function cancelMyOrder(id) {
+  if(confirm("Cancel order?")) database.ref('orders/' + id).update({ status: 'CancelledByCustomer' });
 }
 
 function showPage(pageId) {
@@ -263,6 +246,7 @@ function showPage(pageId) {
   
   if(pageId === 'cart') renderCart();
   if(pageId === 'orders') renderOrders();
+  if(pageId === 'wishlist') renderWishlist();
 }
 
 function renderCategories() {
@@ -285,11 +269,6 @@ function renderMenu() {
   const container = document.getElementById('menu-container');
   if (!container) return;
   let filtered = currentCat === "All" ? menu : menu.filter(m => m.cat === currentCat);
-  
-  if (filtered.length === 0) {
-    container.innerHTML = `<p style="grid-column:1/-1; text-align:center; padding:20px; color:#888;">No items in ${currentCat}.</p>`;
-    return;
-  }
 
   container.innerHTML = filtered.map(item => `
     <div class="food-card" onclick="openModal(${item.id})">
@@ -374,6 +353,22 @@ function toggleStock(id) {
     item.isOut = !item.isOut;
     renderMenu();
     renderAdmin();
+  }
+}
+
+function toggleAdminPassBox() {
+  const box = document.getElementById('admin-pass-box');
+  box.style.display = box.style.display === 'block' ? 'none' : 'block';
+}
+
+function loginAdmin() {
+  const passInp = document.getElementById('admin-pass');
+  if (passInp && passInp.value === 'K.d@12345') {
+    document.getElementById('admin-panel').style.display = 'block';
+    alert("Welcome Admin!");
+    renderAdmin();
+  } else {
+    alert("Invalid Admin Password!");
   }
 }
 
