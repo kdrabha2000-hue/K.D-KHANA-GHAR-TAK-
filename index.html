@@ -121,20 +121,14 @@
         </div>
       </div>
 
-      <!-- SINGLE LOGIN SCREEN -->
+      <!-- LOGIN SCREEN -->
       <div class="checkout-form" id="auth-section">
         <h3>Login / Sign Up</h3>
         <button class="btn-primary" style="background:#ea4335; margin-bottom:15px;" onclick="googleLogin()"><i class="fab fa-google"></i> Sign in with Google</button>
         <div style="text-align:center; color:#777; margin-bottom:15px;">--- OR LOGIN WITH PHONE ---</div>
         
         <input type="number" id="auth-phone" placeholder="Enter 10-Digit Phone Number">
-        <div id="recaptcha-container"></div>
-        <button class="btn-sec" id="send-otp-btn" onclick="sendOTP()">Send OTP SMS</button>
-
-        <div id="otp-box" style="display:none; margin-top:10px;">
-          <input type="number" id="otp-input" placeholder="Enter 6-Digit OTP">
-          <button class="btn-sec" style="background:#2ed573;" onclick="verifyOTP()">Verify OTP & Login</button>
-        </div>
+        <button class="btn-sec" style="background:#2ed573; width:100%; margin-top:5px;" onclick="loginWithPhoneDirect()">Login with Phone Number 🚀</button>
 
         <div style="text-align:center; margin-top:20px; border-top:1px dashed #ccc; padding-top:10px;">
           <span style="font-size:0.8rem; color:#888; cursor:pointer;" onclick="toggleAdminPassBox()">🔒 Restaurant Owner Portal</span>
@@ -145,12 +139,19 @@
         </div>
       </div>
 
+      <!-- USER DETAILS (PHONE NUMBER EDITABLE BUT CANNOT BE DELETED / BLANK) -->
       <div class="checkout-form" id="user-details-section" style="display:none;">
-        <h3>My Saved Details</h3>
+        <h3>My Account Details</h3>
+        <label style="font-size:0.8rem; color:#666;">Phone Number (Editable, cannot be blank):</label>
+        <input type="number" id="user-phone-input" placeholder="Phone Number">
+        
+        <label style="font-size:0.8rem; color:#666; margin-top:5px; display:block;">Full Name:</label>
         <input type="text" id="user-name-input" placeholder="Your Full Name">
+        
+        <label style="font-size:0.8rem; color:#666; margin-top:5px; display:block;">Delivery Address:</label>
         <input type="text" id="user-address-input" placeholder="Save Delivery Address">
         
-        <button class="btn-sec" style="background:#2ed573;" onclick="saveProfile()">Save Details</button>
+        <button class="btn-sec" style="background:#2ed573; margin-top:10px;" onclick="saveProfile()">Save Details</button>
         <button class="btn-sec" style="background:#00a8ff; margin-top:8px;" onclick="customerLogout()">Logout Account</button>
         <button class="btn-sec" style="background:#ff4757; margin-top:8px;" onclick="deleteAccount()">Delete Account</button>
       </div>
