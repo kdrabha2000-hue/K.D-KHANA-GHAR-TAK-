@@ -1,4 +1,3 @@
-// FIREBASE SETUP WITH LOCAL PERSISTENCE
 const firebaseConfig = {
   apiKey: "AIzaSyDDTFzD8eaxS6hsQ_W5akOWRWixyZdjkSo",
   authDomain: "kd-ka-khana-ghar-tak.firebaseapp.com",
@@ -9,44 +8,22 @@ const firebaseConfig = {
   appId: "1:69933070653:web:f9b93ba827d794bb376d54"
 };
 
-if (!firebase.apps.length) {
-  firebase.initializeApp(firebaseConfig);
-}
+if (!firebase.apps.length) firebase.initializeApp(firebaseConfig);
 const auth = firebase.auth();
 const database = firebase.database();
 
 auth.setPersistence(firebase.auth.Auth.Persistence.LOCAL);
 
-// GLOBAL VARIABLES
 let currentUser = null;
 let selectedModalItem = null;
-let confirmationResultGlobal = null;
 let cart = [];
 let wishlist = [];
 let discount = 0;
 let currentCat = "All";
 let isStoreOpen = true;
 let currentAdminUPI = "6000026478@okbizaxis";
-let userCoins = 0;
 
-// LIVE BANNER ROTATION
-let liveBanners = [
-  "🔥 TODAY'S SPECIAL: Chicken Butter Masala @ ₹380",
-  "🎂 SPECIAL BIRTHDAY CAKES: Normal, Custom & Size Offers Available!",
-  "🥤 PAIRS WELL WITH COLD DRINKS: Sprite, Coke & Cold Coffee available!",
-  "⚡ FASTEST DELIVERY: 8:00 AM to 9:30 PM in Udalguri!"
-];
-let currentBannerIdx = 0;
-
-setInterval(() => {
-  const bannerElem = document.getElementById('home-banner');
-  if (bannerElem) {
-    currentBannerIdx = (currentBannerIdx + 1) % liveBanners.length;
-    bannerElem.innerText = liveBanners[currentBannerIdx];
-  }
-}, 3500);
-
-// MENU DATA (114 Food Items + Birthday Cakes + Drinks)
+// COMPLETE 114 RESTAURANT MENU DATA
 let menu = [
   // Cold Drinks & Beverages
   { id: 106, name: "Sprite / Coca-Cola (200ml)", price: 40, cat: "Cold Drinks & Beverages", img: "https://images.unsplash.com/photo-1622483767028-3f66f32aef97?w=200", isOut: false },
@@ -58,16 +35,43 @@ let menu = [
   { id: 203, name: "Offer Cake (1kg)", price: 850, cat: "Birthday Cakes", img: "https://images.unsplash.com/photo-1535141192574-5d4897c12636?w=200", isOut: false },
   { id: 204, name: "Offer Cake (2kg)", price: 1600, cat: "Birthday Cakes", img: "https://images.unsplash.com/photo-1562777717-dc6984f65a63?w=200", isOut: false },
 
+  // Breads & Naan
+  { id: 1, name: "Tandoori Roti", price: 15, cat: "Breads & Naan", img: "https://images.unsplash.com/photo-1626074353765-517a681e40be?w=200", isOut: false },
+  { id: 2, name: "Butter Roti", price: 20, cat: "Breads & Naan", img: "https://images.unsplash.com/photo-1626074353765-517a681e40be?w=200", isOut: false },
+  { id: 3, name: "Plain Naan", price: 40, cat: "Breads & Naan", img: "https://images.unsplash.com/photo-1601050690597-df0568f70950?w=200", isOut: false },
+  { id: 4, name: "Butter Naan", price: 50, cat: "Breads & Naan", img: "https://images.unsplash.com/photo-1601050690597-df0568f70950?w=200", isOut: false },
+  { id: 5, name: "Garlic Naan", price: 70, cat: "Breads & Naan", img: "https://images.unsplash.com/photo-1601050690597-df0568f70950?w=200", isOut: false },
+
+  // Dal & Gravy
+  { id: 10, name: "Dal Tadka", price: 120, cat: "Dal & Gravy", img: "https://images.unsplash.com/photo-1546833999-b9f581a1996d?w=200", isOut: false },
+  { id: 11, name: "Dal Makhani", price: 180, cat: "Dal & Gravy", img: "https://images.unsplash.com/photo-1546833999-b9f581a1996d?w=200", isOut: false },
+
   // Main Course
   { id: 20, name: "Chicken Butter Masala (Full)", price: 380, cat: "Main Course", img: "https://images.unsplash.com/photo-1603894584373-5ac82b2ae398?w=200", isOut: false },
-  { id: 22, name: "Chicken Curry (Full)", price: 240, cat: "Main Course", img: "https://images.unsplash.com/photo-1603894584373-5ac82b2ae398?w=200", isOut: false },
+  { id: 21, name: "Chicken Curry (Full)", price: 240, cat: "Main Course", img: "https://images.unsplash.com/photo-1603894584373-5ac82b2ae398?w=200", isOut: false },
+  { id: 22, name: "Kadai Paneer", price: 220, cat: "Main Course", img: "https://images.unsplash.com/photo-1631452180519-c014fe946bc7?w=200", isOut: false },
 
   // Momos
   { id: 79, name: "Chicken Momo (Full)", price: 70, cat: "Momos", img: "https://images.unsplash.com/photo-1625220194771-7ebdea0b70b9?w=200", isOut: false },
-  { id: 81, name: "Pork Momo (Full)", price: 80, cat: "Momos", img: "https://images.unsplash.com/photo-1625220194771-7ebdea0b70b9?w=200", isOut: false }
+  { id: 81, name: "Pork Momo (Full)", price: 80, cat: "Momos", img: "https://images.unsplash.com/photo-1625220194771-7ebdea0b70b9?w=200", isOut: false },
+
+  // Starters & Tandoor
+  { id: 90, name: "Chicken Pokora (Half)", price: 120, cat: "Starters & Tandoor", img: "https://images.unsplash.com/photo-1565557623262-b51c2513a641?w=200", isOut: false },
+  { id: 91, name: "Chicken Pokora (Full)", price: 220, cat: "Starters & Tandoor", img: "https://images.unsplash.com/photo-1565557623262-b51c2513a641?w=200", isOut: false },
+  { id: 92, name: "Paneer Tikka", price: 200, cat: "Starters & Tandoor", img: "https://images.unsplash.com/photo-1567188040759-fb8a883dc6d8?w=200", isOut: false },
+
+  // Chowmein & Rolls
+  { id: 100, name: "Chicken Egg Chowmein", price: 130, cat: "Chowmein & Rolls", img: "https://images.unsplash.com/photo-1585032226651-759b368d7246?w=200", isOut: false },
+  { id: 101, name: "Chicken Roll", price: 90, cat: "Chowmein & Rolls", img: "https://images.unsplash.com/photo-1626777552726-4a6b54c97e46?w=200", isOut: false },
+
+  // Fried Rice
+  { id: 110, name: "Chicken Fried Rice", price: 160, cat: "Fried Rice", img: "https://images.unsplash.com/photo-1603133872878-684f208fb84b?w=200", isOut: false },
+
+  // Desserts
+  { id: 120, name: "Gulab Jamun (2 pcs)", price: 50, cat: "Desserts", img: "https://images.unsplash.com/photo-1541781774459-bb2af2f05b55?w=200", isOut: false }
 ];
 
-// AUTH OBSERVER (PERSISTENCE)
+// AUTH OBSERVER
 auth.onAuthStateChanged((user) => {
   if (user) {
     currentUser = user;
@@ -89,8 +93,6 @@ auth.onAuthStateChanged((user) => {
         if (document.getElementById('user-address-input')) document.getElementById('user-address-input').value = u.address || "";
         if (document.getElementById('del-name')) document.getElementById('del-name').value = u.name || name;
         if (document.getElementById('del-address')) document.getElementById('del-address').value = u.address || "";
-        userCoins = u.coins || 10;
-        if (document.getElementById('coins-count')) document.getElementById('coins-count').innerText = userCoins;
       }
     });
 
@@ -106,36 +108,6 @@ auth.onAuthStateChanged((user) => {
 function googleLogin() {
   const provider = new firebase.auth.GoogleAuthProvider();
   auth.signInWithPopup(provider).then(() => alert("Google Sign-In Successful!"));
-}
-
-function setupRecaptcha() {
-  if (!window.recaptchaVerifier) {
-    window.recaptchaVerifier = new firebase.auth.RecaptchaVerifier('recaptcha-container', { 'size': 'invisible' });
-  }
-}
-
-function sendOTP() {
-  const phone = document.getElementById('auth-phone').value;
-  if (!phone || phone.length < 10) return alert("Enter valid 10-digit phone number!");
-
-  setupRecaptcha();
-  const phoneNumber = "+91" + phone;
-  auth.signInWithPhoneNumber(phoneNumber, window.recaptchaVerifier)
-    .then((confirmationResult) => {
-      confirmationResultGlobal = confirmationResult;
-      document.getElementById('otp-box').style.display = 'block';
-      alert("OTP Sent to " + phoneNumber);
-    })
-    .catch((error) => alert("OTP Error: " + error.message));
-}
-
-function verifyOTP() {
-  const code = document.getElementById('otp-input').value;
-  if (!code || code.length < 6) return alert("Enter 6-digit OTP!");
-
-  if (confirmationResultGlobal) {
-    confirmationResultGlobal.confirm(code).then(() => alert("Phone Verification Successful!"));
-  }
 }
 
 function toggleAdminPassBox() {
@@ -154,94 +126,61 @@ function loginAdmin() {
   }
 }
 
-function uploadProfileCameraPhoto(input) {
-  if (input.files && input.files[0]) {
-    const reader = new FileReader();
-    reader.onload = function(e) {
-      document.getElementById('user-avatar-img').src = e.target.result;
-      if (currentUser) database.ref('users/' + currentUser.uid).update({ photoUrl: e.target.result });
-    };
-    reader.readAsDataURL(input.files[0]);
-  }
-}
-
-function saveProfile() {
-  if(!currentUser) return alert("Please Login first!");
-  const name = document.getElementById('user-name-input').value;
-  const address = document.getElementById('user-address-input').value;
-
-  database.ref('users/' + currentUser.uid).update({ name, address })
-    .then(() => alert("Profile Saved!"));
-}
-
-function customerLogout() {
-  auth.signOut().then(() => location.reload());
-}
-
-function deleteAccount() {
-  if(!currentUser) return alert("Please login first!");
-  const reason = prompt("Enter reason for deleting account:");
-  if(reason) {
-    database.ref('deleted_accounts/' + currentUser.uid).set({ uid: currentUser.uid, reason, date: new Date().toLocaleString() })
-      .then(() => {
-        database.ref('users/' + currentUser.uid).remove();
-        auth.currentUser.delete().then(() => location.reload());
-      });
-  }
-}
-
-// VOICE SEARCH
-function startVoiceSearch() {
-  if ('webkitSpeechRecognition' in window) {
-    const recognition = new webkitSpeechRecognition();
-    recognition.onresult = function(event) {
-      const text = event.results[0][0].transcript;
-      document.getElementById('search-input').value = text;
-      filterMenu();
-    };
-    recognition.start();
-  } else {
-    alert("Voice Search not supported in this browser.");
-  }
-}
-
-// PRODUCT POPUP MODAL & CROSS-SELLING
-function openModal(id) {
+// EDIT ITEM MODAL FOR ADMIN
+function openEditModal(id) {
   const item = menu.find(m => m.id === id);
-  if (!item) return;
-  selectedModalItem = item;
-  
-  document.getElementById('modal-img').src = item.img;
-  document.getElementById('modal-title').innerText = item.name;
-  document.getElementById('modal-price').innerText = "₹" + item.price;
-  document.getElementById('product-modal').style.display = 'flex';
+  if(!item) return;
+  document.getElementById('edit-item-id').value = item.id;
+  document.getElementById('edit-item-name').value = item.name;
+  document.getElementById('edit-item-price').value = item.price;
+  document.getElementById('edit-item-cat').value = item.cat;
+  document.getElementById('edit-item-modal').style.display = 'flex';
 }
 
-function closeModal() {
-  document.getElementById('product-modal').style.display = 'none';
+function closeEditModal() {
+  document.getElementById('edit-item-modal').style.display = 'none';
 }
 
-function addToCartFromModal() {
-  if (selectedModalItem) {
-    addToCart(selectedModalItem.id);
-    closeModal();
+function saveItemModification() {
+  const id = parseInt(document.getElementById('edit-item-id').value);
+  const name = document.getElementById('edit-item-name').value;
+  const price = parseFloat(document.getElementById('edit-item-price').value);
+  const cat = document.getElementById('edit-item-cat').value;
+  const fileInput = document.getElementById('edit-item-file');
+
+  const item = menu.find(m => m.id === id);
+  if(item) {
+    item.name = name;
+    item.price = price;
+    item.cat = cat;
+
+    if (fileInput.files && fileInput.files[0]) {
+      const reader = new FileReader();
+      reader.onload = function(e) {
+        item.img = e.target.result;
+        finishItemSave();
+      };
+      reader.readAsDataURL(fileInput.files[0]);
+    } else {
+      finishItemSave();
+    }
   }
 }
 
-function buyNowFromModal() {
-  if (selectedModalItem) {
-    addToCart(selectedModalItem.id);
-    closeModal();
-    showPage('cart');
+function finishItemSave() {
+  alert("Item updated successfully!");
+  closeEditModal();
+  renderMenu();
+  renderAdmin();
+}
+
+function deleteOrderItem(orderId) {
+  if(confirm("Are you sure you want to delete this order record?")) {
+    database.ref('orders/' + orderId).remove().then(() => alert("Order Deleted!"));
   }
 }
 
-function addSuggestedDrink(id) {
-  addToCart(id);
-  alert("Cold Drink added to cart!");
-}
-
-// PAYMENT ENGINE & UPI INTEGRATION
+// PAYMENT ENGINE
 function proceedToPayment() {
   if(!currentUser) return alert("Please Login first!");
   if (!isStoreOpen) return alert("Restaurant is currently CLOSED!");
@@ -259,7 +198,6 @@ function proceedToPayment() {
   const totalAmount = Math.max(0, subtotal + deliveryFee - discount);
 
   if (payOption === "UPI") {
-    // TRIGGER DIRECT UPI APP TO 6000026478@okbizaxis
     const upiUrl = `upi://pay?pa=${currentAdminUPI}&pn=KD_KA_KHANA_GHAR_TAK&am=${totalAmount}&cu=INR`;
     window.location.href = upiUrl;
   }
@@ -274,6 +212,7 @@ function placeOrderData(name, address, payOption, instructions, totalAmount) {
     uid: currentUser.uid,
     name: name,
     address: address,
+    phone: document.getElementById('del-phone').value || "N/A",
     instructions: instructions,
     pay: payOption,
     items: cart,
@@ -290,7 +229,6 @@ function placeOrderData(name, address, payOption, instructions, totalAmount) {
   });
 }
 
-// UI RENDERING
 function showPage(pageId) {
   document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
   document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
@@ -298,11 +236,6 @@ function showPage(pageId) {
   
   if(pageId === 'cart') renderCart();
   if(pageId === 'orders') renderOrders();
-}
-
-function toggleNotifications() {
-  const box = document.getElementById('notif-box');
-  if (box) box.style.display = box.style.display === 'block' ? 'none' : 'block';
 }
 
 function renderCategories() {
@@ -326,6 +259,11 @@ function renderMenu() {
   if (!container) return;
   let filtered = currentCat === "All" ? menu : menu.filter(m => m.cat === currentCat);
   
+  if (filtered.length === 0) {
+    container.innerHTML = `<p style="grid-column:1/-1; text-align:center; padding:20px; color:#888;">No items currently in ${currentCat}. You can add items from Admin Panel!</p>`;
+    return;
+  }
+
   container.innerHTML = filtered.map(item => `
     <div class="food-card" onclick="openModal(${item.id})">
       <span class="wishlist-icon" onclick="event.stopPropagation(); toggleWishlist(${item.id})">${wishlist.includes(item.id) ? '❤️' : '🤍'}</span>
@@ -334,23 +272,6 @@ function renderMenu() {
         <div class="food-title">${item.name}</div>
         <div class="food-price">₹${item.price} ${item.isOut ? '<span style="color:red; font-size:0.7rem;">(Out of Stock)</span>' : ''}</div>
         <button class="btn-primary" ${item.isOut ? 'disabled style="background:#ccc;"' : ''} onclick="event.stopPropagation(); addToCart(${item.id})">ADD +</button>
-      </div>
-    </div>
-  `).join('');
-}
-
-function filterMenu() {
-  const query = document.getElementById('search-input').value.toLowerCase();
-  const container = document.getElementById('menu-container');
-  if (!container) return;
-  const filtered = menu.filter(m => m.name.toLowerCase().includes(query));
-  container.innerHTML = filtered.map(item => `
-    <div class="food-card" onclick="openModal(${item.id})">
-      <img src="${item.img}" class="food-img">
-      <div class="food-info">
-        <div class="food-title">${item.name}</div>
-        <div class="food-price">₹${item.price}</div>
-        <button class="btn-primary" onclick="event.stopPropagation(); addToCart(${item.id})">ADD +</button>
       </div>
     </div>
   `).join('');
@@ -370,124 +291,48 @@ function updateCartCount() {
   if (countElem) countElem.innerText = cart.reduce((s, i) => s + i.qty, 0);
 }
 
-function renderCart() {
-  const container = document.getElementById('cart-items');
-  const summary = document.getElementById('bill-summary');
-  if (!container) return;
-
-  if (cart.length === 0) {
-    container.innerHTML = "<p>Your cart is empty.</p>";
-    if (summary) summary.innerHTML = "";
-    return;
-  }
-  container.innerHTML = cart.map(i => `
-    <div class="order-card" style="display:flex; justify-content:space-between; align-items:center;">
-      <div>
-        <b>${i.name}</b><br>
-        <span style="color:green; font-weight:bold;">75% OFF</span> <s style="color:#888;">₹${i.price * 2}</s> <b>₹${i.price}</b> x ${i.qty}
-      </div>
-      <div>
-        <button onclick="changeQty(${i.id}, -1)">-</button> 
-        <span style="margin:0 5px;">${i.qty}</span> 
-        <button onclick="changeQty(${i.id}, 1)">+</button>
-      </div>
-    </div>
-  `).join('');
-  
-  const subtotal = cart.reduce((s, i) => s + (i.price * i.qty), 0);
-  const deliveryFee = subtotal >= 200 ? 0 : 30;
-  if (summary) {
-    summary.innerHTML = `
-      <div>Item Subtotal: ₹${subtotal}</div>
-      <div>Delivery Fee: ${deliveryFee === 0 ? '<span style="color:green; font-weight:bold;">FREE</span>' : '₹30'}</div>
-      <div>Discount: -₹${discount}</div>
-      <div><b>Total Payable: ₹${Math.max(0, subtotal + deliveryFee - discount)}</b></div>
-    `;
-  }
-}
-
-function changeQty(id, delta) {
-  const item = cart.find(c => c.id === id);
-  if (!item) return;
-  item.qty += delta;
-  if (item.qty <= 0) cart = cart.filter(c => c.id !== id);
-  updateCartCount();
-  renderCart();
-}
-
-function renderOrders() {
-  const container = document.getElementById('my-orders-list');
-  if(!container) return;
-
-  if(!currentUser) {
-    container.innerHTML = "<p>Please login in Profile tab to see order history & live tracking.</p>";
-    return;
-  }
-  
-  database.ref('orders').on('value', (snapshot) => {
-    const data = snapshot.val();
-    let myOrders = data ? Object.values(data).filter(o => o.uid === currentUser.uid) : [];
-
-    container.innerHTML = myOrders.length === 0 ? "<p>No orders placed yet.</p>" : myOrders.map(o => {
-      const statuses = ["Pending", "Accepted", "Out for Delivery", "Delivered"];
-      const currentIdx = statuses.indexOf(o.status);
-
-      return `
-      <div class="order-card">
-        <div><b>Order ID:</b> ${o.id} | <b>Date:</b> ${o.date}</div>
-        <div><b>Items:</b> ${(o.items || []).map(i => i.name + ' x' + i.qty).join(', ')}</div>
-        <div><b>Total:</b> ₹${o.total} (${o.pay})</div>
-        
-        <div class="timeline">
-          <div class="timeline-step ${currentIdx >= 0 ? 'completed' : ''}"><div class="timeline-title">Order Placed</div></div>
-          <div class="timeline-step ${currentIdx >= 1 ? 'completed' : ''}"><div class="timeline-title">Accepted / Cooking</div></div>
-          <div class="timeline-step ${currentIdx >= 2 ? 'completed' : ''}"><div class="timeline-title">Out for Delivery</div></div>
-          <div class="timeline-step ${currentIdx >= 3 ? 'completed' : ''}"><div class="timeline-title">Delivered</div></div>
-        </div>
-
-        ${o.status === 'Pending' ? `<button class="btn-sec" style="background:red;" onclick="cancelMyOrder('${o.id}')">Cancel Order</button>` : '🔒 Order Locked'}
-      </div>
-    `}).reverse().join('');
-  });
-}
-
-function cancelMyOrder(id) {
-  if(confirm("Cancel order?")) database.ref('orders/' + id).update({ status: 'CancelledByCustomer' });
-}
-
-// ADMIN PANEL REALTIME LISTENERS & SOUND ALERT
 function renderAdmin() {
   database.ref('orders').on('value', (snap) => {
     const liveOrders = snap.val() ? Object.values(snap.val()) : [];
-
-    // SOUND ALERT FOR NEW PENDING ORDER
     const pendingOrders = liveOrders.filter(o => o.status === 'Pending');
-    if (pendingOrders.length > 0) {
-      document.getElementById('order-sound').play().catch(() => {});
-    }
 
     document.getElementById('stat-total').innerText = liveOrders.length;
     document.getElementById('stat-pending').innerText = pendingOrders.length;
     document.getElementById('stat-earning').innerText = liveOrders.filter(o => o.status === 'Delivered').reduce((s, o) => s + (o.total || 0), 0);
 
     const container = document.getElementById('admin-orders-list');
-    container.innerHTML = liveOrders.map(o => `
+    container.innerHTML = liveOrders.map(o => {
+      const isCancelled = o.status.includes('Cancelled');
+      return `
       <div class="order-card">
-        <b>${o.id}</b> - ${o.name} | Address: ${o.address}<br>
-        Items: ${(o.items || []).map(i => i.name + ' x' + i.qty).join(', ')}<br>
-        Status: <b>${o.status}</b><br>
-        <button class="btn-sec" onclick="updateStatus('${o.id}', 'Accepted')">Accept</button>
-        <button class="btn-sec" onclick="updateStatus('${o.id}', 'Out for Delivery')">Out for Delivery</button>
-        <button class="btn-sec" onclick="updateStatus('${o.id}', 'Delivered')">Delivered</button>
+        <b>ID: ${o.id}</b> | <b>User:</b> ${o.name} | <b>Phone:</b> ${o.phone || 'N/A'}<br>
+        <b>Address:</b> ${o.address}<br>
+        <b>Items:</b> ${(o.items || []).map(i => i.name + ' x' + i.qty).join(', ')}<br>
+        <b>Total Bill:</b> ₹${o.total} (${o.pay})<br>
+        Status: <b>${o.status}</b><br><br>
+        
+        ${isCancelled ? `<div class="cancelled-box">❌ ORDER CANCELLED</div>` : `
+          <button class="btn-sec" style="background:#2ed573;" onclick="updateStatus('${o.id}', 'Accepted')">Accept</button>
+          <button class="btn-sec" style="background:#00a8ff;" onclick="updateStatus('${o.id}', 'Out for Delivery')">Out for Delivery</button>
+          <button class="btn-sec" style="background:#20bf6b;" onclick="updateStatus('${o.id}', 'Delivered')">Delivered</button>
+          <button class="btn-sec" style="background:#ff4757;" onclick="updateStatus('${o.id}', 'CancelledByAdmin')">Reject</button>
+        `}
+        <button class="btn-sec" style="background:#333; margin-left:5px;" onclick="deleteOrderItem('${o.id}')">🗑️ Delete</button>
       </div>
-    `).reverse().join('');
+    `}).reverse().join('');
   });
 
   const menuContainer = document.getElementById('admin-menu-list');
   menuContainer.innerHTML = menu.map(m => `
     <div class="admin-item-row">
-      <b>${m.name}</b> - ₹${m.price}<br>
-      <button onclick="toggleStock(${m.id})" style="background:${m.isOut ? 'red' : 'green'}; color:white; border:none; padding:3px 6px; border-radius:4px;">${m.isOut ? 'Mark In-Stock' : 'Mark Out-of-Stock'}</button>
+      <div style="display:flex; align-items:center; gap:10px;">
+        <img src="${m.img}" style="width:40px; height:40px; border-radius:4px; object-fit:cover;">
+        <div><b>${m.name}</b><br><span style="color:#777;">₹${m.price} [${m.cat}]</span></div>
+      </div>
+      <div>
+        <button onclick="openEditModal(${m.id})" style="background:#00a8ff; color:white; border:none; padding:4px 8px; border-radius:4px; margin-right:4px;">✏️ Edit</button>
+        <button onclick="toggleStock(${m.id})" style="background:${m.isOut ? 'red' : 'green'}; color:white; border:none; padding:4px 8px; border-radius:4px;">${m.isOut ? 'In-Stock' : 'Out-Stock'}</button>
+      </div>
     </div>
   `).join('');
 }
@@ -503,26 +348,6 @@ function toggleStock(id) {
     renderMenu();
     renderAdmin();
   }
-}
-
-function updateAdminUPI() {
-  const newUPI = document.getElementById('admin-upi-input').value;
-  if (newUPI) {
-    currentAdminUPI = newUPI;
-    alert("Store UPI ID updated to " + newUPI);
-  }
-}
-
-function toggleStoreStatus() {
-  isStoreOpen = !isStoreOpen;
-  document.getElementById('store-status-text').innerText = isStoreOpen ? "OPEN" : "CLOSED";
-  document.getElementById('store-status-text').style.color = isStoreOpen ? "green" : "red";
-}
-
-function toggleWishlist(id) {
-  if (wishlist.includes(id)) wishlist = wishlist.filter(x => x !== id);
-  else wishlist.push(id);
-  renderMenu();
 }
 
 window.onload = function() {
