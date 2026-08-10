@@ -1,4 +1,4 @@
-// 1. FIREBASE SETUP & LOCAL PERSISTENCE
+// FIREBASE SETUP WITH LOCAL PERSISTENCE
 const firebaseConfig = {
   apiKey: "AIzaSyDDTFzD8eaxS6hsQ_W5akOWRWixyZdjkSo",
   authDomain: "kd-ka-khana-ghar-tak.firebaseapp.com",
@@ -15,11 +15,11 @@ if (!firebase.apps.length) {
 const auth = firebase.auth();
 const database = firebase.database();
 
-// Set Permanent Auth Persistence
 auth.setPersistence(firebase.auth.Auth.Persistence.LOCAL);
 
 // GLOBAL VARIABLES
 let currentUser = null;
+let selectedModalItem = null;
 let confirmationResultGlobal = null;
 let cart = [];
 let wishlist = [];
@@ -189,7 +189,7 @@ let menu = [
   { id: 113, name: "Ice Cream", price: 70, cat: "Desserts", img: "https://images.unsplash.com/photo-1567206563064-6f60f4002b57?w=200" }
 ];
 
-// AUTH STATE OBSERVER (AUTO-LOGIN PERSISTENCE)
+// AUTH OBSERVER (PERSISTENCE)
 auth.onAuthStateChanged((user) => {
   if (user) {
     currentUser = user;
@@ -204,7 +204,6 @@ auth.onAuthStateChanged((user) => {
     if (document.getElementById('display-name')) document.getElementById('display-name').innerText = name || phone || "Logged User";
     if (document.getElementById('user-avatar-img')) document.getElementById('user-avatar-img').src = photo;
 
-    // Load saved database details
     database.ref('users/' + uid).once('value', (snap) => {
       if(snap.val()) {
         const u = snap.val();
@@ -225,77 +224,56 @@ auth.onAuthStateChanged((user) => {
   }
 });
 
-// GOOGLE AUTH LOGIN
 function googleLogin() {
   const provider = new firebase.auth.GoogleAuthProvider();
   auth.signInWithPopup(provider)
-    .then((result) => {
-      alert("Google Sign-In Successful!");
-    })
-    .catch((error) => {
-      alert("Google Login Error: " + error.message);
-    });
+    .then(() => alert("Google Sign-In Successful!"))
+    .catch((error) => alert("Google Login Error: " + error.message));
 }
 
-// PHONE OTP AUTH LOGIN
 function setupRecaptcha() {
   if (!window.recaptchaVerifier) {
-    window.recaptchaVerifier = new firebase.auth.RecaptchaVerifier('recaptcha-container', {
-      'size': 'invisible'
-    });
+    window.recaptchaVerifier = new firebase.auth.RecaptchaVerifier('recaptcha-container', { 'size': 'invisible' });
   }
 }
 
 function sendOTP() {
   const phone = document.getElementById('auth-phone').value;
-  if (!phone || phone.length < 10) return alert("Enter a valid 10-digit phone number!");
+  if (!phone || phone.length < 10) return alert("Enter valid 10-digit phone number!");
 
   setupRecaptcha();
   const phoneNumber = "+91" + phone;
-  const appVerifier = window.recaptchaVerifier;
-
-  auth.signInWithPhoneNumber(phoneNumber, appVerifier)
+  auth.signInWithPhoneNumber(phoneNumber, window.recaptchaVerifier)
     .then((confirmationResult) => {
       confirmationResultGlobal = confirmationResult;
       document.getElementById('otp-box').style.display = 'block';
-      alert("OTP SMS Sent to " + phoneNumber);
+      alert("OTP Sent to " + phoneNumber);
     })
-    .catch((error) => {
-      alert("OTP Error: " + error.message);
-    });
+    .catch((error) => alert("OTP Error: " + error.message));
 }
 
 function verifyOTP() {
   const code = document.getElementById('otp-input').value;
-  if (!code || code.length < 6) return alert("Enter valid 6-digit OTP!");
+  if (!code || code.length < 6) return alert("Enter 6-digit OTP!");
 
   if (confirmationResultGlobal) {
     confirmationResultGlobal.confirm(code)
-      .then((result) => {
-        alert("Phone Verification Successful!");
-      })
-      .catch((error) => {
-        alert("Invalid OTP Code!");
-      });
+      .then(() => alert("Phone Verification Successful!"))
+      .catch(() => alert("Invalid OTP!"));
   }
 }
 
-// PROFILE CAMERA PHOTO UPLOAD
 function uploadProfileCameraPhoto(input) {
   if (input.files && input.files[0]) {
-    const file = input.files[0];
     const reader = new FileReader();
-
     reader.onload = function(e) {
       const base64Image = e.target.result;
       document.getElementById('user-avatar-img').src = base64Image;
-
       if (currentUser) {
-        database.ref('users/' + currentUser.uid).update({ photoUrl: base64Image })
-          .then(() => alert("Profile photo updated successfully!"));
+        database.ref('users/' + currentUser.uid).update({ photoUrl: base64Image });
       }
     };
-    reader.readAsDataURL(file);
+    reader.readAsDataURL(input.files[0]);
   }
 }
 
@@ -311,14 +289,14 @@ function saveProfile() {
     photoUrl: photoUrl,
     phone: currentUser.phoneNumber || ""
   }).then(() => {
-    alert("Profile Saved Successfully!");
+    alert("Profile Saved!");
     if (name) document.getElementById('display-name').innerText = name;
   });
 }
 
 function customerLogout() {
   auth.signOut().then(() => {
-    alert("Logged out successfully!");
+    alert("Logged out!");
     location.reload();
   });
 }
@@ -333,15 +311,43 @@ function deleteAccount() {
       date: new Date().toLocaleString()
     }).then(() => {
       database.ref('users/' + currentUser.uid).remove();
-      auth.currentUser.delete().then(() => {
-        alert("Account deleted.");
-        location.reload();
-      });
+      auth.currentUser.delete().then(() => location.reload());
     });
   }
 }
 
-// NAVIGATION
+// PRODUCT POPUP MODAL (SHOPSY STYLE)
+function openModal(id) {
+  const item = menu.find(m => m.id === id);
+  if (!item) return;
+  selectedModalItem = item;
+  
+  document.getElementById('modal-img').src = item.img;
+  document.getElementById('modal-title').innerText = item.name;
+  document.getElementById('modal-price').innerText = "₹" + item.price;
+  document.getElementById('product-modal').style.display = 'flex';
+}
+
+function closeModal() {
+  document.getElementById('product-modal').style.display = 'none';
+}
+
+function addToCartFromModal() {
+  if (selectedModalItem) {
+    addToCart(selectedModalItem.id);
+    closeModal();
+  }
+}
+
+function buyNowFromModal() {
+  if (selectedModalItem) {
+    addToCart(selectedModalItem.id);
+    closeModal();
+    showPage('cart');
+  }
+}
+
+// UI RENDERING
 function showPage(pageId) {
   document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
   document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
@@ -356,7 +362,6 @@ function toggleNotifications() {
   if (box) box.style.display = box.style.display === 'block' ? 'none' : 'block';
 }
 
-// UI RENDERING
 function renderCategories() {
   const categories = ["All", "Birthday Cakes", "Breads & Naan", "Dal & Gravy", "Main Course", "Pasta", "Breakfast & Snacks", "Tea & Coffee", "Chowmein & Rolls", "Fried Rice", "Momos", "Starters & Tandoor", "Juices & Drinks", "Desserts"];
   const bar = document.getElementById('category-bar');
@@ -379,38 +384,35 @@ function renderMenu() {
   let filtered = currentCat === "All" ? menu : menu.filter(m => m.cat === currentCat);
   
   container.innerHTML = filtered.map(item => `
-    <div class="food-card">
-      <span class="wishlist-icon" onclick="toggleWishlist(${item.id})">${wishlist.includes(item.id) ? '❤️' : '🤍'}</span>
+    <div class="food-card" onclick="openModal(${item.id})">
+      <span class="wishlist-icon" onclick="event.stopPropagation(); toggleWishlist(${item.id})">${wishlist.includes(item.id) ? '❤️' : '🤍'}</span>
       <img src="${item.img}" class="food-img">
       <div class="food-info">
         <div class="food-title">${item.name}</div>
         <div class="food-price">₹${item.price}</div>
-        <button class="btn-primary" onclick="addToCart(${item.id})">ADD +</button>
+        <button class="btn-primary" onclick="event.stopPropagation(); addToCart(${item.id})">ADD +</button>
       </div>
     </div>
   `).join('');
 }
 
 function filterMenu() {
-  const inputElem = document.getElementById('search-input');
-  if (!inputElem) return;
-  const query = inputElem.value.toLowerCase();
+  const query = document.getElementById('search-input').value.toLowerCase();
   const container = document.getElementById('menu-container');
   if (!container) return;
   const filtered = menu.filter(m => m.name.toLowerCase().includes(query));
   container.innerHTML = filtered.map(item => `
-    <div class="food-card">
+    <div class="food-card" onclick="openModal(${item.id})">
       <img src="${item.img}" class="food-img">
       <div class="food-info">
         <div class="food-title">${item.name}</div>
         <div class="food-price">₹${item.price}</div>
-        <button class="btn-primary" onclick="addToCart(${item.id})">ADD +</button>
+        <button class="btn-primary" onclick="event.stopPropagation(); addToCart(${item.id})">ADD +</button>
       </div>
     </div>
   `).join('');
 }
 
-// CART LOGIC
 function addToCart(id) {
   const item = menu.find(m => m.id === id);
   if (!item) return;
@@ -418,14 +420,11 @@ function addToCart(id) {
   if (exist) exist.qty++;
   else cart.push({ ...item, qty: 1 });
   updateCartCount();
-  alert(item.name + " added to cart!");
 }
 
 function updateCartCount() {
   const countElem = document.getElementById('cart-count');
-  if (countElem) {
-    countElem.innerText = cart.reduce((s, i) => s + i.qty, 0);
-  }
+  if (countElem) countElem.innerText = cart.reduce((s, i) => s + i.qty, 0);
 }
 
 function renderCart() {
@@ -468,21 +467,15 @@ function changeQty(id, delta) {
   renderCart();
 }
 
-// PLACE ORDER & TIMELINE TRACKING
+// PLACE ORDER & TIMELINE LIVE TRACKING
 function placeOrder() {
   if(!currentUser) return alert("Please Login in Profile tab first!");
   
-  const nameInp = document.getElementById('del-name');
-  const addressInp = document.getElementById('del-address');
-  const payInp = document.getElementById('payment-mode');
+  const name = document.getElementById('del-name').value;
+  const address = document.getElementById('del-address').value;
+  const pay = document.getElementById('payment-mode').value;
 
-  if (!nameInp || !addressInp) return;
-
-  const name = nameInp.value;
-  const address = addressInp.value;
-  const pay = payInp ? payInp.value : "COD";
-
-  if (!name || !address) return alert("Please fill all delivery details!");
+  if (!name || !address) return alert("Please fill delivery details!");
   if (cart.length === 0) return alert("Cart is empty!");
 
   const orderId = "ORD" + Date.now().toString().slice(-5);
@@ -501,7 +494,7 @@ function placeOrder() {
   database.ref('orders/' + orderId).set(newOrder).then(() => {
     cart = [];
     updateCartCount();
-    alert("Order Placed Successfully! Tracking ID: " + orderId);
+    alert("Order Placed Successfully!");
     showPage('orders');
   });
 }
@@ -576,7 +569,7 @@ function renderOrders() {
 }
 
 function cancelMyOrder(id) {
-  if(confirm("Are you sure you want to cancel this order?")) {
+  if(confirm("Cancel this order?")) {
     database.ref('orders/' + id).update({ status: 'CancelledByCustomer' });
   }
 }
@@ -586,7 +579,7 @@ function reorder(id) {
     if(snap.val() && snap.val().items) {
       cart = [...snap.val().items];
       updateCartCount();
-      alert("Items added to cart from past order!");
+      alert("Items added to cart!");
       showPage('cart');
     }
   });
@@ -595,29 +588,22 @@ function reorder(id) {
 // ADMIN DASHBOARD
 function loginAdmin() {
   const passInp = document.getElementById('admin-pass');
-  if (!passInp) return;
-  
-  if (passInp.value === 'K.d@12345') {
+  if (passInp && passInp.value === 'K.d@12345') {
     document.getElementById('admin-panel').style.display = 'block';
     alert("Welcome Admin!");
     renderAdmin();
   } else {
-    alert("Access Denied! Invalid Admin Password.");
+    alert("Invalid Admin Password!");
   }
 }
 
 function renderAdmin() {
   database.ref('orders').on('value', (snap) => {
-    const ordersData = snap.val();
-    const liveOrders = ordersData ? Object.values(ordersData) : [];
+    const liveOrders = snap.val() ? Object.values(snap.val()) : [];
 
-    const totalElem = document.getElementById('stat-total');
-    const pendingElem = document.getElementById('stat-pending');
-    const earningElem = document.getElementById('stat-earning');
-
-    if (totalElem) totalElem.innerText = liveOrders.length;
-    if (pendingElem) pendingElem.innerText = liveOrders.filter(o => o.status === 'Pending').length;
-    if (earningElem) earningElem.innerText = liveOrders.filter(o => o.status === 'Delivered').reduce((s, o) => s + (o.total || 0), 0);
+    if (document.getElementById('stat-total')) document.getElementById('stat-total').innerText = liveOrders.length;
+    if (document.getElementById('stat-pending')) document.getElementById('stat-pending').innerText = liveOrders.filter(o => o.status === 'Pending').length;
+    if (document.getElementById('stat-earning')) document.getElementById('stat-earning').innerText = liveOrders.filter(o => o.status === 'Delivered').reduce((s, o) => s + (o.total || 0), 0);
 
     const container = document.getElementById('admin-orders-list');
     if (container) {
@@ -637,8 +623,7 @@ function renderAdmin() {
   });
 
   database.ref('deleted_accounts').on('value', (snap) => {
-    const logsData = snap.val();
-    const logs = logsData ? Object.values(logsData) : [];
+    const logs = snap.val() ? Object.values(snap.val()) : [];
     const container = document.getElementById('admin-delete-logs');
     if(container) {
       container.innerHTML = logs.length === 0 ? "<p>No deleted accounts.</p>" : logs.map(l => `
@@ -674,25 +659,17 @@ function updateStatus(id, st) {
 }
 
 function adminAddItem() {
-  const nameInp = document.getElementById('add-item-name');
-  const priceInp = document.getElementById('add-item-price');
-  const catInp = document.getElementById('add-item-cat');
-  const imgInp = document.getElementById('add-item-img');
-
-  if (!nameInp || !priceInp || !catInp) return;
-
-  const name = nameInp.value;
-  const price = Number(priceInp.value);
-  const cat = catInp.value;
-  const img = (imgInp && imgInp.value) ? imgInp.value : "https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=200";
+  const name = document.getElementById('add-item-name').value;
+  const price = Number(document.getElementById('add-item-price').value);
+  const cat = document.getElementById('add-item-cat').value;
+  const img = document.getElementById('add-item-img').value || "https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=200";
 
   if (!name || !price) return alert("Fill item name & price!");
 
   menu.push({ id: Date.now(), name, price, cat, img });
-  alert("New item added to live menu!");
+  alert("Item added!");
   renderMenu();
   renderAdmin();
-  nameInp.value = ""; priceInp.value = ""; if(imgInp) imgInp.value = "";
 }
 
 function adminDeleteItem(id) {
@@ -710,7 +687,7 @@ function adminEditItem(id) {
   if (item && priceInp) {
     item.price = Number(priceInp.value);
     if(imgInp && imgInp.value) item.img = imgInp.value;
-    alert("Price and Image updated for " + item.name + "!");
+    alert("Updated!");
     renderMenu();
     renderAdmin();
   }
@@ -718,36 +695,28 @@ function adminEditItem(id) {
 
 function adminUpdateBanner() {
   const textInp = document.getElementById('new-banner-text');
-  if (!textInp || !textInp.value) return alert("Enter banner text!");
+  if (!textInp || !textInp.value) return;
   liveBanners.push("🔥 " + textInp.value);
-  const bannerElem = document.getElementById('home-banner');
-  if (bannerElem) bannerElem.innerText = "🔥 " + textInp.value;
-  alert("New Banner Added to Slideshow!");
+  document.getElementById('home-banner').innerText = "🔥 " + textInp.value;
+  alert("Banner Updated!");
   textInp.value = "";
 }
 
 function adminAssignVIP() {
   const phoneInp = document.getElementById('vip-user-phone');
-  if (!phoneInp || !phoneInp.value) return alert("Enter customer phone number!");
+  if (!phoneInp || !phoneInp.value) return;
   database.ref('users/' + phoneInp.value).update({ isVIP: true })
-    .then(() => alert("Customer " + phoneInp.value + " is now a 👑 VIP Member!"));
+    .then(() => alert("Customer marked as 👑 VIP!"));
   phoneInp.value = "";
 }
 
 function adminCreateCoupon() {
-  const codeInp = document.getElementById('new-coupon-code');
-  const discInp = document.getElementById('new-coupon-discount');
-  if (!codeInp || !discInp) return;
-
-  const code = codeInp.value.toUpperCase();
-  const disc = Number(discInp.value);
-  if (!code || !disc) return alert("Enter valid code and discount!");
+  const code = document.getElementById('new-coupon-code').value.toUpperCase();
+  const disc = Number(document.getElementById('new-coupon-discount').value);
+  if (!code || !disc) return;
   
   database.ref('coupons/' + code).set({ discount: disc })
-    .then(() => alert("Coupon " + code + " created for ₹" + disc + " OFF!"));
-  
-  codeInp.value = "";
-  discInp.value = "";
+    .then(() => alert("Coupon " + code + " created!"));
 }
 
 function toggleWishlist(id) {
@@ -757,27 +726,16 @@ function toggleWishlist(id) {
 }
 
 function applyCoupon() {
-  const codeInp = document.getElementById('coupon-code');
-  if (!codeInp) return;
-  const code = codeInp.value.toUpperCase();
+  const code = document.getElementById('coupon-code').value.toUpperCase();
   if (code === 'FIRST30') {
     discount = 30;
     alert("Coupon Applied! ₹30 OFF");
   } else {
-    alert("Invalid Coupon Code!");
+    alert("Invalid Coupon!");
   }
   renderCart();
 }
 
-function useSavedAddress() {
-  const dropdown = document.getElementById('saved-address-dropdown');
-  const addressBox = document.getElementById('del-address');
-  if (dropdown && addressBox && dropdown.value) {
-    addressBox.value = dropdown.value;
-  }
-}
-
-// INITIAL LOAD
 window.onload = function() {
   renderCategories();
   renderMenu();
