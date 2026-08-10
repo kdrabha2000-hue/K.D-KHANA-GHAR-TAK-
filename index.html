@@ -56,10 +56,10 @@
       <div class="menu-grid" id="menu-container"></div>
     </div>
 
-    <!-- WISHLIST PAGE -->
+    <!-- WISHLIST PAGE (FIXED) -->
     <div id="wishlist" class="page">
       <h2>❤️ My Wishlist</h2>
-      <div id="wishlist-container" class="menu-grid"></div>
+      <div id="wishlist-container" class="menu-grid" style="margin-top:15px;"></div>
     </div>
 
     <!-- CART PAGE -->
@@ -99,28 +99,15 @@
       </div>
     </div>
 
-    <!-- ORDERS PAGE -->
+    <!-- ORDERS PAGE (FIXED REALTIME TRACKING) -->
     <div id="orders" class="page">
       <h2>📦 My Orders & Live Tracking</h2>
-      <div id="my-orders-list">
-        <p>Please login in Profile tab to see order history & live tracking.</p>
-      </div>
+      <div id="my-orders-list" style="margin-top:15px;"></div>
     </div>
 
-    <!-- PROFILE PAGE -->
+    <!-- PROFILE / ACCOUNT PAGE (FLIPKART STYLE UI) -->
     <div id="profile" class="page">
-      <div class="profile-header" style="display:flex; align-items:center; gap:15px; margin-bottom:15px; background:white; padding:15px; border-radius:8px;">
-        <div class="avatar-container" style="position:relative;">
-          <img id="user-avatar-img" src="https://cdn-icons-png.flaticon.com/512/3135/3135715.png" style="width:70px; height:70px; border-radius:50%; object-fit:cover; border:2px solid var(--accent-red);">
-          <label for="camera-file-input" style="position:absolute; bottom:0; right:0; background:var(--accent-red); color:white; padding:4px 7px; border-radius:50%; font-size:0.7rem; cursor:pointer;"><i class="fas fa-camera"></i></label>
-          <input type="file" id="camera-file-input" accept="image/*" capture="user" style="display:none;" onchange="uploadProfileCameraPhoto(this)">
-        </div>
-        <div>
-          <h2 id="display-name">Guest User</h2>
-          <div id="user-coins" style="font-size:0.85rem; color:#f39c12;">🪙 SuperCoins Balance: <span id="coins-count">0</span></div>
-        </div>
-      </div>
-
+      
       <!-- LOGIN SCREEN -->
       <div class="checkout-form" id="auth-section">
         <h3>Login / Sign Up</h3>
@@ -128,7 +115,7 @@
         <div style="text-align:center; color:#777; margin-bottom:15px;">--- OR LOGIN WITH PHONE ---</div>
         
         <input type="number" id="auth-phone" placeholder="Enter 10-Digit Phone Number">
-        <button class="btn-sec" style="background:#2ed573; width:100%; margin-top:5px;" onclick="loginWithPhoneDirect()">Login with Phone Number 🚀</button>
+        <button class="btn-sec" style="background:#2ed573; width:100%; margin-top:5px; font-weight:bold; padding:10px;" onclick="loginWithPhoneDirect()">Login with Phone Number 🚀</button>
 
         <div style="text-align:center; margin-top:20px; border-top:1px dashed #ccc; padding-top:10px;">
           <span style="font-size:0.8rem; color:#888; cursor:pointer;" onclick="toggleAdminPassBox()">🔒 Restaurant Owner Portal</span>
@@ -139,24 +126,67 @@
         </div>
       </div>
 
-      <!-- USER DETAILS (PHONE NUMBER EDITABLE BUT CANNOT BE DELETED / BLANK) -->
-      <div class="checkout-form" id="user-details-section" style="display:none;">
-        <h3>My Account Details</h3>
-        <label style="font-size:0.8rem; color:#666;">Phone Number (Editable, cannot be blank):</label>
-        <input type="number" id="user-phone-input" placeholder="Phone Number">
+      <!-- LOGGED-IN FLIPKART STYLE DASHBOARD -->
+      <div id="user-details-section" style="display:none;">
+        <h3 style="margin-bottom:12px; color:#555;">My Account</h3>
         
-        <label style="font-size:0.8rem; color:#666; margin-top:5px; display:block;">Full Name:</label>
-        <input type="text" id="user-name-input" placeholder="Your Full Name">
-        
-        <label style="font-size:0.8rem; color:#666; margin-top:5px; display:block;">Delivery Address:</label>
-        <input type="text" id="user-address-input" placeholder="Save Delivery Address">
-        
-        <button class="btn-sec" style="background:#2ed573; margin-top:10px;" onclick="saveProfile()">Save Details</button>
-        <button class="btn-sec" style="background:#00a8ff; margin-top:8px;" onclick="customerLogout()">Logout Account</button>
-        <button class="btn-sec" style="background:#ff4757; margin-top:8px;" onclick="deleteAccount()">Delete Account</button>
+        <!-- HEADER USER ROW -->
+        <div class="fk-profile-card">
+          <div class="avatar-container" style="position:relative;">
+            <img id="user-avatar-img" src="https://cdn-icons-png.flaticon.com/512/3135/3135715.png" class="fk-avatar">
+            <label for="camera-file-input" class="camera-btn"><i class="fas fa-camera"></i></label>
+            <input type="file" id="camera-file-input" accept="image/*" style="display:none;" onchange="uploadProfileCameraPhoto(this)">
+          </div>
+          <div style="flex:1;">
+            <div style="display:flex; justify-content:space-between; align-items:center;">
+              <h2 id="display-name" style="font-size:1.2rem; font-weight:bold;">Hi Customer</h2>
+              <div class="fk-coins">🪙 <span id="coins-count">14</span></div>
+            </div>
+            <div id="display-phone" style="font-size:0.85rem; color:#666; margin-top:2px;">+91-XXXXXXXXXX</div>
+            <div id="display-address" style="font-size:0.8rem; color:#888; margin-top:4px;"><i class="fas fa-map-marker-alt" style="color:var(--accent-red);"></i> <span id="saved-addr-text">No Address Saved</span></div>
+          </div>
+        </div>
+
+        <!-- FLIPKART 4 QUICK ACTION BUTTONS -->
+        <div class="fk-grid">
+          <div class="fk-grid-card" onclick="showPage('orders')">
+            <i class="fas fa-box fk-icon" style="color:#fb641b;"></i>
+            <span>Orders</span>
+          </div>
+          <div class="fk-grid-card" onclick="showPage('wishlist')">
+            <i class="fas fa-heart fk-icon" style="color:var(--accent-red);"></i>
+            <span>Saved Items</span>
+          </div>
+          <div class="fk-grid-card" onclick="alert('Language: English / Hindi')">
+            <i class="fas fa-language fk-icon" style="color:#2ed573;"></i>
+            <span>Language</span>
+          </div>
+          <div class="fk-grid-card" onclick="window.location.href='https://wa.me/916000026478'">
+            <i class="fas fa-headset fk-icon" style="color:#00a8ff;"></i>
+            <span>Contact Us</span>
+          </div>
+        </div>
+
+        <!-- ACCOUNT DETAILS FORM -->
+        <div class="checkout-form" style="margin-top:15px;">
+          <h4 style="margin-bottom:10px;">Edit Account Information</h4>
+          
+          <label style="font-size:0.8rem; color:#666;">Phone Number (Editable, cannot be blank):</label>
+          <input type="number" id="user-phone-input" placeholder="Phone Number">
+          
+          <label style="font-size:0.8rem; color:#666; margin-top:8px; display:block;">Full Name:</label>
+          <input type="text" id="user-name-input" placeholder="Your Full Name">
+          
+          <label style="font-size:0.8rem; color:#666; margin-top:8px; display:block;">Delivery Address:</label>
+          <input type="text" id="user-address-input" placeholder="Save Delivery Address">
+          
+          <button class="btn-sec" style="background:#2ed573; margin-top:10px; width:100%; font-weight:bold; padding:10px;" onclick="saveProfile()">Save Details</button>
+          <button class="btn-sec" style="background:#00a8ff; margin-top:8px; width:100%; font-weight:bold;" onclick="customerLogout()">Logout Account</button>
+          <button class="btn-sec" style="background:#ff4757; margin-top:8px; width:100%; font-weight:bold;" onclick="deleteAccount()">Delete Account</button>
+        </div>
       </div>
 
-      <div class="checkout-form">
+      <div class="checkout-form" style="margin-top:15px;">
         <h3>Help Center</h3>
         <a href="https://wa.me/916000026478" class="btn-sec" style="background:#25D366; text-decoration:none; display:block; text-align:center;">WhatsApp Support</a>
         <a href="tel:+916000026478" class="btn-sec" style="background:#00a8ff; text-decoration:none; display:block; text-align:center; margin-top:10px;">Call Restaurant</a>
@@ -314,7 +344,7 @@
     </div>
     <div class="nav-item" onclick="showPage('profile')">
       <i class="fas fa-user"></i>
-      <span>Profile</span>
+      <span>Account</span>
     </div>
   </nav>
 
