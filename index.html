@@ -9,6 +9,7 @@
 </head>
 <body>
 
+  <!-- HEADER -->
   <header class="header">
     <div class="header-info">
       <h1>K.D KA KHANA GHAR TAK</h1>
@@ -27,8 +28,15 @@
     </div>
   </header>
 
+  <div class="notif-box" id="notif-box">
+    <h4>Notifications</h4>
+    <p>🚀 Welcome to K.D Restaurant!</p>
+    <p>🥤 Get refreshing Cold Drinks with your meals!</p>
+  </div>
+
   <main class="main-container">
 
+    <!-- HOME PAGE -->
     <div id="home" class="page active">
       <div class="top-announcement-bar" id="top-announcement">
         🚀 Welcome to K.D Restaurant! <br> 🥤 Get refreshing Cold Drinks with your meals!
@@ -50,11 +58,13 @@
       <div class="menu-grid" id="menu-container"></div>
     </div>
 
+    <!-- WISHLIST PAGE -->
     <div id="wishlist" class="page">
       <h2>❤️ My Wishlist</h2>
       <div id="wishlist-container" class="menu-grid" style="margin-top:15px;"></div>
     </div>
 
+    <!-- CART PAGE -->
     <div id="cart" class="page">
       <h2>🛒 My Cart</h2>
       <div id="cart-items"></div>
@@ -76,18 +86,22 @@
       </div>
     </div>
 
+    <!-- LIVE TRACKING & ORDERS PAGE -->
     <div id="orders" class="page">
       <h2>📦 My Orders & Live Tracking</h2>
       <div id="my-orders-list" style="margin-top:15px;"></div>
     </div>
 
+    <!-- ACCOUNT / PROFILE PAGE -->
     <div id="profile" class="page">
       
+      <!-- LOGIN SCREEN -->
       <div class="checkout-form" id="auth-section">
         <h3>Login / Sign Up</h3>
         <input type="number" id="auth-phone" placeholder="Enter 10-Digit Phone Number">
         <button class="btn-sec" style="background:#2ed573; width:100%; margin-top:5px; font-weight:bold; padding:10px;" onclick="loginWithPhoneDirect()">Login with Phone Number 🚀</button>
 
+        <!-- RESTAURANT OWNER LOGIN -->
         <div style="margin-top:20px; border-top:2px dashed #ff3f6c; padding-top:15px; background:#fff5f5; padding:12px; border-radius:8px; text-align:center;">
           <h4 style="color:#d63031; margin-bottom:8px;">🔒 Restaurant Owner Login</h4>
           <input type="password" id="admin-pass" placeholder="Enter Secret Password" style="background:#fff; border:1px solid #ccc; width:100%; padding:10px; border-radius:6px; margin-bottom:8px;">
@@ -95,6 +109,7 @@
         </div>
       </div>
 
+      <!-- LOGGED-IN CUSTOMER DASHBOARD -->
       <div id="user-details-section" style="display:none;">
         <h3 style="margin-bottom:12px; color:#555;">My Account</h3>
         
@@ -135,6 +150,7 @@
         </div>
       </div>
 
+      <!-- OWNER DASHBOARD PANEL -->
       <div id="admin-panel" style="display:none; margin-top:20px; border-top:2px solid #ccc; padding-top:15px;">
         <h3 style="color:var(--accent-red); margin-bottom:10px;">👑 Admin Dashboard</h3>
         
@@ -210,6 +226,7 @@
     </div>
   </main>
 
+  <!-- LANGUAGE MODAL -->
   <div id="lang-modal" class="modal">
     <div class="modal-content">
       <span class="close-btn" onclick="closeLangModal()">&times;</span>
@@ -222,6 +239,7 @@
     </div>
   </div>
 
+  <!-- REWARD MODAL -->
   <div id="reward-modal" class="modal">
     <div class="modal-content" style="text-align:center;">
       <span class="close-btn" onclick="closeRewardModal()">&times;</span>
@@ -232,6 +250,7 @@
     </div>
   </div>
 
+  <!-- PRODUCT POPUP MODAL -->
   <div id="product-modal" class="modal">
     <div class="modal-content">
       <span class="close-btn" onclick="closeModal()">&times;</span>
@@ -247,6 +266,7 @@
     </div>
   </div>
 
+  <!-- BOTTOM NAVIGATION -->
   <nav class="bottom-nav">
     <div class="nav-item active" onclick="showPage('home')"><i class="fas fa-home"></i><span>Home</span></div>
     <div class="nav-item" onclick="showPage('wishlist')"><i class="fas fa-heart"></i><span>Wishlist</span></div>
