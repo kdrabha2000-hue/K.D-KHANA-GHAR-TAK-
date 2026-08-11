@@ -13,7 +13,7 @@
   <header class="header">
     <div class="header-info">
       <h1>K.D KA KHANA GHAR TAK</h1>
-      <p class="subtitle">S&A Family Restaurant</p>
+      <p class="subtitle" id="sub-title-text">S&A Family Restaurant</p>
       <div class="location-bar">
         <i class="fas fa-map-marker-alt" style="color:var(--accent-red);"></i> U.T. Road, Udalguri | <i class="far fa-clock"></i> 8:00 AM - 9:30 PM
       </div>
@@ -60,41 +60,41 @@
 
     <!-- WISHLIST PAGE -->
     <div id="wishlist" class="page">
-      <h2>❤️ My Wishlist</h2>
+      <h2 id="wishlist-heading">❤️ My Wishlist</h2>
       <div id="wishlist-container" class="menu-grid" style="margin-top:15px;"></div>
     </div>
 
     <!-- CART PAGE -->
     <div id="cart" class="page">
-      <h2>🛒 My Cart</h2>
+      <h2 id="cart-heading">🛒 My Cart</h2>
       <div id="cart-items"></div>
 
       <div class="checkout-form">
-        <h3>Delivery Details</h3>
+        <h3 id="del-details-heading">Delivery Details</h3>
         <input type="text" id="del-name" placeholder="Full Name">
         <input type="number" id="del-phone" placeholder="Phone Number">
         <textarea id="del-address" placeholder="Complete Delivery Address"></textarea>
         <input type="text" id="del-instruction" placeholder="Order Instructions (e.g., Don't ring doorbell)">
-        
-        <h3>Select Payment Method</h3>
+
+        <h3 id="pay-method-heading">Select Payment Method</h3>
         <div class="payment-options">
           <label><input type="radio" name="pay-option" value="UPI" checked> 📱 UPI (Google Pay, PhonePe, Paytm)</label><br>
           <label><input type="radio" name="pay-option" value="COD"> 💵 Cash on Delivery (COD)</label>
         </div>
-        
-        <button class="btn-primary" style="width:100%; margin-top:15px; background:#fb641b;" onclick="proceedToPayment()">Proceed to Payment / Place Order 🚀</button>
+
+        <button class="btn-primary" id="place-order-btn" style="width:100%; margin-top:15px; background:#fb641b;" onclick="proceedToPayment()">Proceed to Payment / Place Order 🚀</button>
       </div>
     </div>
 
     <!-- LIVE TRACKING & ORDERS PAGE -->
     <div id="orders" class="page">
-      <h2>📦 My Orders & Live Tracking</h2>
+      <h2 id="orders-heading">📦 My Orders & Live Tracking</h2>
       <div id="my-orders-list" style="margin-top:15px;"></div>
     </div>
 
     <!-- ACCOUNT / PROFILE PAGE -->
     <div id="profile" class="page">
-      
+
       <!-- LOGIN SCREEN -->
       <div class="checkout-form" id="auth-section">
         <h3>Login / Sign Up</h3>
@@ -112,7 +112,7 @@
       <!-- LOGGED-IN CUSTOMER DASHBOARD -->
       <div id="user-details-section" style="display:none;">
         <h3 style="margin-bottom:12px; color:#555;">My Account</h3>
-        
+
         <div class="fk-profile-card">
           <div class="avatar-container" style="position:relative;">
             <img id="user-avatar-img" src="https://cdn-icons-png.flaticon.com/512/3135/3135715.png" class="fk-avatar">
@@ -143,7 +143,7 @@
           <input type="text" id="user-name-input" placeholder="Your Full Name">
           <input type="number" id="user-phone-input" placeholder="Phone Number">
           <input type="text" id="user-address-input" placeholder="Save Delivery Address">
-          
+
           <button class="btn-sec" style="background:#2ed573; margin-top:10px; width:100%; font-weight:bold; padding:10px;" onclick="saveProfile()">Save Details</button>
           <button class="btn-sec" style="background:#00a8ff; margin-top:8px; width:100%; font-weight:bold;" onclick="customerLogout()">Logout Account</button>
           <button class="btn-sec" style="background:#dc3545; margin-top:8px; width:100%; font-weight:bold;" onclick="deleteCustomerAccount()">Delete Account 🗑️</button>
@@ -153,7 +153,7 @@
       <!-- OWNER DASHBOARD PANEL -->
       <div id="admin-panel" style="display:none; margin-top:20px; border-top:2px solid #ccc; padding-top:15px;">
         <h3 style="color:var(--accent-red); margin-bottom:10px;">👑 Admin Dashboard</h3>
-        
+
         <button class="btn-primary" style="background:#00a8ff; margin-bottom:15px;" onclick="window.location.href='tel:8453270362'">📞 Call Restaurant</button>
 
         <div class="admin-stats">
@@ -258,7 +258,7 @@
       <h2 id="modal-title" style="margin-top:10px;"></h2>
       <div id="modal-price" style="font-size:1.2rem; font-weight:bold; color:var(--accent-red); margin:8px 0;"></div>
       <p id="modal-desc" style="font-size:0.85rem; color:#555; line-height:1.4;">Delicious and fresh meal prepared with finest ingredients at K.D Restaurant.</p>
-      
+
       <div style="display:flex; gap:10px; margin-top:15px;">
         <button class="btn-primary" style="background:#ff9f00;" onclick="addToCartFromModal()">ADD TO CART</button>
         <button class="btn-primary" style="background:#fb641b;" onclick="buyNowFromModal()">BUY NOW</button>
