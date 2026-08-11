@@ -18,6 +18,7 @@ let currentUser = null;
 let selectedModalItem = null;
 let cart = JSON.parse(localStorage.getItem('kd_cart')) || [];
 let wishlist = JSON.parse(localStorage.getItem('kd_wishlist')) || [];
+let userCoins = parseInt(localStorage.getItem('kd_coins')) || 14;
 let currentCat = "All";
 let isStoreOpen = true;
 let currentAdminUPI = "6000026478@okbizaxis";
@@ -40,7 +41,7 @@ let menu = [
   { id: 120, name: "Gulab Jamun (2 pcs)", price: 50, cat: "Desserts", img: "https://images.unsplash.com/photo-1541781774459-bb2af2f05b55?w=200", isOut: false }
 ];
 
-// MODAL POPUP
+// MODAL POPUPS & LANGUAGE & REWARDS
 function openModal(id) {
   const item = menu.find(m => m.id === id);
   if (!item) return;
@@ -51,19 +52,34 @@ function openModal(id) {
   document.getElementById('product-modal').style.display = 'flex';
 }
 
-function closeModal() {
-  document.getElementById('product-modal').style.display = 'none';
+function closeModal() { document.getElementById('product-modal').style.display = 'none'; }
+function addToCartFromModal() { if (selectedModalItem) addToCart(selectedModalItem.id); closeModal(); }
+function buyNowFromModal() { if (selectedModalItem) addToCart(selectedModalItem.id); closeModal(); showPage('cart'); }
+
+function openLanguageModal() { document.getElementById('lang-modal').style.display = 'flex'; }
+function closeLangModal() { document.getElementById('lang-modal').style.display = 'none'; }
+function setAppLanguage(lang) { alert("Language set to: " + lang); closeLangModal(); }
+
+function openDailyRewardModal() { document.getElementById('reward-modal').style.display = 'flex'; }
+function closeRewardModal() { document.getElementById('reward-modal').style.display = 'none'; }
+function claimDailyCoins() {
+  userCoins += 2;
+  localStorage.setItem('kd_coins', userCoins);
+  document.getElementById('coins-count').innerText = userCoins;
+  alert("🎉 2 SuperCoins added to your wallet!");
+  closeRewardModal();
 }
 
-function addToCartFromModal() {
-  if (selectedModalItem) addToCart(selectedModalItem.id);
-  closeModal();
-}
-
-function buyNowFromModal() {
-  if (selectedModalItem) addToCart(selectedModalItem.id);
-  closeModal();
-  showPage('cart');
+function uploadProfileCameraPhoto(input) {
+  if (input.files && input.files[0]) {
+    const reader = new FileReader();
+    reader.onload = function(e) {
+      document.getElementById('user-avatar-img').src = e.target.result;
+      if (currentUser) database.ref('users/' + currentUser.uid).update({ photo: e.target.result });
+      alert("Profile Photo Updated!");
+    };
+    reader.readAsDataURL(input.files[0]);
+  }
 }
 
 // ADMIN FUNCTIONS
@@ -82,18 +98,12 @@ function loginAdmin() {
 
 function updateAdminUPI() {
   const upi = document.getElementById('admin-upi-input').value;
-  if (upi) {
-    currentAdminUPI = upi;
-    alert("UPI ID Saved: " + upi);
-  }
+  if (upi) { currentAdminUPI = upi; alert("UPI ID Saved: " + upi); }
 }
 
 function adminUpdateBanner() {
   const txt = document.getElementById('new-banner-text').value;
-  if (txt) {
-    specialOffers.push("🔥 OFFER: " + txt);
-    alert("Banner Offer Added!");
-  }
+  if (txt) { specialOffers.push("🔥 OFFER: " + txt); alert("Banner Offer Added!"); }
 }
 
 function adminAssignVIP() {
@@ -172,9 +182,7 @@ function openEditItemModal(id) {
   document.getElementById('edit-item-modal').style.display = 'flex';
 }
 
-function closeEditModal() {
-  document.getElementById('edit-item-modal').style.display = 'none';
-}
+function closeEditModal() { document.getElementById('edit-item-modal').style.display = 'none'; }
 
 function saveItemEdits() {
   const id = parseInt(document.getElementById('edit-item-id').value);
@@ -262,9 +270,7 @@ function clearAllOrders() {
   }
 }
 
-function updateStatus(id, st) {
-  database.ref('orders/' + id).update({ status: st });
-}
+function updateStatus(id, st) { database.ref('orders/' + id).update({ status: st }); }
 
 function syncStorage() {
   localStorage.setItem('kd_cart', JSON.stringify(cart));
@@ -314,9 +320,7 @@ function startOfferBannerRotation() {
 }
 
 function startMenuRotation() {
-  setInterval(() => {
-    if (!isSearching) renderMenu();
-  }, 150000); // 2.5 Minutes
+  setInterval(() => { if (!isSearching) renderMenu(); }, 150000); // 2.5 Minutes
 }
 
 function filterMenu() {
@@ -346,6 +350,7 @@ function loadUserSession(uid, phone, name, photo, address, dbWish) {
   if (document.getElementById('user-name-input')) document.getElementById('user-name-input').value = name || "";
   if (document.getElementById('user-address-input')) document.getElementById('user-address-input').value = address || "";
   if (document.getElementById('saved-addr-text')) document.getElementById('saved-addr-text').innerText = address || "No Address Saved";
+  if (photo && document.getElementById('user-avatar-img')) document.getElementById('user-avatar-img').src = photo;
 
   renderOrders(); renderMenu(); renderWishlist();
 }
@@ -574,6 +579,13 @@ function renderOrders() {
 
 function cancelMyOrder(id) {
   if(confirm("Cancel order?")) database.ref('orders/' + id).update({ status: 'CancelledByCustomer' });
+}
+
+function deleteCustomerAccount() {
+  if(confirm("Permanently delete account?")) {
+    if(currentUser) database.ref('users/' + currentUser.uid).remove();
+    customerLogout();
+  }
 }
 
 function showPage(pageId) {
