@@ -80,6 +80,33 @@ function loginAdmin() {
   }
 }
 
+function updateAdminUPI() {
+  const upi = document.getElementById('admin-upi-input').value;
+  if (upi) {
+    currentAdminUPI = upi;
+    alert("UPI ID Saved: " + upi);
+  }
+}
+
+function adminUpdateBanner() {
+  const txt = document.getElementById('new-banner-text').value;
+  if (txt) {
+    specialOffers.push("🔥 OFFER: " + txt);
+    alert("Banner Offer Added!");
+  }
+}
+
+function adminAssignVIP() {
+  const phone = document.getElementById('vip-user-phone').value;
+  if (phone) alert("Phone number " + phone + " is now VIP Member!");
+}
+
+function adminCreateCoupon() {
+  const code = document.getElementById('new-coupon-code').value;
+  const discount = document.getElementById('new-coupon-discount').value;
+  if (code && discount) alert("Promo Code " + code + " (₹" + discount + " OFF) Created!");
+}
+
 function toggleStoreStatus() {
   isStoreOpen = !isStoreOpen;
   const statusElem = document.getElementById('store-status-text');
@@ -116,7 +143,6 @@ function adminAddItem() {
   }
 }
 
-// RENDER & EDIT MENU ITEMS
 function renderAdminMenuEditor() {
   const container = document.getElementById('admin-menu-edit-list');
   if (!container) return;
@@ -197,7 +223,6 @@ function deleteMenuItem(id) {
   }
 }
 
-// ORDER MANAGEMENT
 function renderAdminOrders() {
   database.ref('orders').on('value', (snap) => {
     const liveOrders = snap.val() ? Object.values(snap.val()) : [];
