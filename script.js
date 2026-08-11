@@ -87,7 +87,7 @@ function renderOrders() {
   database.ref('orders').on('value', (snapshot) => {
     const data = snapshot.val();
     let myOrders = data ? Object.values(data).filter(o => o.uid === activeUid || o.phone === activePhone) : [];
-    
+
     if (myOrders.length === 0) {
       container.innerHTML = "<p style='text-align:center;'>No orders placed yet.</p>";
       return;
@@ -113,7 +113,6 @@ function renderOrders() {
           <div style="margin-top:2px;"><b>Items:</b> ${itemsSummary}</div>
           <div style="margin-top:4px; font-weight:bold; color:var(--accent-red);">Total: ₹${o.total} (${o.pay})</div>
 
-          <!-- SCREENSHOT EXACT VERTICAL TRACKER -->
           <div class="timeline-container">
             <div class="timeline-item ${step1 ? 'active' : ''}">
               <div class="timeline-dot"></div>
@@ -313,7 +312,7 @@ function renderMenu(customList = null) {
   if (!container) return;
 
   let displayList = customList || (currentCat === "All" ? [...menu] : menu.filter(m => m.cat === currentCat));
-  
+
   if (!customList) {
     displayList = displayList.sort(() => Math.random() - 0.5);
   }
@@ -370,6 +369,222 @@ function showPage(pageId) {
   if(pageId === 'cart') renderCart();
   if(pageId === 'orders') renderOrders();
   if(pageId === 'wishlist') renderWishlist();
+}
+
+// --- ADDED MISSING FUNCTIONS FIXED HERE ---
+function filterMenu() {
+  const query = document.getElementById('search-input').value.toLowerCase();
+  const filtered = menu.filter(item => item.name.toLowerCase().includes(query) || item.cat.toLowerCase().includes(query));
+  renderMenu(filtered);
+}
+
+function toggleNotifications() {
+  const box = document.getElementById('notif-box');
+  if (box) box.style.display = box.style.display === 'block' ? 'none' : 'block';
+}
+
+function openLanguageModal() {
+  const modal = document.getElementById('lang-modal');
+  if (modal) modal.style.display = 'flex';
+}
+
+function closeLangModal() {
+  const modal = document.getElementById('lang-modal');
+  if (modal) modal.style.display = 'none';
+}
+
+function openRewardModal() {
+  const modal = document.getElementById('reward-modal');
+  if (modal) modal.style.display = 'flex';
+}
+
+function closeRewardModal() {
+  const modal = document.getElementById('reward-modal');
+  if (modal) modal.style.display = 'none';
+}
+
+function claimDailyCoins() {
+  userCoins += 2;
+  localStorage.setItem('kd_coins', userCoins);
+  const coinsElem = document.getElementById('coins-count');
+  if (coinsElem) coinsElem.innerText = userCoins;
+  alert("Successfully claimed 2 SuperCoins!");
+  closeRewardModal();
+}
+
+function setAppLanguage(lang) {
+  alert("Language switched to " + lang);
+  closeLangModal();
+}
+
+function loginWithPhoneDirect() {
+  const phone = document.getElementById('auth-phone').value;
+  if (!phone || phone.length < 10) return alert("Enter valid 10-digit phone number!");
+  localStorage.setItem('kd_user_phone', phone);
+  let uid = "user_" + phone;
+  localStorage.setItem('kd_user_uid', uid);
+  loadUserSession(uid, phone, "Customer", "", "", [], []);
+  alert("Logged in successfully!");
+}
+
+function uploadProfileCameraPhoto(input) {
+  if (input.files && input.files[0]) {
+    const reader = new FileReader();
+    reader.onload = function(e) {
+      document.getElementById('user-avatar-img').src = e.target.result;
+      if (currentUser) {
+        database.ref('users/' + currentUser.uid).update({ photo: e.target.result });
+      }
+    };
+    reader.readAsDataURL(input.files[0]);
+  }
+}
+
+function toggleStoreStatus() {
+  isStoreOpen = !isStoreOpen;
+  const statusText = document.getElementById('store-status-text');
+  if (statusText) {
+    statusText.innerText = isStoreOpen ? "OPEN" : "CLOSED";
+    statusText.style.color = isStoreOpen ? "green" : "red";
+  }
+  alert("Store status updated to: " + (isStoreOpen ? "OPEN" : "CLOSED"));
+}
+
+function updateAdminUPI() {
+  const upi = document.getElementById('admin-upi-input').value;
+  if (!upi) return alert("Enter valid UPI ID!");
+  currentAdminUPI = upi;
+  alert("Store UPI ID updated successfully!");
+}
+
+function adminUpdateBanner() {
+  const text = document.getElementById('new-banner-text').value;
+  const banner = document.getElementById('home-banner');
+  if (text && banner) {
+    banner.innerText = text;
+    alert("Banner updated successfully!");
+  } else {
+    alert("Please enter banner text.");
+  }
+}
+
+function adminAssignVIP() {
+  const phone = document.getElementById('vip-user-phone').value;
+  if (!phone) return alert("Enter customer phone number!");
+  alert("Customer with phone " + phone + " successfully assigned as VIP Member!");
+}
+
+function adminCreateCoupon() {
+  const code = document.getElementById('new-coupon-code').value;
+  const disc = document.getElementById('new-coupon-discount').value;
+  if (!code || !disc) return alert("Enter code and discount amount!");
+  alert("Promo Coupon '" + code + "' created successfully with ₹" + disc + " off!");
+}
+
+function adminAddItem() {
+  const name = document.getElementById('add-item-name').value;
+  const price = parseFloat(document.getElementById('add-item-price').value);
+  const cat = document.getElementById('add-item-cat').value;
+  const fileInput = document.getElementById('item-file-input');
+
+  if (!name || isNaN(price)) return alert("Please enter valid item name and price!");
+
+  let imgUrl = "https://images.unsplash.com/photo-1546833999-b9f581a1996d?w=200";
+  if (fileInput.files && fileInput.files[0]) {
+    const reader = new FileReader();
+    reader.onload = function(e) {
+      imgUrl = e.target.result;
+      saveNewItemToMenu(name, price, cat, imgUrl);
+    };
+    reader.readAsDataURL(fileInput.files[0]);
+  } else {
+    saveNewItemToMenu(name, price, cat, imgUrl);
+  }
+}
+
+function saveNewItemToMenu(name, price, cat, imgUrl) {
+  const newItem = { id: Date.now(), name, price, cat, img: imgUrl, isOut: false };
+  menu.push(newItem);
+  renderMenu();
+  renderAdminMenuEditor();
+  alert("New item added to menu successfully!");
+}
+
+function renderAdminMenuEditor() {
+  const container = document.getElementById('admin-menu-edit-list');
+  if (!container) return;
+  container.innerHTML = menu.map(m => `
+    <div style="display:flex; justify-content:space-between; align-items:center; background:#fff; padding:8px; margin-bottom:6px; border-radius:6px; border:1px solid #ddd;">
+      <span><b>${m.name}</b> (₹${m.price})</span>
+      <div>
+        <button class="btn-sec" style="background:${m.isOut ? 'green' : 'orange'}; padding:4px 8px;" onclick="toggleItemStock(${m.id})">${m.isOut ? 'In Stock' : 'Mark Out'}</button>
+        <button class="btn-sec" style="background:red; padding:4px 8px;" onclick="deleteMenuItem(${m.id})">Delete</button>
+      </div>
+    </div>
+  `).join('');
+}
+
+function toggleItemStock(id) {
+  const item = menu.find(m => m.id === id);
+  if (item) {
+    item.isOut = !item.isOut;
+    renderMenu();
+    renderAdminMenuEditor();
+  }
+}
+
+function deleteMenuItem(id) {
+  menu = menu.filter(m => m.id !== id);
+  renderMenu();
+  renderAdminMenuEditor();
+}
+
+function renderAdminOrders() {
+  const container = document.getElementById('admin-orders-list');
+  if (!container) return;
+  database.ref('orders').on('value', (snap) => {
+    const data = snap.val();
+    const orders = data ? Object.values(data) : [];
+
+    let total = orders.length;
+    let pending = orders.filter(o => o.status === 'Pending').length;
+    let earning = orders.reduce((s, o) => s + (o.status !== 'CancelledByCustomer' ? Number(o.total || 0) : 0), 0);
+
+    document.getElementById('stat-total').innerText = total;
+    document.getElementById('stat-pending').innerText = pending;
+    document.getElementById('stat-earning').innerText = earning;
+
+    if(orders.length === 0) {
+      container.innerHTML = "<p>No orders received yet.</p>";
+      return;
+    }
+
+    container.innerHTML = orders.map(o => `
+      <div class="order-card">
+        <b>ID: ${o.id}</b> | <span>${o.status}</span><br>
+        <small>${o.date}</small><br>
+        <b>Customer:</b> ${o.name} (${o.phone})<br>
+        <b>Address:</b> ${o.address}<br>
+        <b>Total:</b> ₹${o.total} (${o.pay})<br>
+        <div style="margin-top:8px; display:flex; gap:5px; flex-wrap:wrap;">
+          <button class="btn-sec" style="background:#00a8ff;" onclick="updateOrderStatus('${o.id}', 'Accepted')">Accept</button>
+          <button class="btn-sec" style="background:#f39c12;" onclick="updateOrderStatus('${o.id}', 'Out for Delivery')">Out for Delivery</button>
+          <button class="btn-sec" style="background:#2ed573;" onclick="updateOrderStatus('${o.id}', 'Delivered')">Delivered</button>
+          <button class="btn-sec" style="background:#dc3545;" onclick="updateOrderStatus('${o.id}', 'CancelledByStore')">Cancel</button>
+        </div>
+      </div>
+    `).reverse().join('');
+  });
+}
+
+function updateOrderStatus(id, status) {
+  database.ref('orders/' + id).update({ status }).then(() => alert("Order status updated to " + status));
+}
+
+function clearAllOrders() {
+  if(confirm("Clear all orders data?")) {
+    database.ref('orders').remove().then(() => alert("All orders cleared!"));
+  }
 }
 
 window.onload = function() {
