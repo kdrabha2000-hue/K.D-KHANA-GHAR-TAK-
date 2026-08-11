@@ -68,7 +68,6 @@ function buyNowFromModal() { if (selectedModalItem) addToCart(selectedModalItem.
 function loginAdmin() {
   const passInp = document.getElementById('admin-pass');
   if (passInp && passInp.value.trim() === 'K.d@12345') {
-    document.getElementById('auth-section').style.display = 'none';
     document.getElementById('admin-panel').style.display = 'block';
     alert("Welcome Restaurant Owner!");
     renderAdminOrders();
@@ -170,12 +169,17 @@ auth.onAuthStateChanged((user) => {
       loadUserSession(user.uid, u.phone || user.phoneNumber || "8453270362", u.name || "Hi Customer", u.photo, u.address || "", u.wishlist, u.cart);
     });
   } else {
-    const savedPhone = localStorage.getItem('kd_user_phone') || "8453270362";
-    const savedUid = localStorage.getItem('kd_user_uid') || "user_8453270362";
-    database.ref('users/' + savedUid).once('value', (snap) => {
-      const u = snap.val() || {};
-      loadUserSession(savedUid, u.phone || savedPhone, u.name || "Hi Customer", u.photo, u.address || "", u.wishlist, u.cart);
-    });
+    const savedPhone = localStorage.getItem('kd_user_phone');
+    const savedUid = localStorage.getItem('kd_user_uid');
+    if (savedPhone && savedUid) {
+      database.ref('users/' + savedUid).once('value', (snap) => {
+        const u = snap.val() || {};
+        loadUserSession(savedUid, u.phone || savedPhone, u.name || "Hi Customer", u.photo, u.address || "", u.wishlist, u.cart);
+      });
+    } else {
+      document.getElementById('auth-section').style.display = 'block';
+      document.getElementById('user-details-section').style.display = 'none';
+    }
   }
 });
 
@@ -214,10 +218,18 @@ function toggleWishlist(id) {
 }
 
 function customerLogout() {
-  localStorage.clear();
+  localStorage.removeItem('kd_user_phone');
+  localStorage.removeItem('kd_user_uid');
+  localStorage.removeItem('kd_cart');
+  localStorage.removeItem('kd_wishlist');
   cart = [];
   wishlist = [];
-  auth.signOut().then(() => location.reload());
+  currentUser = null;
+  auth.signOut().then(() => {
+    location.reload();
+  }).catch(() => {
+    location.reload();
+  });
 }
 
 function renderCart() {
@@ -371,7 +383,6 @@ function showPage(pageId) {
   if(pageId === 'wishlist') renderWishlist();
 }
 
-// --- ADDED MISSING FUNCTIONS FIXED HERE ---
 function filterMenu() {
   const query = document.getElementById('search-input').value.toLowerCase();
   const filtered = menu.filter(item => item.name.toLowerCase().includes(query) || item.cat.toLowerCase().includes(query));
