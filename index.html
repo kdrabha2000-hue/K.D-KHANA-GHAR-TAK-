@@ -106,10 +106,10 @@
           </div>
           <div style="flex:1;">
             <div style="display:flex; justify-content:space-between; align-items:center;">
-              <h2 id="display-name" style="font-size:1.1rem; font-weight:bold;">Hi Customer</h2>
+              <h2 id="display-name" style="font-size:1.1rem; font-weight:bold;">Customer Name</h2>
               <div class="fk-coins">🪙 <span id="coins-count">14</span></div>
             </div>
-            <div id="display-phone" style="font-size:0.85rem; color:#666; margin-top:2px;">+91-XXXXXXXXXX</div>
+            <div id="display-phone" style="font-size:0.85rem; color:#666; margin-top:2px;">+91-8453270362</div>
             <div id="display-address" style="font-size:0.8rem; color:#888; margin-top:4px;"><i class="fas fa-map-marker-alt" style="color:var(--accent-red);"></i> <span id="saved-addr-text">No Address Saved</span></div>
           </div>
         </div>
@@ -125,8 +125,8 @@
 
         <div class="checkout-form">
           <h4 style="margin-bottom:10px;">Edit Account Information</h4>
-          <input type="number" id="user-phone-input" placeholder="Phone Number">
           <input type="text" id="user-name-input" placeholder="Your Full Name">
+          <input type="number" id="user-phone-input" placeholder="Phone Number">
           <input type="text" id="user-address-input" placeholder="Save Delivery Address">
           
           <button class="btn-sec" style="background:#2ed573; margin-top:10px; width:100%; font-weight:bold; padding:10px;" onclick="saveProfile()">Save Details</button>
@@ -158,7 +158,7 @@
         </div>
 
         <div class="checkout-form">
-          <h4>📢 Update Banner (Camera / Gallery Upload)</h4>
+          <h4>📢 Update Banner</h4>
           <input type="text" id="new-banner-text" placeholder="Offer Banner Text">
           <input type="file" id="banner-file-input" accept="image/*" style="margin:5px 0;">
           <button class="btn-sec" style="background:#333; margin-top:5px;" onclick="adminUpdateBanner()">Add Banner Offer</button>
@@ -178,10 +178,9 @@
         </div>
 
         <div class="checkout-form" style="background:#f9f9f9; border:1px dashed #28a745;">
-          <h4 style="color:#28a745;">➕ Add New Item / Cake (Camera / Gallery)</h4>
+          <h4 style="color:#28a745;">➕ Add New Item / Cake</h4>
           <input type="text" id="add-item-name" placeholder="Item Name">
           <input type="number" id="add-item-price" placeholder="Price (₹)">
-          <label style="font-size:0.8rem; color:#666;">📸 Upload Photo (Camera/Gallery):</label>
           <input type="file" id="item-file-input" accept="image/*" style="margin:5px 0;">
           <select id="add-item-cat">
             <option value="Birthday Cakes">Birthday Cakes</option>
@@ -230,21 +229,6 @@
       <h3>Daily Check-in Bonus</h3>
       <p style="margin:10px 0; color:#555;">You earned 🪙 2 SuperCoins today!</p>
       <button class="btn-primary" style="background:#f39c12;" onclick="claimDailyCoins()">Claim Now ⚡</button>
-    </div>
-  </div>
-
-  <div id="edit-item-modal" class="modal">
-    <div class="modal-content">
-      <span class="close-btn" onclick="closeEditModal()">&times;</span>
-      <h3>✏️ Edit Item Details</h3>
-      <input type="hidden" id="edit-item-id">
-      <label style="font-size:0.8rem; color:#666; margin-top:8px; display:block;">Dish Name:</label>
-      <input type="text" id="edit-item-name" placeholder="Item Name">
-      <label style="font-size:0.8rem; color:#666; margin-top:8px; display:block;">Price (₹):</label>
-      <input type="number" id="edit-item-price" placeholder="Price">
-      <label style="font-size:0.8rem; color:#666; margin-top:8px; display:block;">Change Photo (Camera/Gallery):</label>
-      <input type="file" id="edit-item-file" accept="image/*" style="margin:5px 0;">
-      <button class="btn-primary" style="background:#28a745; margin-top:12px;" onclick="saveItemEdits()">Save Edits 💾</button>
     </div>
   </div>
 
