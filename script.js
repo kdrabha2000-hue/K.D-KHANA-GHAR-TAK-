@@ -1,4 +1,3 @@
-// Firebase Configuration
 const firebaseConfig = {
   apiKey: "AIzaSyDDTFzD8eaxS6hsQ_W5akOWRWixyZdjkSo",
   authDomain: "kd-ka-khana-ghar-tak.firebaseapp.com",
@@ -23,9 +22,9 @@ let userCoins = parseInt(localStorage.getItem('kd_coins')) || 14;
 let currentCat = "All";
 let isStoreOpen = true;
 let currentAdminUPI = "6000026478@okbizaxis";
+let isSearching = false;
 
-// DEFAULT MENU DATA
-const defaultMenu = [
+let menu = [
   { id: 106, name: "Sprite / Coca-Cola (200ml)", price: 40, cat: "Cold Drinks & Beverages", img: "https://images.unsplash.com/photo-1622483767028-3f66f32aef97?w=200", isOut: false },
   { id: 107, name: "Fresh Cold Coffee", price: 70, cat: "Cold Drinks & Beverages", img: "https://images.unsplash.com/photo-1509042239860-f550ce710b93?w=200", isOut: false },
   { id: 201, name: "Normal Cake (500gm)", price: 450, cat: "Birthday Cakes", img: "https://images.unsplash.com/photo-1558961363-fa8fdf82db35?w=200", isOut: false },
@@ -42,286 +41,45 @@ const defaultMenu = [
   { id: 120, name: "Gulab Jamun (2 pcs)", price: 50, cat: "Desserts", img: "https://images.unsplash.com/photo-1541781774459-bb2af2f05b55?w=200", isOut: false }
 ];
 
-let savedMenu = JSON.parse(localStorage.getItem('kd_custom_menu'));
-let menu = (savedMenu && savedMenu.length > 0) ? savedMenu : defaultMenu;
-
-// Custom Toast Notification
-function showToast(message, type = "success") {
-  const container = document.getElementById('toast-container');
-  if (!container) return;
-  const toast = document.createElement('div');
-  toast.className = `toast ${type}`;
-  toast.innerText = message;
-  container.appendChild(toast);
-  setTimeout(() => { toast.remove(); }, 3000);
-}
-
 function syncStorage() {
   localStorage.setItem('kd_cart', JSON.stringify(cart));
   localStorage.setItem('kd_wishlist', JSON.stringify(wishlist));
-  localStorage.setItem('kd_custom_menu', JSON.stringify(menu));
   updateCartCount();
-  if (currentUser) {
+  if(currentUser) {
     database.ref('users/' + currentUser.uid + '/wishlist').set(wishlist);
     database.ref('users/' + currentUser.uid + '/cart').set(cart);
   }
 }
 
-// RENDER CATEGORIES
-function renderCategories() {
-  const categories = ["All", "Birthday Cakes", "Cold Drinks & Beverages", "Main Course", "Momos", "Breads & Naan", "Dal & Gravy", "Starters & Tandoor", "Desserts"];
-  const bar = document.getElementById('category-bar');
-  if (bar) {
-    bar.innerHTML = categories.map(c => `
-      <div class="cat-chip ${c === currentCat ? 'active' : ''}" onclick="selectCategory('${c}')">${c}</div>
-    `).join('');
-  }
-}
-
-function selectCategory(cat) {
-  currentCat = cat;
-  renderCategories();
-  renderMenu();
-}
-
-// RENDER MENU ITEMS
-function renderMenu(customList = null) {
-  const container = document.getElementById('menu-container');
-  if (!container) return;
-
-  let displayList = customList || (currentCat === "All" ? [...menu] : menu.filter(m => m.cat === currentCat));
-
-  if (!displayList || displayList.length === 0) {
-    container.innerHTML = `<p style="grid-column:1/-1; text-align:center; padding:20px; color:#888;">No dishes found in this category.</p>`;
-    return;
-  }
-
-  container.innerHTML = displayList.map(item => `
-    <div class="food-card ${item.isOut ? 'out-of-stock' : ''}" onclick="openModal(${item.id})">
-      <span class="wishlist-icon" onclick="event.stopPropagation(); toggleWishlist(${item.id})">${wishlist.includes(item.id) ? '❤️' : '🤍'}</span>
-      <img src="${item.img}" class="food-img" onerror="this.src='https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=200'">
-      <div class="food-info">
-        <div class="food-title">${item.name}</div>
-        <div class="food-price">₹${item.price}</div>
-        <button class="btn-add" onclick="event.stopPropagation(); addToCart(${item.id})">${item.isOut ? 'OUT' : 'Add'}</button>
-      </div>
-    </div>
-  `).join('');
-}
-
-// PRODUCT MODAL
 function openModal(id) {
   const item = menu.find(m => m.id === id);
   if (!item) return;
   selectedModalItem = item;
-
   document.getElementById('modal-img').src = item.img;
   document.getElementById('modal-title').innerText = item.name + (item.isOut ? " (Out of Stock)" : "");
   document.getElementById('modal-price').innerText = "₹" + item.price;
-
-  const heart = document.getElementById('modal-wishlist-heart');
-  if (heart) {
-    heart.className = wishlist.includes(item.id) ? "fas fa-heart" : "far fa-heart";
-    heart.style.color = wishlist.includes(item.id) ? "#ff3f6c" : "#888";
-  }
-
-  const sugContainer = document.getElementById('modal-suggestions');
-  if (sugContainer) {
-    const suggestions = menu.filter(m => m.id !== item.id).slice(0, 5);
-    sugContainer.innerHTML = suggestions.map(s => `
-      <div style="min-width:110px; border:1px solid #eee; border-radius:8px; padding:6px; text-align:center; background:#fff;">
-        <img src="${s.img}" style="width:100%; height:60px; object-fit:cover; border-radius:6px;">
-        <div style="font-size:0.75rem; font-weight:bold; height:28px; overflow:hidden; margin-top:4px;">${s.name}</div>
-        <div style="font-size:0.75rem; color:green; font-weight:bold;">₹${s.price}</div>
-        <button class="btn-sec" style="font-size:0.7rem; padding:3px 8px; margin-top:4px; background:#2ed573;" onclick="addToCart(${s.id})">+ Add</button>
-      </div>
-    `).join('');
-  }
-
   document.getElementById('product-modal').style.display = 'flex';
 }
 
-function closeModal() {
-  document.getElementById('product-modal').style.display = 'none';
-}
-
-function toggleModalWishlist() {
-  if (selectedModalItem) {
-    toggleWishlist(selectedModalItem.id);
-    const heart = document.getElementById('modal-wishlist-heart');
-    if (heart) {
-      heart.className = wishlist.includes(selectedModalItem.id) ? "fas fa-heart" : "far fa-heart";
-      heart.style.color = wishlist.includes(selectedModalItem.id) ? "#ff3f6c" : "#888";
-    }
-  }
-}
-
-function addToCartFromModal() {
-  if (selectedModalItem) addToCart(selectedModalItem.id);
-  closeModal();
-}
-
-function buyNowFromModal() {
-  if (selectedModalItem) {
-    const item = menu.find(m => m.id === selectedModalItem.id);
-    if (item && !item.isOut) {
-      const exist = cart.find(c => c.id === item.id);
-      if (exist) exist.qty++;
-      else cart.push({ ...item, qty: 1 });
-      syncStorage();
-    }
-  }
-  closeModal();
-  showPage('cart');
-}
-
-// RESTAURANT OWNER AUTH
-function toggleOwnerAuthSection() {
-  const box = document.getElementById('owner-auth-box');
-  if (box) box.style.display = box.style.display === 'none' ? 'block' : 'none';
-}
+function closeModal() { document.getElementById('product-modal').style.display = 'none'; }
+function addToCartFromModal() { if (selectedModalItem) addToCart(selectedModalItem.id); closeModal(); }
+function buyNowFromModal() { if (selectedModalItem) addToCart(selectedModalItem.id); closeModal(); showPage('cart'); }
 
 function loginAdmin() {
   const passInp = document.getElementById('admin-pass');
   if (passInp && passInp.value.trim() === 'K.d@12345') {
     document.getElementById('admin-panel').style.display = 'block';
-    document.getElementById('auth-section').style.display = 'none';
-    document.getElementById('owner-auth-box').style.display = 'none';
-    document.getElementById('user-details-section').style.display = 'none';
-    showToast("Welcome Restaurant Owner! 👑");
+    alert("Welcome Restaurant Owner!");
     renderAdminOrders();
     renderAdminMenuEditor();
   } else {
-    showToast("Galat Secret Password!", "error");
+    alert("Galat Password!");
   }
 }
 
-function logoutAdmin() {
-  document.getElementById('admin-panel').style.display = 'none';
-  if (currentUser) {
-    document.getElementById('user-details-section').style.display = 'block';
-  } else {
-    document.getElementById('auth-section').style.display = 'block';
-  }
-  showToast("Logged out from Admin Dashboard");
-}
-
-// ADMIN MENU EDITOR
-function renderAdminMenuEditor() {
-  const container = document.getElementById('admin-menu-edit-list');
-  if (!container) return;
-
-  container.innerHTML = menu.map(item => `
-    <div style="display:flex; justify-content:space-between; align-items:center; background:#fff; padding:8px 10px; margin-bottom:8px; border-radius:6px; border:1px solid #ddd;">
-      <div style="display:flex; align-items:center; gap:10px;">
-        <img src="${item.img}" style="width:40px; height:40px; object-fit:cover; border-radius:4px;">
-        <div>
-          <b>${item.name}</b><br>
-          <span style="color:green; font-weight:bold;">₹${item.price}</span>
-        </div>
-      </div>
-      <div style="display:flex; gap:5px;">
-        <button class="btn-sec" style="background:#f39c12; padding:4px 8px; font-size:0.75rem;" onclick="openEditDishModal(${item.id})">✏️ Edit</button>
-        <button class="btn-sec" style="background:${item.isOut ? '#2ed573' : '#ff9f00'}; padding:4px 8px; font-size:0.75rem;" onclick="toggleStockStatus(${item.id})">${item.isOut ? 'In Stock' : 'Mark Out'}</button>
-        <button class="btn-sec" style="background:#dc3545; padding:4px 8px; font-size:0.75rem;" onclick="adminDeleteDish(${item.id})">Delete</button>
-      </div>
-    </div>
-  `).join('');
-}
-
-function openEditDishModal(id) {
-  const item = menu.find(m => m.id === id);
-  if (!item) return;
-
-  document.getElementById('edit-dish-id').value = item.id;
-  document.getElementById('edit-dish-name').value = item.name;
-  document.getElementById('edit-dish-price').value = item.price;
-  document.getElementById('edit-dish-img').value = item.img;
-  document.getElementById('edit-dish-modal').style.display = 'flex';
-}
-
-function closeEditDishModal() {
-  document.getElementById('edit-dish-modal').style.display = 'none';
-}
-
-function saveEditedDish() {
-  const id = parseInt(document.getElementById('edit-dish-id').value);
-  const name = document.getElementById('edit-dish-name').value;
-  const price = parseInt(document.getElementById('edit-dish-price').value);
-  const imgUrl = document.getElementById('edit-dish-img').value;
-  const fileInp = document.getElementById('edit-dish-file');
-
-  const itemIndex = menu.findIndex(m => m.id === id);
-  if (itemIndex > -1) {
-    menu[itemIndex].name = name;
-    menu[itemIndex].price = price;
-
-    if (fileInp.files && fileInp.files[0]) {
-      const reader = new FileReader();
-      reader.onload = function (e) {
-        menu[itemIndex].img = e.target.result;
-        syncStorage(); renderMenu(); renderAdminMenuEditor();
-        closeEditDishModal();
-        showToast("Dish Updated Successfully!");
-      };
-      reader.readAsDataURL(fileInp.files[0]);
-    } else {
-      if (imgUrl) menu[itemIndex].img = imgUrl;
-      syncStorage(); renderMenu(); renderAdminMenuEditor();
-      closeEditDishModal();
-      showToast("Dish Updated Successfully!");
-    }
-  }
-}
-
-function toggleStockStatus(id) {
-  const item = menu.find(m => m.id === id);
-  if (item) {
-    item.isOut = !item.isOut;
-    syncStorage(); renderMenu(); renderAdminMenuEditor();
-    showToast(`Status updated for ${item.name}`);
-  }
-}
-
-function adminDeleteDish(id) {
-  if (confirm("Delete this dish permanently?")) {
-    menu = menu.filter(m => m.id !== id);
-    syncStorage(); renderMenu(); renderAdminMenuEditor();
-    showToast("Dish deleted!");
-  }
-}
-
-function adminAddItem() {
-  const name = document.getElementById('add-item-name').value;
-  const price = parseInt(document.getElementById('add-item-price').value);
-  const cat = document.getElementById('add-item-cat').value;
-  const urlInp = document.getElementById('add-item-url').value;
-  const fileInp = document.getElementById('item-file-input');
-
-  if (!name || !price) return showToast("Enter Name and Price!", "error");
-
-  const newId = Date.now();
-  let defaultImg = urlInp || "https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=200";
-
-  if (fileInp.files && fileInp.files[0]) {
-    const reader = new FileReader();
-    reader.onload = function (e) {
-      menu.push({ id: newId, name, price, cat, img: e.target.result, isOut: false });
-      syncStorage(); renderMenu(); renderAdminMenuEditor();
-      showToast("New Item Added!");
-    };
-    reader.readAsDataURL(fileInp.files[0]);
-  } else {
-    menu.push({ id: newId, name, price, cat, img: defaultImg, isOut: false });
-    syncStorage(); renderMenu(); renderAdminMenuEditor();
-    showToast("New Item Added!");
-  }
-}
-
-// RENDER ORDERS WITH LIVE TIMELINE
 function renderOrders() {
   const container = document.getElementById('my-orders-list');
-  if (!container) return;
+  if(!container) return;
   const activePhone = (currentUser && currentUser.phone) || localStorage.getItem('kd_user_phone');
   const activeUid = (currentUser && currentUser.uid) || localStorage.getItem('kd_user_uid');
 
@@ -330,7 +88,7 @@ function renderOrders() {
     let myOrders = data ? Object.values(data).filter(o => o.uid === activeUid || o.phone === activePhone) : [];
 
     if (myOrders.length === 0) {
-      container.innerHTML = "<p style='text-align:center; padding:20px; color:#888;'>No orders placed yet.</p>";
+      container.innerHTML = "<p style='text-align:center;'>No orders placed yet.</p>";
       return;
     }
 
@@ -377,71 +135,341 @@ function renderOrders() {
             </div>
           </div>
 
-          ${o.status === 'Pending' ? `<button class="btn-sec" style="background:red; margin-top:10px;" onclick="cancelMyOrder('${o.id}')">Cancel Order</button>` : ''}
+          ${o.status === 'Pending' ? `<button class="btn-sec" style="background:red;" onclick="cancelMyOrder('${o.id}')">Cancel Order</button>` : ''}
         </div>
       `;
     }).reverse().join('');
   });
 }
 
-function renderAdminOrders() {
-  const container = document.getElementById('admin-orders-list');
-  if (!container) return;
-
-  database.ref('orders').on('value', (snapshot) => {
-    const data = snapshot.val();
-    let orders = data ? Object.values(data) : [];
-
-    document.getElementById('stat-total').innerText = orders.length;
-    document.getElementById('stat-pending').innerText = orders.filter(o => o.status === 'Pending').length;
-    document.getElementById('stat-earning').innerText = orders.filter(o => o.status === 'Delivered').reduce((s, o) => s + o.total, 0);
-
-    if (orders.length === 0) {
-      container.innerHTML = "<p style='text-align:center;'>No orders received yet.</p>";
-      return;
-    }
-
-    container.innerHTML = orders.map(o => `
-      <div class="order-card" style="border-left:4px solid #00a8ff;">
-        <div style="display:flex; justify-content:space-between;">
-          <b>ID: ${o.id}</b>
-          <b style="color:orange;">${o.status}</b>
-        </div>
-        <small>${o.date}</small>
-        <div><b>Customer:</b> ${o.name} (${o.phone})</div>
-        <div><b>Address:</b> ${o.address}</div>
-        <div><b>Items:</b> ${(o.items || []).map(i => i.name + ' x' + i.qty).join(', ')}</div>
-        <div><b>Total:</b> ₹${o.total} (${o.pay})</div>
-
-        <div style="display:flex; gap:5px; margin-top:8px; flex-wrap:wrap;">
-          <button class="btn-sec" style="background:#2ed573;" onclick="updateOrderStatus('${o.id}', 'Accepted')">Accept</button>
-          <button class="btn-sec" style="background:#ff9f00;" onclick="updateOrderStatus('${o.id}', 'Out for Delivery')">Out for Delivery</button>
-          <button class="btn-sec" style="background:#00a8ff;" onclick="updateOrderStatus('${o.id}', 'Delivered')">Delivered</button>
-          <button class="btn-sec" style="background:#dc3545;" onclick="updateOrderStatus('${o.id}', 'Cancelled')">Cancel</button>
-        </div>
-      </div>
-    `).reverse().join('');
-  });
-}
-
-function updateOrderStatus(id, status) {
-  database.ref('orders/' + id).update({ status });
-  showToast(`Order status set to ${status}`);
-}
-
-function clearAllOrders() {
-  if (confirm("Delete all orders from system?")) {
-    database.ref('orders').remove();
-    showToast("All orders cleared!");
-  }
-}
-
-// USER SESSION MANAGEMENT
 function loadUserSession(uid, phone, name, photo, address, dbWish, dbCart) {
   currentUser = { uid, phone, name, address };
-  if (dbWish) wishlist = dbWish;
-  if (dbCart) cart = dbCart;
+  if(dbWish) wishlist = dbWish;
+  if(dbCart) cart = dbCart;
   syncStorage();
 
   document.getElementById('auth-section').style.display = 'none';
-  document.getElem
+  document.getElementById('user-details-section').style.display = 'block';
+
+  document.getElementById('display-name').innerText = name || "Customer Name";
+  document.getElementById('display-phone').innerText = "+91-" + phone;
+  document.getElementById('user-phone-input').value = phone;
+  document.getElementById('user-name-input').value = name || "";
+  document.getElementById('user-address-input').value = address || "";
+  document.getElementById('saved-addr-text').innerText = address || "No Address Saved";
+  if (photo) document.getElementById('user-avatar-img').src = photo;
+
+  renderOrders(); renderMenu(); renderWishlist(); renderCart();
+}
+
+auth.onAuthStateChanged((user) => {
+  if (user) {
+    database.ref('users/' + user.uid).once('value', (snap) => {
+      const u = snap.val() || {};
+      loadUserSession(user.uid, u.phone || user.phoneNumber || "8453270362", u.name || "Hi Customer", u.photo, u.address || "", u.wishlist, u.cart);
+    });
+  } else {
+    const savedPhone = localStorage.getItem('kd_user_phone');
+    const savedUid = localStorage.getItem('kd_user_uid');
+    if (savedPhone && savedUid) {
+      database.ref('users/' + savedUid).once('value', (snap) => {
+        const u = snap.val() || {};
+        loadUserSession(savedUid, u.phone || savedPhone, u.name || "Hi Customer", u.photo, u.address || "", u.wishlist, u.cart);
+      });
+    } else {
+      document.getElementById('auth-section').style.display = 'block';
+      document.getElementById('user-details-section').style.display = 'none';
+    }
+  }
+});
+
+function saveProfile() {
+  if(!currentUser) return alert("Please Login first!");
+  const name = document.getElementById('user-name-input').value;
+  const address = document.getElementById('user-address-input').value;
+  const phone = document.getElementById('user-phone-input').value;
+
+  if (!phone || phone.length < 10) return alert("Valid phone number required!");
+
+  database.ref('users/' + currentUser.uid).update({ name, address, phone }).then(() => {
+    loadUserSession(currentUser.uid, phone, name, document.getElementById('user-avatar-img').src, address, wishlist, cart);
+    alert("Profile Saved!");
+  });
+}
+
+function addToCart(id) {
+  const item = menu.find(m => m.id === id);
+  if (!item) return;
+  if (item.isOut) return alert("Item currently Out of Stock!");
+  const exist = cart.find(c => c.id === id);
+  if (exist) exist.qty++;
+  else cart.push({ ...item, qty: 1 });
+  syncStorage();
+  renderCart();
+  alert("Added to cart!");
+}
+
+function toggleWishlist(id) {
+  if (wishlist.includes(id)) wishlist = wishlist.filter(x => x !== id);
+  else wishlist.push(id);
+  syncStorage();
+  renderMenu();
+  renderWishlist();
+}
+
+function customerLogout() {
+  localStorage.removeItem('kd_user_phone');
+  localStorage.removeItem('kd_user_uid');
+  localStorage.removeItem('kd_cart');
+  localStorage.removeItem('kd_wishlist');
+  cart = [];
+  wishlist = [];
+  currentUser = null;
+  auth.signOut().then(() => {
+    location.reload();
+  }).catch(() => {
+    location.reload();
+  });
+}
+
+function renderCart() {
+  const container = document.getElementById('cart-items');
+  if (!container) return;
+
+  if (cart.length === 0) {
+    container.innerHTML = "<p style='text-align:center; padding:15px; color:#888;'>Your cart is empty.</p>";
+    return;
+  }
+  container.innerHTML = cart.map(i => `
+    <div class="order-card" style="display:flex; justify-content:space-between; align-items:center;">
+      <div>
+        <b>${i.name}</b><br>
+        <span style="color:green; font-weight:bold;">₹${i.price}</span> x ${i.qty}
+      </div>
+      <div>
+        <button class="btn-sec" onclick="changeQty(${i.id}, -1)">-</button> 
+        <span style="margin:0 5px; font-weight:bold;">${i.qty}</span> 
+        <button class="btn-sec" onclick="changeQty(${i.id}, 1)">+</button>
+      </div>
+    </div>
+  `).join('');
+}
+
+function changeQty(id, delta) {
+  const item = cart.find(c => c.id === id);
+  if (!item) return;
+  item.qty += delta;
+  if (item.qty <= 0) cart = cart.filter(c => c.id !== id);
+  syncStorage();
+  renderCart();
+}
+
+function proceedToPayment() {
+  if (!isStoreOpen) return alert("Restaurant is currently CLOSED!");
+
+  const name = document.getElementById('del-name').value;
+  const phone = document.getElementById('del-phone').value;
+  const address = document.getElementById('del-address').value;
+  const payOptionElement = document.querySelector('input[name="pay-option"]:checked');
+  const payOption = payOptionElement ? payOptionElement.value : "UPI";
+
+  if (!name || !address || !phone) return alert("Please fill Name, Phone, and Address!");
+  if (cart.length === 0) return alert("Cart is empty!");
+
+  const subtotal = cart.reduce((s, i) => s + (i.price * i.qty), 0);
+  const totalAmount = subtotal + (subtotal >= 200 ? 0 : 30);
+
+  if (payOption === "UPI") {
+    window.location.href = `upi://pay?pa=${currentAdminUPI}&pn=KD_KA_KHANA_GHAR_TAK&am=${totalAmount}&cu=INR`;
+  }
+
+  const orderId = "ORD" + Date.now().toString().slice(-5);
+  let activeUid = (currentUser && currentUser.uid) ? currentUser.uid : localStorage.getItem('kd_user_uid') || ("user_" + phone);
+
+  database.ref('orders/' + orderId).set({
+    id: orderId, uid: activeUid, name, phone, address, pay: payOption, items: cart, total: totalAmount, status: "Pending", date: new Date().toLocaleString()
+  }).then(() => {
+    cart = [];
+    syncStorage();
+    alert("Order Placed Successfully! ID: " + orderId);
+    showPage('orders');
+  });
+}
+
+function renderWishlist() {
+  const container = document.getElementById('wishlist-container');
+  if (!container) return;
+  const wishlistItems = menu.filter(m => wishlist.includes(m.id));
+
+  if (wishlistItems.length === 0) {
+    container.innerHTML = `<p style="grid-column:1/-1; text-align:center; padding:20px; color:#888;">Your Wishlist is empty.</p>`;
+    return;
+  }
+
+  container.innerHTML = wishlistItems.map(item => `
+    <div class="food-card ${item.isOut ? 'out-of-stock' : ''}" onclick="openModal(${item.id})">
+      <span class="wishlist-icon" onclick="event.stopPropagation(); toggleWishlist(${item.id})">❤️</span>
+      <img src="${item.img}" class="food-img">
+      <div class="food-info">
+        <div class="food-title">${item.name}</div>
+        <div class="food-price">₹${item.price}</div>
+        <button class="btn-add" onclick="event.stopPropagation(); addToCart(${item.id})">${item.isOut ? 'OUT' : 'ADD'}</button>
+      </div>
+    </div>
+  `).join('');
+}
+
+function renderMenu(customList = null) {
+  const container = document.getElementById('menu-container');
+  if (!container) return;
+
+  let displayList = customList || (currentCat === "All" ? [...menu] : menu.filter(m => m.cat === currentCat));
+
+  if (!customList) {
+    displayList = displayList.sort(() => Math.random() - 0.5);
+  }
+
+  container.innerHTML = displayList.map(item => `
+    <div class="food-card ${item.isOut ? 'out-of-stock' : ''}" onclick="openModal(${item.id})">
+      <span class="wishlist-icon" onclick="event.stopPropagation(); toggleWishlist(${item.id})">${wishlist.includes(item.id) ? '❤️' : '🤍'}</span>
+      <img src="${item.img}" class="food-img">
+      <div class="food-info">
+        <div class="food-title">${item.name}</div>
+        <div class="food-price">₹${item.price}</div>
+        <button class="btn-add" onclick="event.stopPropagation(); addToCart(${item.id})">${item.isOut ? 'OUT' : 'Add'}</button>
+      </div>
+    </div>
+  `).join('');
+}
+
+function renderCategories() {
+  const categories = ["All", "Birthday Cakes", "Cold Drinks & Beverages", "Main Course", "Momos", "Breads & Naan", "Dal & Gravy", "Starters & Tandoor", "Desserts"];
+  const bar = document.getElementById('category-bar');
+  if (bar) {
+    bar.innerHTML = categories.map(c => `
+      <div class="cat-chip ${c === currentCat ? 'active' : ''}" onclick="selectCategory('${c}')">${c}</div>
+    `).join('');
+  }
+}
+
+function selectCategory(cat) {
+  currentCat = cat;
+  renderCategories();
+  renderMenu();
+}
+
+function updateCartCount() {
+  const countElem = document.getElementById('cart-count');
+  if (countElem) countElem.innerText = cart.reduce((s, i) => s + i.qty, 0);
+}
+
+function cancelMyOrder(id) {
+  if(confirm("Cancel order?")) database.ref('orders/' + id).update({ status: 'CancelledByCustomer' });
+}
+
+function deleteCustomerAccount() {
+  if(confirm("Permanently delete account?")) {
+    if(currentUser) database.ref('users/' + currentUser.uid).remove();
+    customerLogout();
+  }
+}
+
+function showPage(pageId) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+  if (document.getElementById(pageId)) document.getElementById(pageId).classList.add('active');
+  if(pageId === 'cart') renderCart();
+  if(pageId === 'orders') renderOrders();
+  if(pageId === 'wishlist') renderWishlist();
+}
+
+function filterMenu() {
+  const query = document.getElementById('search-input').value.toLowerCase();
+  const filtered = menu.filter(item => item.name.toLowerCase().includes(query) || item.cat.toLowerCase().includes(query));
+  renderMenu(filtered);
+}
+
+function toggleNotifications() {
+  const box = document.getElementById('notif-box');
+  if (box) box.style.display = box.style.display === 'block' ? 'none' : 'block';
+}
+
+function openLanguageModal() {
+  const modal = document.getElementById('lang-modal');
+  if (modal) modal.style.display = 'flex';
+}
+
+function closeLangModal() {
+  const modal = document.getElementById('lang-modal');
+  if (modal) modal.style.display = 'none';
+}
+
+function openRewardModal() {
+  const modal = document.getElementById('reward-modal');
+  if (modal) modal.style.display = 'flex';
+}
+
+function closeRewardModal() {
+  const modal = document.getElementById('reward-modal');
+  if (modal) modal.style.display = 'none';
+}
+
+function claimDailyCoins() {
+  userCoins += 2;
+  localStorage.setItem('kd_coins', userCoins);
+  const coinsElem = document.getElementById('coins-count');
+  if (coinsElem) coinsElem.innerText = userCoins;
+  alert("Successfully claimed 2 SuperCoins!");
+  closeRewardModal();
+}
+
+function setAppLanguage(lang) {
+  alert("Language switched to " + lang);
+  closeLangModal();
+}
+
+function loginWithPhoneDirect() {
+  const phone = document.getElementById('auth-phone').value;
+  if (!phone || phone.length < 10) return alert("Enter valid 10-digit phone number!");
+  localStorage.setItem('kd_user_phone', phone);
+  let uid = "user_" + phone;
+  localStorage.setItem('kd_user_uid', uid);
+  loadUserSession(uid, phone, "Customer", "", "", [], []);
+  alert("Logged in successfully!");
+}
+
+function uploadProfileCameraPhoto(input) {
+  if (input.files && input.files[0]) {
+    const reader = new FileReader();
+    reader.onload = function(e) {
+      document.getElementById('user-avatar-img').src = e.target.result;
+      if (currentUser) {
+        database.ref('users/' + currentUser.uid).update({ photo: e.target.result });
+      }
+    };
+    reader.readAsDataURL(input.files[0]);
+  }
+}
+
+function toggleStoreStatus() {
+  isStoreOpen = !isStoreOpen;
+  const statusText = document.getElementById('store-status-text');
+  if (statusText) {
+    statusText.innerText = isStoreOpen ? "OPEN" : "CLOSED";
+    statusText.style.color = isStoreOpen ? "green" : "red";
+  }
+  alert("Store status updated to: " + (isStoreOpen ? "OPEN" : "CLOSED"));
+}
+
+function updateAdminUPI() {
+  const upi = document.getElementById('admin-upi-input').value;
+  if (!upi) return alert("Enter valid UPI ID!");
+  currentAdminUPI = upi;
+  alert("Store UPI ID updated successfully!");
+}
+
+function adminUpdateBanner() {
+  const text = document.getElementById('new-banner-text').value;
+  const banner = document.getElementById('home-banner');
+  if (text && banner) banner.innerText = "🔥 TODAY'S SPECIAL: " + text;
+}
