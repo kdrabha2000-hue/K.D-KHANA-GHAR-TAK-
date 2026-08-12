@@ -572,4 +572,13 @@ function deleteDish(id) {
   if (confirm("Delete item?")) {
     menu = menu.filter(m => m.id !== id);
     renderMenu();
-    renderAdmin
+    renderAdminMenuEditor();
+  }
+}
+
+// AUTOMATIC LOAD ON PAGE LAUNCH
+window.addEventListener('DOMContentLoaded', () => {
+  renderCategories();
+  renderMenu();
+  updateCartCount();
+});
