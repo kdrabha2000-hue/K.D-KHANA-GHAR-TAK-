@@ -34,6 +34,9 @@
     <p>🥤 Get refreshing Cold Drinks with your meals!</p>
   </div>
 
+  <!-- TOAST NOTIFICATION CONTAINER (Replacing Javascript Alerts) -->
+  <div id="toast-container" class="toast-container"></div>
+
   <main class="main-container">
 
     <!-- HOME PAGE -->
@@ -69,6 +72,11 @@
       <h2 id="cart-heading">🛒 My Cart</h2>
       <div id="cart-items"></div>
 
+      <!-- Minimum Order Value Alert Notice -->
+      <div id="min-order-notice" class="min-order-notice" style="display:none;">
+        ⚠️ Minimum order value is <b>₹300</b>. Add <b>₹<span id="min-order-diff">0</span></b> more to proceed!
+      </div>
+
       <div class="checkout-form">
         <h3 id="del-details-heading">Delivery Details</h3>
         <input type="text" id="del-name" placeholder="Full Name">
@@ -95,11 +103,32 @@
     <!-- ACCOUNT / PROFILE PAGE -->
     <div id="profile" class="page">
 
-      <!-- LOGIN SCREEN -->
+      <!-- LOGIN / SIGNUP SCREEN -->
       <div class="checkout-form" id="auth-section">
         <h3>Login / Sign Up</h3>
         <input type="number" id="auth-phone" placeholder="Enter 10-Digit Phone Number">
         <button class="btn-sec" style="background:#2ed573; width:100%; margin-top:5px; font-weight:bold; padding:10px;" onclick="loginWithPhoneDirect()">Login with Phone Number 🚀</button>
+
+        <div style="text-align:center; margin:12px 0; color:#888;">OR</div>
+
+        <!-- Additional Login Options (Google & Email) -->
+        <button class="btn-sec" style="background:#4285F4; width:100%; font-weight:bold; padding:10px; margin-bottom:8px;" onclick="loginWithGoogle()"><i class="fab fa-google"></i> Continue with Google</button>
+        <div style="display:flex; gap:5px;">
+          <input type="email" id="auth-email" placeholder="Enter Email Address" style="margin-bottom:0;">
+          <button class="btn-sec" style="background:#ff3f6c; font-weight:bold; width:120px;" onclick="loginWithEmail()">OTP Email</button>
+        </div>
+
+        <!-- Restaurant Owner Login Toggle Option -->
+        <div style="margin-top:20px; border-top:1px dashed #ccc; padding-top:12px; text-align:center;">
+          <a href="javascript:void(0)" onclick="toggleOwnerAuthSection()" style="color:#d63031; font-weight:bold; text-decoration:none;">🔒 Restaurant Owner Login? Click Here</a>
+        </div>
+      </div>
+
+      <!-- RESTAURANT OWNER LOGIN (Hidden by default for Users) -->
+      <div id="owner-auth-box" style="display:none; margin-top:15px; border:2px dashed #ff3f6c; padding:12px; border-radius:8px; text-align:center; background:#fff5f5;">
+        <h4 style="color:#d63031; margin-bottom:8px;">🔒 Restaurant Owner Login</h4>
+        <input type="password" id="admin-pass" placeholder="Enter Secret Password" style="background:#fff; border:1px solid #ccc; width:100%; padding:10px; border-radius:6px; margin-bottom:8px;">
+        <button class="btn-sec" style="background:#d63031; width:100%; font-weight:bold; padding:10px;" onclick="loginAdmin()">Open Owner Dashboard 👑</button>
       </div>
 
       <!-- LOGGED-IN CUSTOMER DASHBOARD -->
@@ -139,20 +168,27 @@
 
           <button class="btn-sec" style="background:#2ed573; margin-top:10px; width:100%; font-weight:bold; padding:10px;" onclick="saveProfile()">Save Details</button>
           <button class="btn-sec" style="background:#00a8ff; margin-top:8px; width:100%; font-weight:bold;" onclick="customerLogout()">Logout Account</button>
-          <button class="btn-sec" style="background:#dc3545; margin-top:8px; width:100%; font-weight:bold;" onclick="deleteCustomerAccount()">Delete Account 🗑️</button>
+          
+          <div style="margin-top:15px; border-top:1px solid #eee; padding-top:10px;">
+            <select id="delete-reason-select" style="width:100%; padding:8px; margin-bottom:6px; border-radius:5px; border:1px solid #ccc;">
+              <option value="">Select Reason for Account Deletion</option>
+              <option value="Not using anymore">Not using anymore</option>
+              <option value="High prices or charges">High prices or charges</option>
+              <option value="Delivery issues">Delivery issues</option>
+              <option value="Created another account">Created another account</option>
+              <option value="Other">Other Reason</option>
+            </select>
+            <button class="btn-sec" style="background:#dc3545; width:100%; font-weight:bold;" onclick="deleteCustomerAccount()">Delete Account 🗑️</button>
+          </div>
         </div>
-      </div>
-
-      <!-- PERMANENT RESTAURANT OWNER LOGIN (Visible Everywhere in Profile) -->
-      <div style="margin-top:20px; border-top:2px dashed #ff3f6c; padding-top:15px; background:#fff5f5; padding:12px; border-radius:8px; text-align:center;">
-        <h4 style="color:#d63031; margin-bottom:8px;">🔒 Restaurant Owner Login</h4>
-        <input type="password" id="admin-pass" placeholder="Enter Secret Password" style="background:#fff; border:1px solid #ccc; width:100%; padding:10px; border-radius:6px; margin-bottom:8px;">
-        <button class="btn-sec" style="background:#d63031; width:100%; font-weight:bold; padding:10px;" onclick="loginAdmin()">Open Owner Dashboard 👑</button>
       </div>
 
       <!-- OWNER DASHBOARD PANEL -->
       <div id="admin-panel" style="display:none; margin-top:20px; border-top:2px solid #ccc; padding-top:15px;">
-        <h3 style="color:var(--accent-red); margin-bottom:10px;">👑 Admin Dashboard</h3>
+        <div style="display:flex; justify-content:space-between; align-items:center;">
+          <h3 style="color:var(--accent-red); margin-bottom:10px;">👑 Admin Dashboard</h3>
+          <button class="btn-sec" style="background:#555; padding:5px 10px; font-size:0.8rem;" onclick="logoutAdmin()">Logout Admin</button>
+        </div>
 
         <button class="btn-primary" style="background:#00a8ff; margin-bottom:15px;" onclick="window.location.href='tel:8453270362'">📞 Call Restaurant</button>
 
@@ -198,6 +234,7 @@
           <input type="text" id="add-item-name" placeholder="Item Name">
           <input type="number" id="add-item-price" placeholder="Price (₹)">
           <input type="file" id="item-file-input" accept="image/*" style="margin:5px 0;">
+          <input type="text" id="add-item-url" placeholder="Or Enter Image URL" style="margin-bottom:8px;">
           <select id="add-item-cat">
             <option value="Birthday Cakes">Birthday Cakes</option>
             <option value="Cold Drinks & Beverages">Cold Drinks & Beverages</option>
@@ -226,6 +263,26 @@
     </div>
   </main>
 
+  <!-- EDIT DISH ITEM MODAL (ADMIN) -->
+  <div id="edit-dish-modal" class="modal">
+    <div class="modal-content">
+      <span class="close-btn" onclick="closeEditDishModal()">&times;</span>
+      <h3>✏️ Edit Menu Item</h3>
+      <input type="hidden" id="edit-dish-id">
+      <div style="margin-top:10px;">
+        <label>Dish Name:</label>
+        <input type="text" id="edit-dish-name" placeholder="Dish Name">
+        <label>Price (₹):</label>
+        <input type="number" id="edit-dish-price" placeholder="Price">
+        <label>Image URL:</label>
+        <input type="text" id="edit-dish-img" placeholder="Image URL">
+        <label>Upload New Photo:</label>
+        <input type="file" id="edit-dish-file" accept="image/*">
+        <button class="btn-primary" style="background:#28a745; margin-top:12px;" onclick="saveEditedDish()">Save Changes 💾</button>
+      </div>
+    </div>
+  </div>
+
   <!-- LANGUAGE MODAL -->
   <div id="lang-modal" class="modal">
     <div class="modal-content">
@@ -250,10 +307,14 @@
     </div>
   </div>
 
-  <!-- PRODUCT POPUP MODAL -->
+  <!-- PRODUCT POPUP MODAL (WITH WISHLIST HEART & SUGGESTIONS) -->
   <div id="product-modal" class="modal">
-    <div class="modal-content">
+    <div class="modal-content" style="position:relative;">
       <span class="close-btn" onclick="closeModal()">&times;</span>
+      
+      <!-- Wishlist Heart Toggle Icon -->
+      <i id="modal-wishlist-heart" class="far fa-heart" onclick="toggleModalWishlist()" style="position:absolute; top:15px; left:15px; font-size:1.5rem; color:#ff3f6c; background:#fff; padding:6px; border-radius:50%; cursor:pointer; box-shadow:0 2px 5px rgba(0,0,0,0.2);"></i>
+
       <img id="modal-img" src="" class="modal-img">
       <h2 id="modal-title" style="margin-top:10px;"></h2>
       <div id="modal-price" style="font-size:1.2rem; font-weight:bold; color:var(--accent-red); margin:8px 0;"></div>
@@ -263,6 +324,29 @@
         <button class="btn-primary" style="background:#ff9f00;" onclick="addToCartFromModal()">ADD TO CART</button>
         <button class="btn-primary" style="background:#fb641b;" onclick="buyNowFromModal()">BUY NOW</button>
       </div>
+
+      <!-- Suggested Items Horizontal Slider Bar -->
+      <div style="margin-top:20px; border-top:1px solid #eee; padding-top:10px;">
+        <h4 style="font-size:0.9rem; color:#444; margin-bottom:8px;">🥤 Frequently Ordered Together:</h4>
+        <div id="modal-suggestions" style="display:flex; gap:10px; overflow-x:auto; padding-bottom:5px;"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ORDER SUCCESS ANIMATION MODAL -->
+  <div id="order-success-modal" class="modal">
+    <div class="modal-content" style="text-align:center; padding:25px;">
+      <div class="success-checkmark">
+        <div class="check-icon">
+          <span class="icon-line line-tip"></span>
+          <span class="icon-line line-long"></span>
+          <div class="icon-circle"></div>
+          <div class="icon-fix"></div>
+        </div>
+      </div>
+      <h2 style="color:#2ed573; margin-top:15px;">Order Placed Successfully! 🎉</h2>
+      <p style="margin:10px 0; color:#555;">Order ID: <b id="success-order-id" style="color:#111;">#ORD12345</b></p>
+      <button class="btn-primary" style="background:#2ed573;" onclick="closeSuccessModalAndTrack()">Track Live Order 📦</button>
     </div>
   </div>
 
