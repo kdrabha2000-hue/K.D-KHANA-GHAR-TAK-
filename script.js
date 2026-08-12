@@ -142,6 +142,55 @@ function renderOrders() {
   });
 }
 
+function renderAdminOrders() {
+  const container = document.getElementById('admin-orders-list');
+  if(!container) return;
+
+  database.ref('orders').on('value', (snapshot) => {
+    const data = snapshot.val();
+    let orders = data ? Object.values(data) : [];
+
+    document.getElementById('stat-total').innerText = orders.length;
+    document.getElementById('stat-pending').innerText = orders.filter(o => o.status === 'Pending').length;
+    document.getElementById('stat-earning').innerText = orders.filter(o => o.status === 'Delivered').reduce((s,o) => s + o.total, 0);
+
+    if (orders.length === 0) {
+      container.innerHTML = "<p style='text-align:center;'>No orders received yet.</p>";
+      return;
+    }
+
+    container.innerHTML = orders.map(o => `
+      <div class="order-card" style="border-left:4px solid #00a8ff;">
+        <div style="display:flex; justify-content:space-between;">
+          <b>ID: ${o.id}</b>
+          <b style="color:orange;">${o.status}</b>
+        </div>
+        <small>${o.date}</small>
+        <div><b>Customer:</b> ${o.name} (${o.phone})</div>
+        <div><b>Address:</b> ${o.address}</div>
+        <div><b>Items:</b> ${(o.items || []).map(i => i.name + ' x' + i.qty).join(', ')}</div>
+        <div><b>Total:</b> ₹${o.total} (${o.pay})</div>
+
+        <div style="display:flex; gap:5px; margin-top:8px; flex-wrap:wrap;">
+          <button class="btn-sec" style="background:#2ed573;" onclick="updateOrderStatus('${o.id}', 'Accepted')">Accept</button>
+          <button class="btn-sec" style="background:#ff9f00;" onclick="updateOrderStatus('${o.id}', 'Out for Delivery')">Out for Delivery</button>
+          <button class="btn-sec" style="background:#00a8ff;" onclick="updateOrderStatus('${o.id}', 'Delivered')">Delivered</button>
+          <button class="btn-sec" style="background:#dc3545;" onclick="updateOrderStatus('${o.id}', 'Cancelled')">Cancel</button>
+        </div>
+      </div>
+    `).reverse().join('');
+  });
+}
+
+function updateOrderStatus(id, status) {
+  database.ref('orders/' + id).update({ status });
+  alert("Order status set to: " + status);
+}
+
+function clearAllOrders() {
+  if(confirm("Delete all orders?")) database.ref('orders').remove();
+}
+
 function loadUserSession(uid, phone, name, photo, address, dbWish, dbCart) {
   currentUser = { uid, phone, name, address };
   if(dbWish) wishlist = dbWish;
@@ -325,10 +374,6 @@ function renderMenu(customList = null) {
 
   let displayList = customList || (currentCat === "All" ? [...menu] : menu.filter(m => m.cat === currentCat));
 
-  if (!customList) {
-    displayList = displayList.sort(() => Math.random() - 0.5);
-  }
-
   container.innerHTML = displayList.map(item => `
     <div class="food-card ${item.isOut ? 'out-of-stock' : ''}" onclick="openModal(${item.id})">
       <span class="wishlist-icon" onclick="event.stopPropagation(); toggleWishlist(${item.id})">${wishlist.includes(item.id) ? '❤️' : '🤍'}</span>
@@ -473,3 +518,58 @@ function adminUpdateBanner() {
   const banner = document.getElementById('home-banner');
   if (text && banner) banner.innerText = "🔥 TODAY'S SPECIAL: " + text;
 }
+
+function adminAddItem() {
+  const name = document.getElementById('add-item-name').value;
+  const price = parseInt(document.getElementById('add-item-price').value);
+  const cat = document.getElementById('add-item-cat').value;
+  const fileInp = document.getElementById('item-file-input');
+
+  if (!name || !price) return alert("Fill Name and Price!");
+
+  const newId = Date.now();
+  if (fileInp && fileInp.files && fileInp.files[0]) {
+    const reader = new FileReader();
+    reader.onload = function(e) {
+      menu.push({ id: newId, name, price, cat, img: e.target.result, isOut: false });
+      renderMenu(); renderAdminMenuEditor();
+      alert("Dish Added!");
+    };
+    reader.readAsDataURL(fileInp.files[0]);
+  } else {
+    menu.push({ id: newId, name, price, cat, img: "https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=200", isOut: false });
+    renderMenu(); renderAdminMenuEditor();
+    alert("Dish Added!");
+  }
+}
+
+function renderAdminMenuEditor() {
+  const container = document.getElementById('admin-menu-edit-list');
+  if (!container) return;
+  container.innerHTML = menu.map(item => `
+    <div style="display:flex; justify-content:space-between; align-items:center; background:#fff; padding:8px; margin-bottom:5px; border-radius:4px; border:1px solid #ddd;">
+      <div>
+        <b>${item.name}</b> - ₹${item.price}
+      </div>
+      <div>
+        <button class="btn-sec" style="background:${item.isOut ? 'green' : 'orange'}; padding:3px 6px;" onclick="toggleStockStatus(${item.id})">${item.isOut ? 'In Stock' : 'Mark Out'}</button>
+        <button class="btn-sec" style="background:red; padding:3px 6px;" onclick="deleteDish(${item.id})">Delete</button>
+      </div>
+    </div>
+  `).join('');
+}
+
+function toggleStockStatus(id) {
+  const item = menu.find(m => m.id === id);
+  if (item) {
+    item.isOut = !item.isOut;
+    renderMenu();
+    renderAdminMenuEditor();
+  }
+}
+
+function deleteDish(id) {
+  if (confirm("Delete item?")) {
+    menu = menu.filter(m => m.id !== id);
+    renderMenu();
+    renderAdmin
