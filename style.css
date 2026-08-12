@@ -63,7 +63,7 @@ body { background-color: var(--primary-bg); color: var(--text-dark); padding-bot
 /* SHOPSY/FLIPKART UI */
 .fk-profile-card { background: white; padding: 15px; border-radius: 12px; display: flex; align-items: center; gap: 15px; box-shadow: 0 2px 6px rgba(0,0,0,0.06); margin-bottom: 15px; }
 .fk-avatar { width: 60px; height: 60px; border-radius: 50%; object-fit: cover; border: 2px solid var(--accent-red); }
-.camera-btn { position: absolute; bottom: 0; right: 0; background: var(--accent-red); color: white; width: 22px; height: 22px; border-radius: 50%; font-size: 0.65rem; display: flex; align- items: center; justify-content: center; cursor: pointer; }
+.camera-btn { position: absolute; bottom: 0; right: 0; background: var(--accent-red); color: white; width: 22px; height: 22px; border-radius: 50%; font-size: 0.65rem; display: flex; align-items: center; justify-content: center; cursor: pointer; }
 .fk-coins { background: #fff8e1; border: 1px solid #ffe082; padding: 3px 8px; border-radius: 15px; font-size: 0.8rem; font-weight: bold; color: #f39c12; }
 
 .fk-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 15px; }
