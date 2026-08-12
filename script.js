@@ -1,4 +1,4 @@
-Const firebaseConfig = {
+const firebaseConfig = {
   apiKey: "AIzaSyDDTFzD8eaxS6hsQ_W5akOWRWixyZdjkSo",
   authDomain: "kd-ka-khana-ghar-tak.firebaseapp.com",
   databaseURL: "https://kd-ka-khana-ghar-tak-default-rtdb.asia-southeast1.firebasedatabase.app",
@@ -471,4 +471,11 @@ function updateAdminUPI() {
 function adminUpdateBanner() {
   const text = document.getElementById('new-banner-text').value;
   const banner = document.getElementById('home-banner');
-  if (text && banner)
+  if (text && banner) banner.innerText = "🔥 TODAY'S SPECIAL: " + text;
+}
+
+window.addEventListener('DOMContentLoaded', () => {
+  renderCategories();
+  renderMenu();
+  updateCartCount();
+});
