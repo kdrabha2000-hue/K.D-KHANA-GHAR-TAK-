@@ -24,7 +24,8 @@ let currentCat = "All";
 let isStoreOpen = true;
 let currentAdminUPI = "6000026478@okbizaxis";
 
-let menu = JSON.parse(localStorage.getItem('kd_custom_menu')) || [
+// DEFAULT MENU DATA
+const defaultMenu = [
   { id: 106, name: "Sprite / Coca-Cola (200ml)", price: 40, cat: "Cold Drinks & Beverages", img: "https://images.unsplash.com/photo-1622483767028-3f66f32aef97?w=200", isOut: false },
   { id: 107, name: "Fresh Cold Coffee", price: 70, cat: "Cold Drinks & Beverages", img: "https://images.unsplash.com/photo-1509042239860-f550ce710b93?w=200", isOut: false },
   { id: 201, name: "Normal Cake (500gm)", price: 450, cat: "Birthday Cakes", img: "https://images.unsplash.com/photo-1558961363-fa8fdf82db35?w=200", isOut: false },
@@ -41,7 +42,10 @@ let menu = JSON.parse(localStorage.getItem('kd_custom_menu')) || [
   { id: 120, name: "Gulab Jamun (2 pcs)", price: 50, cat: "Desserts", img: "https://images.unsplash.com/photo-1541781774459-bb2af2f05b55?w=200", isOut: false }
 ];
 
-// Helper: Custom Toast Notification
+let savedMenu = JSON.parse(localStorage.getItem('kd_custom_menu'));
+let menu = (savedMenu && savedMenu.length > 0) ? savedMenu : defaultMenu;
+
+// Custom Toast Notification
 function showToast(message, type = "success") {
   const container = document.getElementById('toast-container');
   if (!container) return;
@@ -49,9 +53,7 @@ function showToast(message, type = "success") {
   toast.className = `toast ${type}`;
   toast.innerText = message;
   container.appendChild(toast);
-  setTimeout(() => {
-    toast.remove();
-  }, 3000);
+  setTimeout(() => { toast.remove(); }, 3000);
 }
 
 function syncStorage() {
@@ -65,7 +67,49 @@ function syncStorage() {
   }
 }
 
-// PRODUCT MODAL WITH WISHLIST & SUGGESTIONS
+// RENDER CATEGORIES
+function renderCategories() {
+  const categories = ["All", "Birthday Cakes", "Cold Drinks & Beverages", "Main Course", "Momos", "Breads & Naan", "Dal & Gravy", "Starters & Tandoor", "Desserts"];
+  const bar = document.getElementById('category-bar');
+  if (bar) {
+    bar.innerHTML = categories.map(c => `
+      <div class="cat-chip ${c === currentCat ? 'active' : ''}" onclick="selectCategory('${c}')">${c}</div>
+    `).join('');
+  }
+}
+
+function selectCategory(cat) {
+  currentCat = cat;
+  renderCategories();
+  renderMenu();
+}
+
+// RENDER MENU ITEMS
+function renderMenu(customList = null) {
+  const container = document.getElementById('menu-container');
+  if (!container) return;
+
+  let displayList = customList || (currentCat === "All" ? [...menu] : menu.filter(m => m.cat === currentCat));
+
+  if (!displayList || displayList.length === 0) {
+    container.innerHTML = `<p style="grid-column:1/-1; text-align:center; padding:20px; color:#888;">No dishes found in this category.</p>`;
+    return;
+  }
+
+  container.innerHTML = displayList.map(item => `
+    <div class="food-card ${item.isOut ? 'out-of-stock' : ''}" onclick="openModal(${item.id})">
+      <span class="wishlist-icon" onclick="event.stopPropagation(); toggleWishlist(${item.id})">${wishlist.includes(item.id) ? '❤️' : '🤍'}</span>
+      <img src="${item.img}" class="food-img" onerror="this.src='https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=200'">
+      <div class="food-info">
+        <div class="food-title">${item.name}</div>
+        <div class="food-price">₹${item.price}</div>
+        <button class="btn-add" onclick="event.stopPropagation(); addToCart(${item.id})">${item.isOut ? 'OUT' : 'Add'}</button>
+      </div>
+    </div>
+  `).join('');
+}
+
+// PRODUCT MODAL
 function openModal(id) {
   const item = menu.find(m => m.id === id);
   if (!item) return;
@@ -75,19 +119,12 @@ function openModal(id) {
   document.getElementById('modal-title').innerText = item.name + (item.isOut ? " (Out of Stock)" : "");
   document.getElementById('modal-price').innerText = "₹" + item.price;
 
-  // Heart Icon State
   const heart = document.getElementById('modal-wishlist-heart');
   if (heart) {
-    if (wishlist.includes(item.id)) {
-      heart.className = "fas fa-heart";
-      heart.style.color = "#ff3f6c";
-    } else {
-      heart.className = "far fa-heart";
-      heart.style.color = "#888";
-    }
+    heart.className = wishlist.includes(item.id) ? "fas fa-heart" : "far fa-heart";
+    heart.style.color = wishlist.includes(item.id) ? "#ff3f6c" : "#888";
   }
 
-  // Render Suggested Items (Beverages / Desserts)
   const sugContainer = document.getElementById('modal-suggestions');
   if (sugContainer) {
     const suggestions = menu.filter(m => m.id !== item.id).slice(0, 5);
@@ -112,12 +149,9 @@ function toggleModalWishlist() {
   if (selectedModalItem) {
     toggleWishlist(selectedModalItem.id);
     const heart = document.getElementById('modal-wishlist-heart');
-    if (wishlist.includes(selectedModalItem.id)) {
-      heart.className = "fas fa-heart";
-      heart.style.color = "#ff3f6c";
-    } else {
-      heart.className = "far fa-heart";
-      heart.style.color = "#888";
+    if (heart) {
+      heart.className = wishlist.includes(selectedModalItem.id) ? "fas fa-heart" : "far fa-heart";
+      heart.style.color = wishlist.includes(selectedModalItem.id) ? "#ff3f6c" : "#888";
     }
   }
 }
@@ -141,7 +175,7 @@ function buyNowFromModal() {
   showPage('cart');
 }
 
-// RESTAURANT OWNER AUTHENTICATION
+// RESTAURANT OWNER AUTH
 function toggleOwnerAuthSection() {
   const box = document.getElementById('owner-auth-box');
   if (box) box.style.display = box.style.display === 'none' ? 'block' : 'none';
@@ -410,41 +444,4 @@ function loadUserSession(uid, phone, name, photo, address, dbWish, dbCart) {
   syncStorage();
 
   document.getElementById('auth-section').style.display = 'none';
-  document.getElementById('owner-auth-box').style.display = 'none';
-  document.getElementById('user-details-section').style.display = 'block';
-
-  document.getElementById('display-name').innerText = name || "Customer Name";
-  document.getElementById('display-phone').innerText = "+91-" + phone;
-  document.getElementById('user-phone-input').value = phone;
-  document.getElementById('user-name-input').value = name || "";
-  document.getElementById('user-address-input').value = address || "";
-  document.getElementById('saved-addr-text').innerText = address || "No Address Saved";
-  if (photo) document.getElementById('user-avatar-img').src = photo;
-
-  renderOrders(); renderMenu(); renderWishlist(); renderCart();
-}
-
-auth.onAuthStateChanged((user) => {
-  if (user) {
-    database.ref('users/' + user.uid).once('value', (snap) => {
-      const u = snap.val() || {};
-      loadUserSession(user.uid, u.phone || user.phoneNumber || "8453270362", u.name || "Hi Customer", u.photo, u.address || "", u.wishlist, u.cart);
-    });
-  } else {
-    const savedPhone = localStorage.getItem('kd_user_phone');
-    const savedUid = localStorage.getItem('kd_user_uid');
-    if (savedPhone && savedUid) {
-      database.ref('users/' + savedUid).once('value', (snap) => {
-        const u = snap.val() || {};
-        loadUserSession(savedUid, u.phone || savedPhone, u.name || "Hi Customer", u.photo, u.address || "", u.wishlist, u.cart);
-      });
-    } else {
-      document.getElementById('auth-section').style.display = 'block';
-      document.getElementById('user-details-section').style.display = 'none';
-    }
-  }
-});
-
-function loginWithPhoneDirect() {
-  const phone = document.getElementById('auth-phone').value;
-  
+  document.getElem
